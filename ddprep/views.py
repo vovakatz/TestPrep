@@ -84,13 +84,13 @@ def format_duration(exam) -> str:
 
 @bp.app_template_filter("rich")
 def format_rich(text: str | None) -> Markup:
-    """Escape text, then turn `backtick spans` into <code> (mirrors DDPrep.rich in app.js)."""
+    """Escape text, then turn `backtick spans` into <code> (mirrors TestPrep.rich in app.js)."""
     return Markup(CODE_SPAN.sub(r"<code>\1</code>", str(escape(text or ""))))
 
 
 @bp.app_template_filter("question_rich")
 def format_question(text: str | None) -> Markup:
-    """Server-side twin of DDPrep.questionText: lead line, code snippet, optional trailing question."""
+    """Server-side twin of TestPrep.questionText: lead line, code snippet, optional trailing question."""
     lines = (text or "").split("\n")
     if len(lines) < 2:
         return format_rich(text)

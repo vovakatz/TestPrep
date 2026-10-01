@@ -1,4 +1,4 @@
-"""DDPrep - Datadog Fundamentals exam preparation app."""
+"""TestPrep - Datadog Fundamentals exam preparation app."""
 
 from __future__ import annotations
 

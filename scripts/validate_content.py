@@ -1,4 +1,4 @@
-"""Validate DDPrep content files.
+"""Validate TestPrep content files.
 
 Usage:
     python scripts/validate_content.py                 # validate every content/*.json bank
