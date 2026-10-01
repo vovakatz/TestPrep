@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% from "_macros.html" import mode_badge %}
+{% block title %}Exam in progress{% endblock %}
+{% block body_class %}exam-mode{% endblock %}
+{% block content %}
+<div class="exam" id="exam"
+     data-exam-id="{{ exam.id }}"
+     data-started-at="{{ exam.started_at }}"
+     data-answer-url="{{ url_for('main.api_answer', exam_id=exam.id) }}">
+
+  <div class="exam-bar">
+    <div class="exam-bar-left">
+      {{ mode_badge(exam.mode) }}
+      <span class="exam-counter"><span id="q-index">1</span> <span class="muted">/ {{ items | length }}</span></span>
+    </div>
+    <div class="exam-progress" aria-hidden="true"><div class="exam-progress-fill" id="progress-fill"></div></div>
+    <div class="exam-bar-right">
+      <span class="timer" title="Time elapsed"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M10 2h4"/></svg><span id="timer">0:00</span></span>
+      <span class="score-live" title="Correct so far"><span id="live-correct">0</span> correct</span>
+      <button class="btn btn-secondary btn-sm" type="button" id="finish-btn">Finish exam</button>
+    </div>
+  </div>
+
+  <div class="exam-body">
+    <section class="question-card" aria-live="polite">
+      <div class="question-meta">
+        <span class="muted">Question <span id="q-number">1</span></span>
+        <span id="q-difficulty" class="difficulty"></span>
+      </div>
+      <div class="question-text" id="q-text" role="heading" aria-level="1"></div>
+      <p class="muted small" id="q-instruction">Choose only ONE best answer.</p>
+      <div class="choices" id="choices" role="radiogroup" aria-labelledby="q-text"></div>
+
+      <div class="feedback" id="feedback" hidden>
+        <div class="feedback-head">
+          <span class="feedback-icon" id="feedback-icon" aria-hidden="true"></span>
+          <strong id="feedback-title"></strong>
+          <span class="feedback-topic" id="feedback-topic"></span>
+        </div>
+        <p class="feedback-text" id="feedback-text"></p>
+        <a class="link small" id="feedback-ref" href="#" target="_blank" rel="noopener">Read the docs ↗</a>
+      </div>
+
+      <div class="question-actions">
+        <button class="btn btn-ghost" type="button" id="prev-btn">← Previous</button>
+        <div class="spacer"></div>
+        <button class="btn btn-ghost" type="button" id="skip-btn">Skip</button>
+        <button class="btn btn-primary" type="button" id="submit-btn" disabled>Submit answer</button>
+        <button class="btn btn-primary" type="button" id="next-btn" hidden>Next question →</button>
+      </div>
+      <p class="kbd-hint small muted">Keys: <kbd>1</kbd>–<kbd>4</kbd> select · <kbd>Enter</kbd> submit / next · <kbd>←</kbd><kbd>→</kbd> move</p>
+    </section>
+
+    <aside class="navigator" aria-label="Question navigator">
+      <h2 class="small">Questions</h2>
+      <div class="nav-grid" id="nav-grid"></div>
+      <ul class="nav-legend small">
+        <li><span class="dot dot-correct"></span>Correct</li>
+        <li><span class="dot dot-wrong"></span>Incorrect</li>
+        <li><span class="dot dot-open"></span>Unanswered</li>
+      </ul>
+    </aside>
+  </div>
+
+  <form method="post" action="{{ url_for('main.finish_exam', exam_id=exam.id) }}" id="finish-form"></form>
+
+  <dialog class="modal" id="finish-dialog">
+    <h2>Finish this exam?</h2>
+    <p id="finish-message"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" type="button" id="finish-cancel">Keep going</button>
+      <button class="btn btn-primary" type="button" id="finish-confirm">Finish and see score</button>
+    </div>
+  </dialog>
+</div>
+<script type="application/json" id="exam-data">{{ items | tojson }}</script>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/exam.js') }}"></script>{% endblock %}

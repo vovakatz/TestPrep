@@ -1,0 +1,1327 @@
+{
+  "questions": [
+    {
+      "id": "viz-q-001",
+      "topic": "Host Map",
+      "question": "By default, what does the fill color of each object on the Datadog Host Map represent?",
+      "choices": [
+        "Memory usage, from green (free) to red (exhausted)",
+        "CPU utilization, from green (0%) to orange (100%)",
+        "Agent health, green when running and red when stopped",
+        "Network traffic, from blue (idle) to red (saturated)"
+      ],
+      "answer": 1,
+      "explanation": "By default the Host Map colors each object by CPU usage, on a scale from green (0% utilized) to orange (100% utilized). You can change this with the Fill by drop-down (for example to memory or error logs), but memory is not the default. The fill color is a metric scale, not an Agent up/down indicator.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-002",
+      "topic": "Host Map",
+      "question": "An engineer wants the Host Map to arrange hosts by availability zone and then subdivide each zone by instance type. Which configuration achieves this?",
+      "choices": [
+        "Group by availability-zone, then instance-type",
+        "Filter by availability-zone AND instance-type",
+        "Fill by availability-zone, Size by instance-type",
+        "Set instance-type as the Secondary resource"
+      ],
+      "answer": 0,
+      "explanation": "Group by spatially arranges objects and accepts multiple groupings: grouping by availability zone and then instance type first arranges by zone and then subdivides by instance type. Filter only limits which resources are shown, Fill by and Size by take metrics or signals rather than grouping tags, and the Secondary resource selects an entity type (Host, Pod, Container, Cluster), not a tag.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-003",
+      "topic": "Host Map",
+      "question": "On the Host Map, you want hexagons to be larger for hosts with higher memory usage while their color still reflects CPU. Which control do you use for memory?",
+      "choices": [
+        "Fill by",
+        "Group by",
+        "Size by",
+        "Filter"
+      ],
+      "answer": 2,
+      "explanation": "Size by sizes each object by a metric or signal, letting the map communicate a second metric in addition to color. Fill by controls the color (CPU utilization by default), Group by arranges objects into tag-based groups, and Filter limits the map to a subset of your infrastructure.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-004",
+      "topic": "Host Map",
+      "question": "Your Host Map shows both production and staging hosts. You want staging hosts removed from view so that only production resources appear. Which control do you use?",
+      "choices": [
+        "Group by",
+        "Fill by",
+        "Filter",
+        "Size by"
+      ],
+      "answer": 2,
+      "explanation": "Filter limits the Host Map to a specific subset of your infrastructure; filtering by your production tag shows only production resources. Group by would still display the staging hosts, just in a separate group, while Fill by and Size by set each object's color and size from a metric or signal.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-005",
+      "topic": "Host Map",
+      "question": "On the Host Map with Host selected as the resource, what does each individual hexagon represent?",
+      "choices": [
+        "A group of hosts sharing a tag",
+        "A single host",
+        "One integration running on a host",
+        "A monitor scoped to a host"
+      ],
+      "answer": 1,
+      "explanation": "Each hexagon is one object of the selected resource type, so in a host view each hexagon is a single host, colored by the Fill by metric and optionally sized by the Size by metric. Groups created with Group by are sections that contain many hexagons, and integrations and monitors are not drawn as hexagons.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-006",
+      "topic": "Host Map",
+      "question": "You want to check whether hosts with role:web are spread evenly across your availability zones. Which Host Map setup shows this most directly?",
+      "choices": [
+        "Group by role:web and Size by availability-zone",
+        "Filter by role:web and Group by availability-zone",
+        "Fill by availability-zone and Filter by role:web",
+        "Filter by availability-zone and Group by host name"
+      ],
+      "answer": 1,
+      "explanation": "Filter limits the map to the web hosts, and Group by availability zone arranges them into one section per zone, so an uneven distribution is visible at a glance. Fill by and Size by take metrics or signals rather than tags, filtering by one availability zone hides the zones you want to compare, and grouping by host name just makes one group per host.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-007",
+      "topic": "Host Map",
+      "question": "A FinOps engineer wants to find expensive EC2 instance types whose hosts are mostly idle. Which Host Map setup is the best starting point?",
+      "choices": [
+        "Fill by instance-type and Size by host name",
+        "Group by instance-type and keep Fill by CPU utilization",
+        "Filter by CPU utilization and Group by host name",
+        "Size by instance-type and Filter by availability-zone"
+      ],
+      "answer": 1,
+      "explanation": "Grouping by instance type while coloring by CPU shows at a glance which expensive instance groups are underutilized (mostly green), which is the documented cost and resource-optimization use case. Fill by and Size by expect metrics or signals, not tags such as instance-type or host name, and a filter alone does not show utilization per instance type.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-008",
+      "topic": "Host Map",
+      "question": "In the current Host Map, which configuration makes the Size by selector unavailable?",
+      "choices": [
+        "Specifying a Secondary resource",
+        "Grouping by more than one tag",
+        "Using OR in the filter",
+        "Filling by an error-log signal"
+      ],
+      "answer": 0,
+      "explanation": "The Host Map documentation states that Size by can be used only if you do not specify a Secondary resource; with a Main/Secondary hierarchy, child objects are nested inside their parents instead. Nothing in the documentation restricts Size by when you use multiple groupings, logical operators in the filter, or a signal such as error logs for Fill by.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-009",
+      "topic": "Host Map",
+      "question": "In the Host List (Infrastructure > Hosts), what happens when you click a host?",
+      "choices": [
+        "The Host Map opens, zoomed in on that host",
+        "A detail panel with its tags and metrics opens",
+        "The monitor editor opens, pre-scoped to that host",
+        "The Agent install page for the host's OS opens"
+      ],
+      "answer": 1,
+      "explanation": "Clicking a host in the Host List opens its detail side panel, which includes hostnames and aliases, tags, metrics and containers, plus logs and Agent configuration when those are enabled. It does not switch to the Host Map, open the monitor editor or show Agent installation instructions.",
+      "reference": "https://docs.datadoghq.com/infrastructure/list/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-010",
+      "topic": "Host Map",
+      "question": "A finance analyst plans to estimate the monthly infrastructure host bill by counting the hosts shown in the Host List. What does the Datadog documentation advise?",
+      "choices": [
+        "Count only ACTIVE hosts to get the billable total",
+        "Do not use the Host List to estimate host billing",
+        "Count only the hosts that run the Datadog Agent",
+        "Use the Host List count after a 15-minute delay"
+      ],
+      "answer": 1,
+      "explanation": "The Host List documentation explicitly notes that the list should not be used to estimate your infrastructure host billing and points to the billing documentation instead. The list is a live inventory of hosts reporting through the Agent or cloud integrations (by default, those active in the last 15 minutes), which is not the same thing as a billable host count.",
+      "reference": "https://docs.datadoghq.com/infrastructure/list/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-011",
+      "topic": "Host Map",
+      "question": "Your Host List includes several Amazon EC2 instances that have no Datadog Agent installed. How did they get there?",
+      "choices": [
+        "They were discovered by Agent Autodiscovery",
+        "They were added by a host monitor's scope",
+        "They come from the Datadog AWS integration",
+        "They were imported by a dashboard template variable"
+      ],
+      "answer": 2,
+      "explanation": "Hosts reach the Host List through the Agent or cloud integrations; EC2 instances without an Agent appear once your AWS account is set up in the Datadog AWS integration. Autodiscovery configures checks for containers on a host that already runs an Agent, and monitors and template variables only read existing host data rather than adding hosts.",
+      "reference": "https://docs.datadoghq.com/infrastructure/list/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-012",
+      "topic": "Host Map",
+      "question": "A platform team wants the same fill, group and filter visualization they use for hosts, but for their Docker containers. What should they use?",
+      "choices": [
+        "The Host Map with Container selected as the resource",
+        "The Infrastructure List filtered to Docker hosts",
+        "A Top List widget of docker.containers.running",
+        "The Metrics Summary page filtered by docker"
+      ],
+      "answer": 0,
+      "explanation": "The Host Map (which absorbed the former Container Map) visualizes hosts, pods, containers and clusters; you select Container as the resource and keep using Fill by, Group by and Filter. The Infrastructure List is a tabular inventory, a Top List ranks values, and Metrics Summary lists metric metadata.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-013",
+      "topic": "Dashboards",
+      "question": "Once an integration is installed and configured, how are its out-of-the-box dashboards meant to be used?",
+      "choices": [
+        "As the source of truth for every metric the integration collects",
+        "As empty dashboards that stay blank until you add widgets",
+        "As templates you can clone and then customize",
+        "As private dashboards that only Admin users can view"
+      ],
+      "answer": 2,
+      "explanation": "Datadog recommends cloning a preset dashboard, including the out-of-the-box templates for installed integrations, and then customizing the widgets of the clone. These dashboards arrive populated with widgets, so they are not empty, and the full list of metrics an integration collects is documented in the integration's Data Collected section rather than on its dashboard.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-014",
+      "topic": "Dashboards",
+      "question": "Which dashboard layout option uses an automatic layout in which all widgets represent a single point in time, and is commonly used for troubleshooting and correlation?",
+      "choices": [
+        "Timeboard",
+        "Screenboard",
+        "Notebook",
+        "Powerpack"
+      ],
+      "answer": 0,
+      "explanation": "Timeboards have automatic layouts that represent a single point in time, fixed or real-time, across the entire dashboard, and are used for troubleshooting, correlation and data exploration. Screenboards have free-form layouts suited to status boards and storytelling. Notebooks and Powerpacks are not dashboard layout types.",
+      "reference": "https://docs.datadoghq.com/dashboards/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-015",
+      "topic": "Dashboards",
+      "question": "You often set a dashboard's template variables to env:prod and region:us-east-1 and want to return to that exact combination in one click later. What should you use?",
+      "choices": [
+        "A saved view of the variable selections",
+        "A clone of the dashboard for that combination",
+        "A new default time frame for the dashboard",
+        "A star on the dashboard in the Dashboard List"
+      ],
+      "answer": 0,
+      "explanation": "Saved views store template variable values: choose Save selections as view from the Saved Views dropdown, then pick the view later to restore those values (changing a variable does not update a view automatically). A clone duplicates the whole dashboard and drifts from the original, the default time frame does not store variable values, and starring only marks the dashboard as a favorite.",
+      "reference": "https://docs.datadoghq.com/dashboards/template_variables/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-016",
+      "topic": "Dashboards",
+      "question": "A dashboard contains only log widgets, and you add a template variable on the service tag. Which values does its dropdown offer?",
+      "choices": [
+        "Service values from every Datadog data source",
+        "Only service values from host metrics",
+        "Only service values found in the logs data",
+        "Values typed manually by the dashboard owner"
+      ],
+      "answer": 2,
+      "explanation": "Template variable values are populated from the data sources that the dashboard's widgets use, so a logs-only dashboard offers only values found in logs; adding metric or RUM widgets would add values from those sources. Restricting Available Values by hand is optional, not the default, which is all values.",
+      "reference": "https://docs.datadoghq.com/dashboards/template_variables/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-017",
+      "topic": "Dashboards",
+      "question": "You set the template variable env to prod on a dashboard and copy the URL to share with a colleague. Which URL parameter captures that selection?",
+      "choices": [
+        "&tpl_var_env=prod",
+        "&env=prod",
+        "&var_env=prod",
+        "&filter_env=prod"
+      ],
+      "answer": 0,
+      "explanation": "When a template variable value changes, the dashboard URL updates with &tpl_var_<TEMPLATE_VARIABLE_NAME>=<VALUE>, so $env set to prod appears as &tpl_var_env=prod. Anyone opening the link sees the dashboard scoped the same way. The other forms do not follow the documented tpl_var_ prefix.",
+      "reference": "https://docs.datadoghq.com/dashboards/template_variables/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-018",
+      "topic": "Dashboards",
+      "question": "You create a dashboard template variable and leave its Default Value unchanged. What value is applied when the dashboard loads?",
+      "choices": [
+        "The first tag value in alphabetical order",
+        "No value, so widgets show no data",
+        "*, which queries all values of the tag",
+        "The value reported most recently"
+      ],
+      "answer": 2,
+      "explanation": "A template variable's Default Value defaults to *, and the list of available values always includes *, which queries all values of the tag or attribute. Datadog does not pick an alphabetical or most-recent value, and widgets keep showing data for all values.",
+      "reference": "https://docs.datadoghq.com/dashboards/template_variables/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-019",
+      "topic": "Dashboards",
+      "question": "For a dashboard template variable based on a metric tag, which period is used to populate the values offered in its dropdown?",
+      "choices": [
+        "The dashboard's global time frame",
+        "The last 48 hours",
+        "The last 15 months of retention",
+        "The last 15 minutes"
+      ],
+      "answer": 1,
+      "explanation": "For metrics (and cloud cost), template variable values are queried over now minus 48 hours, while most other data sources use the dashboard's time frame. That is why a tag value that has not been reported recently can be missing from the dropdown even though historical data exists.",
+      "reference": "https://docs.datadoghq.com/dashboards/template_variables/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-020",
+      "topic": "Dashboards",
+      "question": "An on-call lead wants one large number showing the current average error rate, with the background turning red when it exceeds a limit. Which widget fits best?",
+      "choices": [
+        "Top List",
+        "Heatmap",
+        "Change",
+        "Query Value"
+      ],
+      "answer": 3,
+      "explanation": "Query Value widgets reduce a query to a single value (avg, min, sum, max or last over the time frame) and support conditional formatting such as green/yellow/red backgrounds. A Top List ranks many groups, a Heatmap shows metrics aggregated across tags over time, and the Change widget compares values with an earlier period.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/query_value/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-021",
+      "topic": "Dashboards",
+      "question": "Which widget is designed to list the hosts with the least free disk space, ranked from worst to best?",
+      "choices": [
+        "Top List",
+        "Query Value",
+        "Distribution",
+        "Timeseries"
+      ],
+      "answer": 0,
+      "explanation": "The Top List widget displays the tag values with the most or least of a metric, such as the highest CPU consumers or the hosts with the least disk space. Query Value collapses everything to one number, Distribution shows a histogram, and Timeseries shows evolution over time rather than a ranking.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/top_list/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-022",
+      "topic": "Dashboards",
+      "question": "A manager wants a widget showing, for each service, how request count changed compared with one week earlier, sorted by the size of the change. Which widget is built for this?",
+      "choices": [
+        "Top List",
+        "Heatmap",
+        "Change",
+        "Query Value"
+      ],
+      "answer": 2,
+      "explanation": "The Change widget compares a metric's current value with the value an hour, day, week or month before, as absolute or relative change, broken down by a tag key and ordered by change, name, present value or past value. A Top List ranks current values only, a Heatmap shows distributions over time, and Query Value shows a single number for the whole query.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/change/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-023",
+      "topic": "Dashboards",
+      "question": "What is a key difference between the Distribution widget and the Heatmap widget?",
+      "choices": [
+        "The Distribution widget can graph only log events",
+        "The Distribution widget's x-axis is quantity, not time",
+        "The Heatmap widget cannot aggregate across tags",
+        "The Heatmap widget shows only the latest value"
+      ],
+      "answer": 1,
+      "explanation": "Both show data aggregated across tags, but unlike the heatmap, a distribution graph's x-axis is quantity rather than time. The Distribution widget supports many sources (metrics, processes, APM, logs, RUM), and the Heatmap aggregates metrics across multiple tags over the time window.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/distribution/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-024",
+      "topic": "Dashboards",
+      "question": "A dashboard owner wants to gather several related graphs under one titled section that viewers can collapse. Which widget provides this?",
+      "choices": [
+        "Group",
+        "Free Text",
+        "Notes and Links",
+        "Iframe"
+      ],
+      "answer": 0,
+      "explanation": "The Group widget keeps similar graphs together; each group has a custom header, holds one to many graphs, and is collapsible. Free Text and Notes and Links add headings or Markdown text but do not contain other widgets, and an Iframe embeds an external page.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/group/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-025",
+      "topic": "Dashboards",
+      "question": "A platform team built a set of widgets for monitoring a service and wants other teams to add that same block to their dashboards, with later updates syncing everywhere. What should they create?",
+      "choices": [
+        "A cloned dashboard for each team",
+        "A dashboard template variable",
+        "A public shared dashboard",
+        "A Powerpack"
+      ],
+      "answer": 3,
+      "explanation": "Powerpacks are templated groups of widgets that act as reusable dashboard building blocks, and changes to a Powerpack sync across every dashboard where it is used. A clone is an unlinked copy that does not receive updates, a template variable only filters widgets, and a shared dashboard exposes one dashboard to outside viewers.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/powerpack/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-026",
+      "topic": "Dashboards",
+      "question": "The author of a custom Powerpack deletes it. What happens to instances of that Powerpack already placed on dashboards?",
+      "choices": [
+        "They are removed from every dashboard that used them",
+        "They stay, but show an alert that it was deleted",
+        "They turn into separate cloned dashboards",
+        "They become read-only until it is restored"
+      ],
+      "answer": 1,
+      "explanation": "After a Powerpack is deleted, existing instances remain intact but display an alert indicating the Powerpack has been deleted; detaching an instance converts it into a regular widget group and removes the alert. Only the author can delete a Powerpack, and deleting it does not strip widgets from dashboards.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/powerpack/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-027",
+      "topic": "Dashboards",
+      "question": "How does the selected time frame affect how often a private (non-shared) dashboard refreshes?",
+      "choices": [
+        "Longer time frames refresh more frequently",
+        "The refresh interval is fixed at 60 seconds",
+        "Shorter time frames refresh more frequently",
+        "It refreshes only when a variable changes"
+      ],
+      "answer": 2,
+      "explanation": "The refresh rate of a private dashboard depends on the time frame: the shorter it is, the more often data refreshes (for example every 10 seconds for the past 5 minutes, but every hour for the past week). A fixed refresh interval regardless of time frame applies to publicly shared dashboards, not private ones.",
+      "reference": "https://docs.datadoghq.com/dashboards/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-028",
+      "topic": "Dashboards",
+      "question": "You need to show a dashboard to an external vendor's staff who have no Datadog accounts, restricted to their company email domain. Which sharing option fits?",
+      "choices": [
+        "An invite-only shared dashboard",
+        "A public shared dashboard",
+        "Edit restrictions under Permissions",
+        "Exporting the dashboard JSON"
+      ],
+      "answer": 0,
+      "explanation": "Invite-only shared dashboards let you share with individual email addresses or whole email domains, and adding a domain prevents public access. A public shared dashboard is reachable by anyone with the link, Permissions controls which Datadog users can edit, and exported JSON is only a definition without live data.",
+      "reference": "https://docs.datadoghq.com/dashboards/sharing/shared_dashboards/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-029",
+      "topic": "Using Metrics",
+      "question": "Which set lists the space aggregators Datadog offers for combining a metric's timeseries across sources in a graph?",
+      "choices": [
+        "avg, median, p95, count",
+        "sum, count, rate, gauge",
+        "first, last, mean, mode",
+        "avg, sum, min, max"
+      ],
+      "answer": 3,
+      "explanation": "Datadog offers four space aggregators: avg, sum, min and max, with avg by as the default in the graph editor. Count, rate and gauge are metric types, and percentiles such as p95 are not general space aggregators for standard metrics.",
+      "reference": "https://docs.datadoghq.com/dashboards/guide/query-to-the-graph/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-030",
+      "topic": "Using Metrics",
+      "question": "A graph queries system.disk.total scoped to {host:bubs, device:/dev/vda1}, which matches exactly one timeseries. What happens if you change the space aggregator from avg to sum?",
+      "choices": [
+        "The graph does not change",
+        "Every value doubles",
+        "The graph shows the total over the time frame",
+        "The values are converted to a per-second rate"
+      ],
+      "answer": 0,
+      "explanation": "Space aggregation combines several sources into one line; when the scope matches a single source, sum, avg, max and min have no effect because there is nothing to combine. Totals over time are controlled by time aggregation (rollup), and per-second conversion is done by functions or as_rate(), not by the space aggregator.",
+      "reference": "https://docs.datadoghq.com/dashboards/guide/query-to-the-graph/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-031",
+      "topic": "Using Metrics",
+      "question": "When Datadog renders a metric graph, which step immediately follows selecting the timeseries that match the query's scope?",
+      "choices": [
+        "Space aggregation across all matching sources",
+        "Applying functions such as abs() or timeshift()",
+        "Time aggregation (rollup) of each source's points",
+        "Arithmetic between the queries in the formula"
+      ],
+      "answer": 2,
+      "explanation": "The backend first keeps the timeseries matching the scope, then performs time aggregation for each source, then space aggregation across sources, and finally applies functions and arithmetic. Time aggregation comes first because data is stored at up to 1-second granularity and must be reduced to a limited number of points per source before sources are combined.",
+      "reference": "https://docs.datadoghq.com/dashboards/guide/query-to-the-graph/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-032",
+      "topic": "Using Metrics",
+      "question": "Unless you specify otherwise, how does Datadog roll up the raw datapoints of a gauge metric that fall into each time interval of a graph?",
+      "choices": [
+        "It sums them",
+        "It averages them",
+        "It takes the maximum",
+        "It keeps the last value"
+      ],
+      "answer": 1,
+      "explanation": "By default the backend computes the rollup aggregate by averaging all real values in each interval, which smooths graphs as you zoom out. You can override the method with .rollup() (sum, min, max, count), and COUNT/RATE queries get .as_count() appended in the UI, which switches the time aggregator to sum.",
+      "reference": "https://docs.datadoghq.com/dashboards/functions/rollup/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-033",
+      "topic": "Using Metrics",
+      "question": "According to the Rollup documentation, up to how many points can a single series have in a line or bar graph?",
+      "choices": [
+        "150",
+        "3,600",
+        "10,000",
+        "1,500"
+      ],
+      "answer": 3,
+      "explanation": "The Rollup documentation states that, to retain visual clarity, a series can have up to 1,500 points, and Datadog rolls data up automatically (avg by default) to respect this limit; a custom rollup can go up to that limit, about one point per minute over a day. 150 is the target used by Query Value widgets, not by line or bar graphs.",
+      "reference": "https://docs.datadoghq.com/dashboards/functions/rollup/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-034",
+      "topic": "Using Metrics",
+      "question": "You add .rollup(avg, 60) to a query and view it over a two-month time frame. What happens?",
+      "choices": [
+        "A coarser interval is used so the point limit is respected",
+        "One point per minute is returned across the full two months",
+        "The query fails with an invalid rollup interval error",
+        "The rollup method is switched from avg to sum to fit the limit"
+      ],
+      "answer": 0,
+      "explanation": "A custom rollup interval is honored only while it keeps the series within the point limit; the documentation notes that rollup(60) over a 2-month window does not give the requested one-minute granularity. Datadog uses a larger interval instead while still applying the avg method you chose, and the query does not fail.",
+      "reference": "https://docs.datadoghq.com/dashboards/guide/query-to-the-graph/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-035",
+      "topic": "Using Metrics",
+      "question": "Which query displays the total number of requests per day over the past week for the COUNT metric app.requests?",
+      "choices": [
+        "sum:app.requests{*}.as_rate().rollup(avg, 86400)",
+        "sum:app.requests{*}.as_count().rollup(max, 86400)",
+        "sum:app.requests{*}.as_count().rollup(sum, 86400)",
+        "sum:app.requests{*}.as_count().rollup(sum, 60)"
+      ],
+      "answer": 2,
+      "explanation": "The rollup function takes the aggregator first and the interval in seconds second, so .rollup(sum, 86400) adds up each day's counts. A max rollup keeps only the largest single count in each day rather than the total, as_rate() with avg returns an average per-second rate, and a 60-second interval produces per-minute buckets.",
+      "reference": "https://docs.datadoghq.com/dashboards/functions/rollup/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-036",
+      "topic": "Using Metrics",
+      "question": "A DogStatsD COUNT metric is graphed and you want the number of events in each rollup interval instead of a normalized per-second value. Which modifier do you use?",
+      "choices": [
+        ".as_rate()",
+        ".as_count()",
+        ".fill(zero)",
+        ".rollup(avg)"
+      ],
+      "answer": 1,
+      "explanation": "as_count() displays the metric in COUNT form, giving the absolute variation over each rollup interval, while as_rate() normalizes it per second. fill() only interpolates gaps, and a rollup with avg would average values rather than total them.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/type_modifiers/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-037",
+      "topic": "Using Metrics",
+      "question": "Which effects does appending .as_count() have on how a query is time-aggregated?",
+      "choices": [
+        "It sets the time aggregator to sum and disables interpolation",
+        "It sets the time aggregator to avg and turns on interpolation",
+        "It permanently changes the stored metric type to COUNT",
+        "It converts the space aggregator from avg to sum"
+      ],
+      "answer": 0,
+      "explanation": "The as_count() in-application modifier disables interpolation and sets the time aggregator to SUM (for RATE metrics it also multiplies by the sampling interval). It only changes how the query is evaluated: changing a stored metric type is done on the Metrics Summary page, and space aggregation is selected separately.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/type_modifiers/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-038",
+      "topic": "Using Metrics",
+      "question": "You want to overlay today's system.load.1 with its values from exactly 14 days earlier on the same graph. Which function do you add?",
+      "choices": [
+        "moving_rollup()",
+        "derivative()",
+        "anomalies()",
+        "timeshift()"
+      ],
+      "answer": 3,
+      "explanation": "timeshift() graphs values from an arbitrary number of seconds before the current timestamp, for example timeshift(avg:system.load.1{*}, -1209600) for two weeks. moving_rollup() combines recent points, derivative() graphs the rate of change, and anomalies() draws an expected band based on history instead of shifting the data.",
+      "reference": "https://docs.datadoghq.com/dashboards/functions/timeshift/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-039",
+      "topic": "Using Metrics",
+      "question": "A metric reports a steadily increasing total, such as bytes sent since boot. Which function graphs how quickly it changes each second?",
+      "choices": [
+        "cumsum()",
+        "integral()",
+        "per_second()",
+        "abs()"
+      ],
+      "answer": 2,
+      "explanation": "per_second() graphs the rate at which a metric is changing per second (per_minute() and per_hour() also exist). cumsum() and integral() accumulate values over the visible window rather than measuring change, and abs() only returns absolute values.",
+      "reference": "https://docs.datadoghq.com/dashboards/functions/rate/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-040",
+      "topic": "Using Metrics",
+      "question": "A graph of request latency grouped by host should highlight the one web server behaving differently from its 20 peers. Which function fits?",
+      "choices": [
+        "outliers()",
+        "anomalies()",
+        "forecast()",
+        "timeshift()"
+      ],
+      "answer": 0,
+      "explanation": "outliers() highlights series that behave differently from the rest of their group. anomalies() compares a series with its own past behavior, forecast() predicts where a metric is heading, and timeshift() just shifts data along the timeline.",
+      "reference": "https://docs.datadoghq.com/dashboards/functions/algorithms/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-041",
+      "topic": "Using Metrics",
+      "question": "You want to graph JVM heap usage as a fraction of the maximum heap (jvm.heap_memory / jvm.heap_memory_max). How do you build this in the graph editor?",
+      "choices": [
+        "Add jvm.heap_memory and choose the sum by aggregator",
+        "Add both as queries, then enter a / b as the formula",
+        "Apply a rollup of jvm.heap_memory_max to the heap query",
+        "Group jvm.heap_memory by a jvm.heap_memory_max tag"
+      ],
+      "answer": 1,
+      "explanation": "Arithmetic between metrics is done by adding each metric as a lettered query (a, b, ...) and entering the operation in the Formula box, here a / b. Space aggregators, rollups and grouping each operate within a single query and cannot divide one metric by another.",
+      "reference": "https://docs.datadoghq.com/dashboards/querying/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-042",
+      "topic": "Using Metrics",
+      "question": "Which statement about metric arithmetic in Datadog graphs is correct?",
+      "choices": [
+        "It is applied to raw points before any rollup",
+        "It can be performed between two formulas",
+        "It is applied after time and space aggregation",
+        "It is evaluated before the scope filter"
+      ],
+      "answer": 2,
+      "explanation": "Arithmetic, like most functions, is applied at the last step, after time and space aggregation, on the points already computed for each query. Formulas are not lettered, so arithmetic cannot be done between formulas, and scope filtering happens first, when the matching timeseries are selected.",
+      "reference": "https://docs.datadoghq.com/dashboards/guide/query-to-the-graph/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-043",
+      "topic": "Using Metrics",
+      "question": "A custom metric stopped reporting three days ago and is no longer offered in the Metrics Explorer query editor. What explains this?",
+      "choices": [
+        "Metrics with no data for 48 hours are deleted by Datadog",
+        "It lists only metrics collected by integrations",
+        "Custom metrics must first be saved to a dashboard",
+        "It lists only metrics reported in the last 24 hours"
+      ],
+      "answer": 3,
+      "explanation": "Metrics not reported in the last 24 hours do not appear in the Metrics Explorer query editor, but you can still graph them by typing the metric name or full query. Datadog does not delete metrics after 48 hours, and custom metrics are listed alongside integration metrics without needing a dashboard.",
+      "reference": "https://docs.datadoghq.com/metrics/explorer/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-044",
+      "topic": "Using Metrics",
+      "question": "Where do you view and edit a metric's metadata, such as its unit, type and description?",
+      "choices": [
+        "The Metrics Summary details side panel",
+        "The Export button menu in Metrics Explorer",
+        "The Host Map Fill by selector",
+        "A dashboard's template variable panel"
+      ],
+      "answer": 0,
+      "explanation": "Clicking a metric in Metrics Summary opens a details side panel with its metadata (unit, type, integration, interval, description), most of which can be edited there or through the API. The Metrics Explorer Export menu copies links or sends the graph to dashboards, notebooks, incidents or monitors, and the Host Map and template variables only consume metrics.",
+      "reference": "https://docs.datadoghq.com/metrics/summary/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-045",
+      "topic": "Using Metrics",
+      "question": "To reduce costs, you want to find custom metrics that nobody has queried in the past 90 days. Which Metrics Summary facet helps most directly?",
+      "choices": [
+        "Metric Origin",
+        "Metric Type",
+        "Query Activity",
+        "Configuration"
+      ],
+      "answer": 2,
+      "explanation": "The Query Activity facet filters metrics not queried in Datadog or by the API in the past 30, 60 or 90 days. Metric Origin shows which product a metric came from, Metric Type separates distributions from counts, gauges and rates, and Configuration shows metrics with tag configurations.",
+      "reference": "https://docs.datadoghq.com/metrics/summary/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-046",
+      "topic": "Using Metrics",
+      "question": "Over the same time window, why can a Query Value widget use a coarser effective rollup interval than a line graph?",
+      "choices": [
+        "It always applies a fixed 1-hour rollup interval",
+        "It targets only 150 points per series",
+        "It averages all hosts before any rollup",
+        "It only reads data from the last 15 minutes"
+      ],
+      "answer": 1,
+      "explanation": "The Rollup documentation notes that Query Value widgets target 150 points instead of the 1,500 points used by line and bar graph widgets, so the same window yields a coarser effective rollup interval. The widget still honors the selected time frame, and time aggregation still happens before space aggregation.",
+      "reference": "https://docs.datadoghq.com/dashboards/functions/rollup/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-047",
+      "topic": "Monitors and Alerts",
+      "question": "A multi alert monitor is grouped by service and host. The team wants at most one notification per service that breaches the threshold, not one per host. What should they change?",
+      "choices": [
+        "Switch the monitor to Simple Alert mode",
+        "Remove host from the notification grouping",
+        "Add a new group delay for new hosts",
+        "Build a composite monitor for each service"
+      ],
+      "answer": 1,
+      "explanation": "Multi Alert notification grouping lets you drop dimensions: removing host from the multi alert options sends one notification per service, and the dimension that is not aggregated on (host) appears as a sub group in the UI. Simple Alert would send a single notification for the whole monitor rather than one per service, and group delays or composites do not change how notifications are grouped.",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-048",
+      "topic": "Monitors and Alerts",
+      "question": "A monitor query is grouped by host, but the team wants only one notification when one or more hosts breach the threshold. What should they change?",
+      "choices": [
+        "Set the alert aggregation to Simple Alert",
+        "Keep Multi Alert with host as a dimension",
+        "Enable renotification every 10 minutes",
+        "Add a new group delay of 60 seconds"
+      ],
+      "answer": 0,
+      "explanation": "With one or more group-by dimensions, Simple Alert mode sends one notification if one or more groups meet the alert conditions, whereas Multi Alert sends one notification per group. Renotification only repeats alerts, and new group delay only postpones evaluation of newly appearing groups.",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-049",
+      "topic": "Monitors and Alerts",
+      "question": "Which option is a detection method you can choose inside a Metric monitor?",
+      "choices": [
+        "Composite",
+        "Watchdog",
+        "Host",
+        "Forecast"
+      ],
+      "answer": 3,
+      "explanation": "Metric monitors offer threshold, change, anomaly, outlier and forecast detection methods. Composite, Watchdog and Host are separate monitor types chosen on the New Monitor page, not detection methods inside a metric monitor.",
+      "reference": "https://docs.datadoghq.com/monitors/types/metric/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-050",
+      "topic": "Monitors and Alerts",
+      "question": "You want to be alerted when checkout requests drop by more than 50% compared with an hour earlier, whatever their absolute level. Which detection method fits?",
+      "choices": [
+        "Threshold alert with a below condition",
+        "Change alert using % change",
+        "Outlier detection across services",
+        "Forecast alert with a linear model"
+      ],
+      "answer": 1,
+      "explanation": "A change alert compares the absolute or relative (%) change in value between N minutes ago and now against a threshold, which suits drops that have no fixed absolute threshold. A threshold alert needs a static value, outlier detection compares group members with each other, and a forecast predicts future values.",
+      "reference": "https://docs.datadoghq.com/monitors/types/change-alert/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-051",
+      "topic": "Monitors and Alerts",
+      "question": "A logins metric grows steadily week over week and has strong daily patterns, so any static threshold quickly becomes outdated. Which monitor type is best suited?",
+      "choices": [
+        "Anomaly",
+        "Threshold metric",
+        "Outlier",
+        "Service check"
+      ],
+      "answer": 0,
+      "explanation": "Anomaly detection identifies when a metric behaves differently than it has in the past, accounting for trends and day-of-week and time-of-day patterns; the documentation uses a steadily growing login count as its example. Static thresholds go stale, outlier monitors compare peers within a group, and service check monitors track check statuses.",
+      "reference": "https://docs.datadoghq.com/monitors/types/anomaly/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-052",
+      "topic": "Monitors and Alerts",
+      "question": "What does an outlier monitor require of the metric it evaluates?",
+      "choices": [
+        "At least three weeks of history for the metric",
+        "A distribution metric with percentiles enabled",
+        "Three or more group members that behave alike",
+        "A single ungrouped series with daily seasonality"
+      ],
+      "answer": 2,
+      "explanation": "An outlier monitor needs a metric grouped by something like host or availability zone, with three or more members that exhibit uniform behavior, so that one member can stand out from its peers. Three weeks of history is what anomaly detection needs for weekly seasonality, not a requirement of outlier monitors.",
+      "reference": "https://docs.datadoghq.com/monitors/types/outlier/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-053",
+      "topic": "Monitors and Alerts",
+      "question": "A composite monitor uses the trigger condition a && b. Monitor a is in Alert and monitor b is in Warn. What is the composite monitor's status?",
+      "choices": [
+        "Alert",
+        "Warn",
+        "OK",
+        "No Data"
+      ],
+      "answer": 1,
+      "explanation": "When A && B is alert-worthy, the composite takes the least severe status of the two, so Alert && Warn results in Warn. With A || B it would take the most severe status (Alert). OK would only result if one of the monitors were not alert-worthy.",
+      "reference": "https://docs.datadoghq.com/monitors/types/composite/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-054",
+      "topic": "Monitors and Alerts",
+      "question": "Which service check does a host monitor use to determine whether a host is still reporting to Datadog?",
+      "choices": [
+        "datadog.agent.up",
+        "process.up",
+        "http.can_connect",
+        "ntp.in_sync"
+      ],
+      "answer": 0,
+      "explanation": "Every Datadog Agent reports the datadog.agent.up service check with status OK, and a host monitor alerts when it stops reporting OK for the configured number of minutes (2 by default). process.up is watched by process check monitors, while http.can_connect and ntp.in_sync come from the HTTP and NTP checks.",
+      "reference": "https://docs.datadoghq.com/monitors/types/host/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-055",
+      "topic": "Monitors and Alerts",
+      "question": "You expect system.cpu.idle to report continuously from every production host and want the team notified when it stops. Which missing-data option should you choose?",
+      "choices": [
+        "Evaluate as zero",
+        "Show last known status",
+        "Show NO DATA",
+        "Show NO DATA and notify"
+      ],
+      "answer": 3,
+      "explanation": "Show NO DATA and notify sets the monitor status to NO DATA and sends a notification, which is what you want for a metric that should always report. Show NO DATA changes the status without notifying, Evaluate as zero compares a zero with the thresholds, and Show last known status keeps the previous state.",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-056",
+      "topic": "Monitors and Alerts",
+      "question": "A monitor alerts when a value is > 80, has an alert recovery threshold of 70, and has no warning threshold. The value falls from 85 to 75. What happens?",
+      "choices": [
+        "It recovers because 75 is below 80",
+        "It moves to WARN until the value reaches 70",
+        "It stays in ALERT until the value is 70 or less",
+        "It switches to NO DATA until the value stabilizes"
+      ],
+      "answer": 2,
+      "explanation": "For an alert condition of > threshold, the recovery condition is <= the alert recovery threshold, so the monitor recovers only once the value is 70 or less. Without a recovery threshold it would recover as soon as the value fell back below 80; there is no warning threshold to move into, and NO DATA only reflects missing data.",
+      "reference": "https://docs.datadoghq.com/monitors/guide/recovery-thresholds/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-057",
+      "topic": "Monitors and Alerts",
+      "question": "A metric monitor uses the max aggregation over the last 5 minutes and alerts when the value is above the threshold. When does it trigger?",
+      "choices": [
+        "If any single point in the window is above the threshold",
+        "If all points in the window are above the threshold",
+        "If the window's average value is above the threshold",
+        "If the sum of every point in the window is above the threshold"
+      ],
+      "answer": 0,
+      "explanation": "With the max aggregation, an alert triggers if any single value in the evaluated series crosses the threshold. min requires all points in the window to cross it (for above-threshold monitors), average compares the mean, and sum compares the total of all points.",
+      "reference": "https://docs.datadoghq.com/monitors/types/metric/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-058",
+      "topic": "Monitors and Alerts",
+      "question": "By default, how often is a metric monitor with a 15-minute evaluation window evaluated?",
+      "choices": [
+        "Every 15 minutes",
+        "Every minute",
+        "Every 5 minutes",
+        "Every 10 minutes"
+      ],
+      "answer": 1,
+      "explanation": "The default evaluation frequency depends on the window: under 24 hours it is 1 minute, from 24 to under 48 hours it is 10 minutes, and 48 hours or more it is 30 minutes. A 15-minute window is therefore evaluated every minute, each time looking back over the last 15 minutes.",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-059",
+      "topic": "Monitors and Alerts",
+      "question": "Which notification variable inserts the value that breached the alert into a metric monitor's message?",
+      "choices": [
+        "{{threshold}}",
+        "{{comparator}}",
+        "{{value}}",
+        "{{last_triggered_at}}"
+      ],
+      "answer": 2,
+      "explanation": "{{value}} renders the value that breached the alert for metric-based query monitors. {{threshold}} is the configured alert threshold, {{comparator}} is the relational operator in the alert conditions, and {{last_triggered_at}} is the UTC time the monitor last triggered.",
+      "reference": "https://docs.datadoghq.com/monitors/notify/variables/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-060",
+      "topic": "Monitors and Alerts",
+      "question": "You want part of a monitor message, including its @-handles, to be sent only when the monitor recovers. Which conditional variable should wrap it?",
+      "choices": [
+        "{{#is_recovery}}",
+        "{{^is_alert}}",
+        "{{#is_alert_to_warning}}",
+        "{{#is_renotify}}"
+      ],
+      "answer": 0,
+      "explanation": "Text inside {{#is_recovery}}...{{/is_recovery}} is displayed when the monitor recovers from ALERT, WARNING, UNKNOWN or NO DATA. {{^is_alert}} matches any time the monitor does not alert (including warnings), {{#is_alert_to_warning}} matches only the ALERT to WARNING transition, and {{#is_renotify}} is for renotifications.",
+      "reference": "https://docs.datadoghq.com/monitors/notify/variables/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-061",
+      "topic": "Monitors and Alerts",
+      "question": "Which monitor message pages the PagerDuty service web only for alerts and emails the team only for warnings?",
+      "choices": [
+        "{{#is_warning}}@pagerduty-web{{/is_warning}} {{#is_alert}}@team@example.com{{/is_alert}}",
+        "@pagerduty-web {{#is_warning}}@team@example.com{{/is_warning}}",
+        "{{#is_alert}}@pagerduty-web @team@example.com{{/is_alert}}",
+        "{{#is_alert}}@pagerduty-web{{/is_alert}} {{#is_warning}}@team@example.com{{/is_warning}}"
+      ],
+      "answer": 3,
+      "explanation": "Each state-based conditional variable needs its own block, and handles inside a block are notified only when the transition matches it. A handle placed outside every conditional block is invoked on every state transition, so an unwrapped @pagerduty-web would page for warnings and recoveries too.",
+      "reference": "https://docs.datadoghq.com/monitors/notify/variables/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-062",
+      "topic": "Monitors and Alerts",
+      "question": "A multi alert monitor is grouped by host. You want to notify @db-team@company.com only when the triggering host's role tag contains db (for example role:db_cassandra or role:db_postgres). Which block does this?",
+      "choices": [
+        "{{#is_exact_match \"host.role.name\" \"db\"}} @db-team@company.com {{/is_exact_match}}",
+        "{{#is_match \"host.role.name\" \"db\"}} @db-team@company.com {{/is_match}}",
+        "{{#is_alert \"host.role.name\" \"db\"}} @db-team@company.com {{/is_alert}}",
+        "{{#is_match \"host.name\" \"db\"}} @db-team@company.com {{/is_match}}"
+      ],
+      "answer": 1,
+      "explanation": "{{#is_match}} displays its content when the tag variable contains the comparison substring, so \"db\" in host.role.name matches both db_cassandra and db_postgres. {{#is_exact_match}} requires the whole value to equal \"db\", {{#is_alert}} does not take comparison arguments, and matching on host.name checks the hostname instead of the role tag.",
+      "reference": "https://docs.datadoghq.com/monitors/notify/variables/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-063",
+      "topic": "Monitors and Alerts",
+      "question": "With the Slack integration already configured, which handle in a monitor message sends the notification to the Slack channel ops-alerts?",
+      "choices": [
+        "#slack-ops-alerts",
+        "@ops-alerts.slack",
+        "@slack-ops-alerts",
+        "{{slack.ops-alerts}}"
+      ],
+      "answer": 2,
+      "explanation": "Integrations are notified with @<INTEGRATION_NAME>-<VALUES>, so a Slack channel is addressed as @slack-<channel> (or @slack-<account>-<channel> when several Slack accounts are connected). Typing @slack in the message box lists the available channels; the # and {{ }} forms are not notification handles.",
+      "reference": "https://docs.datadoghq.com/integrations/slack/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-064",
+      "topic": "Monitors and Alerts",
+      "question": "A monitor can stay in ALERT for hours. The team wants a reminder every 30 minutes with extra escalation text that is not in the first notification. What should they configure?",
+      "choices": [
+        "Auto resolve after 30 minutes",
+        "Renotification plus an {{#is_renotify}} block",
+        "A recurring downtime every 30 minutes",
+        "A 1800-second new group delay"
+      ],
+      "answer": 1,
+      "explanation": "Renotification reminds the team at a configured interval while the monitor stays in alert, no data or warn, and the escalation text belongs in an {{#is_renotify}} block, the recommended approach. Auto resolve would close the alert, a downtime would silence it, and new group delay only affects newly appearing groups.",
+      "reference": "https://docs.datadoghq.com/monitors/notify/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-065",
+      "topic": "Monitors and Alerts",
+      "question": "Which statement about monitor downtimes is correct?",
+      "choices": [
+        "They stop monitors from being evaluated during the window",
+        "They delete the monitor's alert history for the window",
+        "They apply only to monitors that existed when scheduled",
+        "They silence notifications but monitors still change state"
+      ],
+      "answer": 3,
+      "explanation": "Downtimes silence monitors' alerts and notifications but do not prevent monitor state transitions, so evaluation and status history continue. Monitors created or edited after a downtime is scheduled are automatically included if they match its scope.",
+      "reference": "https://docs.datadoghq.com/monitors/downtimes/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-066",
+      "topic": "Monitors and Alerts",
+      "question": "A monitor goes into ALERT during a scheduled downtime and is still in ALERT when the downtime expires. What happens by default?",
+      "choices": [
+        "A new notification is sent when the downtime ends",
+        "Nothing is sent until the monitor recovers and re-alerts",
+        "The monitor is resolved automatically at expiration",
+        "The suppressed alert is delivered with its original time"
+      ],
+      "answer": 0,
+      "explanation": "By default, if a monitor is in an alert-worthy state (ALERT, WARNING or NO DATA) when a downtime expires, it triggers a new notification. This does not apply when a downtime is canceled manually; in that case no notification is sent even if the monitor is in an alert-worthy state.",
+      "reference": "https://docs.datadoghq.com/monitors/downtimes/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-067",
+      "topic": "Monitors and Alerts",
+      "question": "A downtime is scheduled on the monitor tags team:web and env:prod. Which monitors does it silence?",
+      "choices": [
+        "Monitors that have either of the two tags",
+        "Every monitor in the organization",
+        "Only monitors that have both tags",
+        "Only monitors created after the downtime"
+      ],
+      "answer": 2,
+      "explanation": "When a downtime targets monitor tags, only monitors that have ALL of the selected tags are silenced. Leaving the monitor selection empty is what silences all monitors, and monitors created after scheduling are included only if they match the scope.",
+      "reference": "https://docs.datadoghq.com/monitors/downtimes/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-068",
+      "topic": "Monitors and Alerts",
+      "question": "A monitor on AWS CloudWatch metrics keeps evaluating incomplete data because the provider backfills points late. What does Datadog recommend?",
+      "choices": [
+        "A new group delay of 15 minutes",
+        "An evaluation delay of about 15 minutes",
+        "Auto resolve after 15 minutes",
+        "Renotification every 15 minutes"
+      ],
+      "answer": 1,
+      "explanation": "Datadog recommends a 15-minute evaluation delay (900 seconds) for cloud metrics, which are backfilled by service providers, so the monitor evaluates a window ending 15 minutes in the past. New group delay only applies to newly created groups, and auto resolve and renotification do not change which data is evaluated.",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/",
+      "difficulty": 3
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "viz-fc-001",
+      "topic": "Host Map",
+      "front": "Host Map: what do an object's color and size represent?",
+      "back": "Color = the Fill by metric or signal (default: CPU utilization, green at 0% to orange at 100%).\nSize = the optional Size by metric or signal (only when no Secondary resource is set).",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/"
+    },
+    {
+      "id": "viz-fc-002",
+      "topic": "Host Map",
+      "front": "Host Map: Group by vs Filter",
+      "back": "Group by: spatially arranges objects into groups by tags; multiple tags nest (e.g., availability zone, then instance type).\nFilter: limits the map to a subset of your infrastructure; supports AND, OR, NOT and wildcards (*).",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/"
+    },
+    {
+      "id": "viz-fc-003",
+      "topic": "Host Map",
+      "front": "Host Map: which resource types can it display?",
+      "back": "Hosts, pods, containers and clusters, chosen as Main/Secondary resources with hierarchical relationships. The former Container Map view is now the Host Map with Container selected.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/"
+    },
+    {
+      "id": "viz-fc-004",
+      "topic": "Host Map",
+      "front": "Host Map: what does each hexagon represent?",
+      "back": "One object of the selected resource type, e.g., one host. Its color shows the Fill by metric (CPU utilization by default) and its size the Size by metric; Group by arranges the hexagons into sections by tag.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/"
+    },
+    {
+      "id": "viz-fc-005",
+      "topic": "Host Map",
+      "front": "Host Map: how do you spot expensive instance types that are underused?",
+      "back": "Group by instance type (optionally then by role) and keep Fill by on CPU utilization. Mostly green groups of expensive instance types are candidates for cheaper instances.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/"
+    },
+    {
+      "id": "viz-fc-006",
+      "topic": "Host Map",
+      "front": "Host Map: how do you check how hosts are spread across availability zones?",
+      "back": "Filter to the hosts you care about (for example, one role), then Group by availability zone. Uneven group sizes show where resources may need rebalancing.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/"
+    },
+    {
+      "id": "viz-fc-007",
+      "topic": "Host Map",
+      "front": "Host List: what does clicking a host show?",
+      "back": "A detail side panel with the host's hostnames and aliases, tags, metrics and containers, plus logs and Agent configuration when enabled.",
+      "reference": "https://docs.datadoghq.com/infrastructure/list/"
+    },
+    {
+      "id": "viz-fc-008",
+      "topic": "Host Map",
+      "front": "Host List: how can you export the host inventory?",
+      "back": "Export > Open in DDSQL Editor (then download), or export to a dashboard, notebook or spreadsheet. For JSON, use the host overview report or the search hosts API endpoint. Don't use the list to estimate host billing.",
+      "reference": "https://docs.datadoghq.com/infrastructure/list/"
+    },
+    {
+      "id": "viz-fc-009",
+      "topic": "Dashboards",
+      "front": "Dashboard layouts: Dashboards vs Timeboards vs Screenboards",
+      "back": "Dashboards: grid-based layout, maximum width of 12 grid squares.\nTimeboards: automatic layout; the whole board shows one point in time (fixed or real-time); troubleshooting and correlation.\nScreenboards: free-form layout; status boards and storytelling.",
+      "reference": "https://docs.datadoghq.com/dashboards/"
+    },
+    {
+      "id": "viz-fc-010",
+      "topic": "Dashboards",
+      "front": "How do you customize an out-of-the-box integration dashboard?",
+      "back": "Clone it (Configure > Clone dashboard) and edit the clone. OOTB dashboards serve as templates; the clone is an unlinked copy, so your changes don't affect the original.",
+      "reference": "https://docs.datadoghq.com/getting_started/dashboards/"
+    },
+    {
+      "id": "viz-fc-011",
+      "topic": "Dashboards",
+      "front": "What defines a dashboard template variable?",
+      "back": "Tag or attribute (tag key, or a facet/measure)\nName (used in queries, e.g., $env)\nDefault Value (defaults to *)\nAvailable Values (defaults to all; always includes *)",
+      "reference": "https://docs.datadoghq.com/dashboards/template_variables/"
+    },
+    {
+      "id": "viz-fc-012",
+      "topic": "Dashboards",
+      "front": "Where do a template variable's dropdown values come from?",
+      "back": "From the data sources used by the dashboard's widgets (a logs-only dashboard offers only log values).\nMetrics and cloud cost: values from now - 48 hours.\nOther sources: the dashboard's time frame.",
+      "reference": "https://docs.datadoghq.com/dashboards/template_variables/"
+    },
+    {
+      "id": "viz-fc-013",
+      "topic": "Dashboards",
+      "front": "How is a template variable selection stored in the dashboard URL?",
+      "back": "As &tpl_var_<TEMPLATE_VARIABLE_NAME>=<VALUE>, e.g., &tpl_var_env=prod.",
+      "reference": "https://docs.datadoghq.com/dashboards/template_variables/"
+    },
+    {
+      "id": "viz-fc-014",
+      "topic": "Dashboards",
+      "front": "What is a Powerpack?",
+      "back": "A templated group of widgets saved as a reusable dashboard building block (preset by Datadog or custom to your org). Updates sync to all instances; not supported on screenboards; only the author can delete it.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/powerpack/"
+    },
+    {
+      "id": "viz-fc-015",
+      "topic": "Dashboards",
+      "front": "Query Value widget",
+      "back": "Shows a single value (avg, min, sum, max or last over the time frame) with optional conditional formatting (e.g., green/yellow/red background) and a timeseries background. Targets 150 points.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/query_value/"
+    },
+    {
+      "id": "viz-fc-016",
+      "topic": "Dashboards",
+      "front": "Change widget",
+      "back": "Shows how a metric changed versus an hour, day, week or month before, as absolute or relative change. Results can be ordered by change, name, present value or past value.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/change/"
+    },
+    {
+      "id": "viz-fc-017",
+      "topic": "Dashboards",
+      "front": "Group widget vs Free Text widget",
+      "back": "Group: collapsible container with a custom header that holds one to many graphs (screenboard widgets cannot be grouped).\nFree Text: adds headings, commonly on screenboards.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/group/"
+    },
+    {
+      "id": "viz-fc-018",
+      "topic": "Dashboards",
+      "front": "Private dashboard refresh rate",
+      "back": "Depends on the time frame: shorter frames refresh more often. Examples: past 5 minutes = every 10 s, past hour = every 20 s, past day = every 3 min, past week = every hour.",
+      "reference": "https://docs.datadoghq.com/dashboards/"
+    },
+    {
+      "id": "viz-fc-019",
+      "topic": "Using Metrics",
+      "front": "Query to the graph: in what order does Datadog process a metric query?",
+      "back": "1. Select the timeseries matching the scope\n2. Time aggregation (rollup) per source\n3. Space aggregation across sources\n4. Functions and arithmetic",
+      "reference": "https://docs.datadoghq.com/dashboards/guide/query-to-the-graph/"
+    },
+    {
+      "id": "viz-fc-020",
+      "topic": "Using Metrics",
+      "front": "Space aggregators",
+      "back": "avg (default, 'avg by'), sum, min, max. They have no effect when the scope matches a single timeseries.",
+      "reference": "https://docs.datadoghq.com/dashboards/querying/"
+    },
+    {
+      "id": "viz-fc-021",
+      "topic": "Using Metrics",
+      "front": "Default rollup method and points per series",
+      "back": "Default time aggregation: avg. Per the Rollup docs, a line or bar graph series can have up to 1,500 points, while Query Value widgets target 150. Default intervals give far fewer points (e.g., 5-minute buckets over a day = 288 points).",
+      "reference": "https://docs.datadoghq.com/dashboards/functions/rollup/"
+    },
+    {
+      "id": "viz-fc-022",
+      "topic": "Using Metrics",
+      "front": ".rollup() syntax",
+      "back": ".rollup(<AGGREGATOR>, <INTERVAL>)\nAggregator: avg (default), sum, min, max or count.\nInterval: seconds, optional. Example: .rollup(sum, 86400) for daily totals.",
+      "reference": "https://docs.datadoghq.com/dashboards/functions/rollup/"
+    },
+    {
+      "id": "viz-fc-023",
+      "topic": "Using Metrics",
+      "front": "Default line-graph rollup intervals (examples)",
+      "back": "Past hour: 20s\nPast 4 hours: 1m\nPast day: 5m\nPast week: 1hr\nPast month: 4hr",
+      "reference": "https://docs.datadoghq.com/dashboards/functions/rollup/"
+    },
+    {
+      "id": "viz-fc-024",
+      "topic": "Using Metrics",
+      "front": ".as_count() vs .as_rate()",
+      "back": ".as_count(): absolute count per rollup interval.\n.as_rate(): value normalized per second.\nOn COUNT and RATE metrics, both disable interpolation and set the time aggregator to sum; neither changes how gauges are displayed.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/type_modifiers/"
+    },
+    {
+      "id": "viz-fc-025",
+      "topic": "Using Metrics",
+      "front": "timeshift() and calendar_shift()",
+      "back": "timeshift(<query>, -<SECONDS>) graphs values from N seconds earlier (e.g., -1209600 = 2 weeks).\ncalendar_shift(<query>, \"-1d\"|\"-7d\"|\"-1mo\", <timezone>) compares equivalent calendar periods.",
+      "reference": "https://docs.datadoghq.com/dashboards/functions/timeshift/"
+    },
+    {
+      "id": "viz-fc-026",
+      "topic": "Using Metrics",
+      "front": "anomalies() vs outliers() vs forecast()",
+      "back": "anomalies(): gray band of expected values based on the series' own past.\noutliers(): highlights series behaving differently from the rest of the group.\nforecast(): predicts where a metric is heading.",
+      "reference": "https://docs.datadoghq.com/dashboards/functions/algorithms/"
+    },
+    {
+      "id": "viz-fc-027",
+      "topic": "Using Metrics",
+      "front": "How do you do arithmetic between two metrics in a graph?",
+      "back": "Add each metric as a lettered query (a, b, ...) and enter a formula such as a / b. Arithmetic is applied after time and space aggregation and cannot be done between formulas.",
+      "reference": "https://docs.datadoghq.com/dashboards/querying/"
+    },
+    {
+      "id": "viz-fc-028",
+      "topic": "Using Metrics",
+      "front": "Metrics Explorer: key facts",
+      "back": "Basic interface for examining metrics. Default time frame: Past 1 Hour. Metrics not reported in the last 24 hours aren't listed in the editor (type them manually). Export to a dashboard, notebook, incident or monitor.",
+      "reference": "https://docs.datadoghq.com/metrics/explorer/"
+    },
+    {
+      "id": "viz-fc-029",
+      "topic": "Using Metrics",
+      "front": "Metrics Summary: what can you do there?",
+      "back": "List metrics reported in the past hour, day or week; search by metric name or tag; open a metric's side panel to view/edit metadata (unit, type, description, interval) and browse tags and related assets; filter with facets such as Query Activity.",
+      "reference": "https://docs.datadoghq.com/metrics/summary/"
+    },
+    {
+      "id": "viz-fc-030",
+      "topic": "Monitors and Alerts",
+      "front": "Metric monitor detection methods",
+      "back": "Threshold, Change, Anomaly, Outlier, Forecast.",
+      "reference": "https://docs.datadoghq.com/monitors/types/metric/"
+    },
+    {
+      "id": "viz-fc-031",
+      "topic": "Monitors and Alerts",
+      "front": "Simple Alert vs Multi Alert",
+      "back": "Simple Alert: one notification aggregated over all reporting sources (default when the query is ungrouped).\nMulti Alert: one notification per group (e.g., per host) that meets the conditions (default when grouped).",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/"
+    },
+    {
+      "id": "viz-fc-032",
+      "topic": "Monitors and Alerts",
+      "front": "Monitor threshold types",
+      "back": "Alert threshold (required), Warning threshold, Alert recovery threshold and Warning recovery threshold (optional). Without recovery thresholds, a monitor recovers once the alert condition is no longer met.",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/"
+    },
+    {
+      "id": "viz-fc-033",
+      "topic": "Monitors and Alerts",
+      "front": "Recovery condition when the alert condition is '> alert threshold'",
+      "back": "Recovery happens when the value is <= the alert recovery threshold (e.g., alert > 80, recover <= 70). Recovery thresholds reduce flapping.",
+      "reference": "https://docs.datadoghq.com/monitors/guide/recovery-thresholds/"
+    },
+    {
+      "id": "viz-fc-034",
+      "topic": "Monitors and Alerts",
+      "front": "Monitor options when data is missing",
+      "back": "Evaluate as zero\nShow last known status\nShow NO DATA\nShow NO DATA and notify\nShow OK",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/"
+    },
+    {
+      "id": "viz-fc-035",
+      "topic": "Monitors and Alerts",
+      "front": "Monitor statuses",
+      "back": "OK, Warn, Alert, No Data. In monitor search, 'Triggered' means Alert, Warn or No Data.",
+      "reference": "https://docs.datadoghq.com/monitors/manage/search/"
+    },
+    {
+      "id": "viz-fc-036",
+      "topic": "Monitors and Alerts",
+      "front": "Host monitor",
+      "back": "Watches the datadog.agent.up service check (reported with status OK by every Agent).\nCheck alert: triggers if it stops reporting OK for N minutes (default 2).\nCluster alert: triggers when a percentage of hosts stop reporting.",
+      "reference": "https://docs.datadoghq.com/monitors/types/host/"
+    },
+    {
+      "id": "viz-fc-037",
+      "topic": "Monitors and Alerts",
+      "front": "Monitor aggregation: max vs min (above-threshold alert)",
+      "back": "max: alert if any single value crosses the threshold.\nmin: alert if all points in the window cross it.\n(The behavior is reversed for below-threshold monitors.)",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/"
+    },
+    {
+      "id": "viz-fc-038",
+      "topic": "Monitors and Alerts",
+      "front": "Default monitor evaluation frequency by evaluation window",
+      "back": "Window < 24 hours: every 1 minute\n24 hours <= window < 48 hours: every 10 minutes\nWindow >= 48 hours: every 30 minutes",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/"
+    },
+    {
+      "id": "viz-fc-039",
+      "topic": "Monitors and Alerts",
+      "front": "Common conditional variables in monitor messages",
+      "back": "{{#is_alert}}, {{#is_warning}}, {{#is_recovery}}, {{#is_no_data}}, {{#is_renotify}}, {{#is_match}}, {{#is_exact_match}}. Prefix ^ negates (e.g., {{^is_alert}}); close each with {{/...}}.",
+      "reference": "https://docs.datadoghq.com/monitors/notify/variables/"
+    },
+    {
+      "id": "viz-fc-040",
+      "topic": "Monitors and Alerts",
+      "front": "Built-in template and tag variables for monitor messages",
+      "back": "{{value}} (breaching value), {{threshold}}, {{warn_threshold}}, {{comparator}}, {{first_triggered_at}}, {{last_triggered_at}}, {{triggered_duration_sec}}.\nTag variables: {{host.name}}, {{host.ip}}, {{<key>.name}} (e.g., {{env.name}}).",
+      "reference": "https://docs.datadoghq.com/monitors/notify/variables/"
+    },
+    {
+      "id": "viz-fc-041",
+      "topic": "Monitors and Alerts",
+      "front": "Monitor @-notification handles",
+      "back": "@<email address>, @slack-<channel>, @pagerduty-<service>, @webhook-<name>, @teams-..., @jira-..., @team-<handle>. An @-handle needs a space before it.",
+      "reference": "https://docs.datadoghq.com/monitors/notify/"
+    },
+    {
+      "id": "viz-fc-042",
+      "topic": "Monitors and Alerts",
+      "front": "Monitor downtimes",
+      "back": "Silence alerts and notifications (monitor states still change). Target monitors by name or tags (must match ALL), refine with a group scope; one-time or recurring (RRULE). The Mute button on a monitor creates a downtime for it.",
+      "reference": "https://docs.datadoghq.com/monitors/downtimes/"
+    },
+    {
+      "id": "viz-fc-043",
+      "topic": "Monitors and Alerts",
+      "front": "Composite monitor",
+      "back": "Combines up to 10 existing monitors with a Boolean expression (e.g., a && b). Cannot include other composites. && takes the least severe status, || the most severe.",
+      "reference": "https://docs.datadoghq.com/monitors/types/composite/"
+    }
+  ]
+}

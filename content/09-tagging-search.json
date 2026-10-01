@@ -1,0 +1,958 @@
+{
+  "questions": [
+    {
+      "id": "tag-q-001",
+      "topic": "Tagging Best Practices",
+      "question": "Unified service tagging is a Datadog best practice that ties telemetry together through the use of which three standard tags?",
+      "choices": [
+        "host, service, and source",
+        "service, device, and version",
+        "env, service, and version",
+        "env, host, and team"
+      ],
+      "answer": 2,
+      "explanation": "Unified service tagging uses the three reserved tags env, service, and version so that traces, metrics, and logs can be correlated consistently. host, source, device, and team are also reserved tag keys, but they serve other purposes: host-level correlation, log pipeline selection, disk segregation, and ownership.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-002",
+      "topic": "Tagging Best Practices",
+      "question": "What is the maximum length of a Datadog tag, and how is it counted for a tag in `<key>:<value>` format?",
+      "choices": [
+        "200 characters for the key plus 200 for the value",
+        "100 characters, counting only the value after the colon",
+        "200 characters, with key, colon, and value all counted",
+        "256 characters, counting the key and value but not the colon"
+      ],
+      "answer": 2,
+      "explanation": "Tags can be up to 200 characters long, and for `<key>:<value>` tags the key, the colon, and the value all count toward that single limit. There is no separate per-key or per-value allowance, and the documented limit is neither 100 nor 256 characters.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#define-tags",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-003",
+      "topic": "Tagging Best Practices",
+      "question": "A developer submits a custom metric with the tag `Team:Payments`. How will this tag appear on the metric in Datadog?",
+      "choices": [
+        "`team:payments`, fully lowercased",
+        "`Team:Payments`, unchanged",
+        "`team:Payments` (key only lowercased)",
+        "Rejected: uppercase isn't allowed"
+      ],
+      "answer": 0,
+      "explanation": "Metric tags and span tags are normalized to lowercase, so the whole tag `Team:Payments` is stored as `team:payments`; this is why Datadog advises against camel case in tag keys. The tag is not rejected, the value is lowercased along with the key, and the original casing is not preserved (log attributes, unlike tags, are case-sensitive).",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#define-tags",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-004",
+      "topic": "Tagging Best Practices",
+      "question": "In `datadog.yaml`, an engineer adds the host tag `owner:web ops` (containing a space) to the `tags` list. What tag does Datadog apply?",
+      "choices": [
+        "`owner:web` and a separate tag `ops`",
+        "`owner:webops`",
+        "`owner:web%20ops`",
+        "`owner:web_ops`"
+      ],
+      "answer": 3,
+      "explanation": "Characters outside the allowed set, including spaces, commas, and backslashes, are converted to underscores, and a YAML list entry stays a single tag, so the result is `owner:web_ops`. Splitting on whitespace into separate tags is how the `DD_TAGS` environment variable behaves, not a YAML entry, and Datadog neither deletes nor URL-encodes the space.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/assigning_tags/",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-005",
+      "topic": "Tagging Best Practices",
+      "question": "A containerized Agent is started with `DD_TAGS=\"owner:site reliability env:prod\"`. Which tags does it apply?",
+      "choices": [
+        "`owner:site_reliability` and `env:prod`",
+        "`owner:site`, `reliability`, and `env:prod`",
+        "Only `env:prod`; the owner tag is dropped",
+        "A single tag, `owner:site_reliability_env:prod`"
+      ],
+      "answer": 1,
+      "explanation": "`DD_TAGS` uses whitespace as the separator between tags and does not convert whitespace to underscores, so each space-separated token becomes its own tag: `owner:site`, `reliability`, and `env:prod`. Nothing is dropped or merged. To set a tag value that contains spaces, use YAML configuration or integration annotations, where whitespace is converted to underscores.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/assigning_tags/#environment-variables",
+      "difficulty": 3
+    },
+    {
+      "id": "tag-q-006",
+      "topic": "Tagging Best Practices",
+      "question": "For the tag `env:staging:east`, which part does Datadog treat as the tag key?",
+      "choices": [
+        "`env`",
+        "`env:staging`",
+        "`east`",
+        "No key, because the tag contains two colons"
+      ],
+      "answer": 0,
+      "explanation": "In `<key>:<value>` format the key always precedes the first colon, so `env:staging:east` has key `env` and value `staging:east`. Colons are allowed after the leading letter, so the tag is valid and is not split at the last colon; by contrast, `env_staging:east` would have the key `env_staging`.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#define-tags",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-007",
+      "topic": "Tagging Best Practices",
+      "question": "A developer proposes tags for a DogStatsD counter that tracks checkout attempts. The `request_id` value is unique for every request. Which proposed tag goes against Datadog's tagging best practices?",
+      "choices": [
+        "`env:prod`",
+        "`payment_method:card`",
+        "`request_id:9b2c6f0e`",
+        "`region:us-east-1`"
+      ],
+      "answer": 2,
+      "explanation": "Tags should not come from unbounded sources such as epoch timestamps, user IDs, or request IDs. Because a custom metric is identified by the metric name plus each unique combination of tag values, a per-request ID creates a new timeseries for nearly every request and causes unbounded metric growth. `env`, `region`, and a small set of payment methods are bounded values that are useful for filtering and grouping.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#define-tags",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-008",
+      "topic": "Tagging Best Practices",
+      "question": "According to Datadog's list of reserved tag keys, what does the `source` tag enable?",
+      "choices": [
+        "Correlation between metrics, traces, processes, and logs on a host",
+        "Segregation of metrics and logs by device or disk",
+        "Assigning ownership of resources to a team",
+        "Span filtering and automated pipeline creation for Log Management"
+      ],
+      "answer": 3,
+      "explanation": "The `source` tag drives span filtering and automated pipeline creation for Log Management; when a log's source matches an integration name, Datadog installs that integration's parsers and facets. Correlation across telemetry from a machine is the role of `host`, device or disk segregation is `device`, and ownership is `team`.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#overview",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-009",
+      "topic": "Tagging Best Practices",
+      "question": "To get the full range of unified service tagging for a Kubernetes Deployment, where should the `tags.datadoghq.com/env`, `tags.datadoghq.com/service`, and `tags.datadoghq.com/version` labels be added?",
+      "choices": [
+        "On both the parent workload and the pod template",
+        "Only on the Kubernetes namespace object",
+        "Only in the `tags` list of the Agent's `datadog.yaml` file",
+        "Only as annotations on each Node object"
+      ],
+      "answer": 0,
+      "explanation": "Datadog's full configuration adds the `tags.datadoghq.com/*` labels to both the parent workload (such as the Deployment) and the pod template; APM-instrumented apps also set `DD_ENV`, `DD_SERVICE`, and `DD_VERSION`, which can be populated from those labels with the downward API. Namespace labels, node annotations, and Agent-level tags cannot express per-workload `service` and `version` values.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-010",
+      "topic": "Tagging Best Practices",
+      "question": "A Redis container is not instrumented with APM, so it doesn't need the `DD_*` environment variables. Which Docker labels set its unified service tags?",
+      "choices": [
+        "`tags.datadoghq.com/env`, `tags.datadoghq.com/service`, `tags.datadoghq.com/version`",
+        "`com.datadoghq.ad.env`, `com.datadoghq.ad.service`, `com.datadoghq.ad.version`",
+        "`com.datadoghq.tags.env`, `com.datadoghq.tags.service`, `com.datadoghq.tags.version`",
+        "`datadog.tags.env`, `datadog.tags.service`, `datadog.tags.version`"
+      ],
+      "answer": 2,
+      "explanation": "For containers that don't need the Datadog environment variables (for example Redis, PostgreSQL, or NGINX not traced by APM), the Docker partial configuration uses the labels `com.datadoghq.tags.env`, `com.datadoghq.tags.service`, and `com.datadoghq.tags.version`. The `tags.datadoghq.com/*` form is for Kubernetes labels, and `com.datadoghq.ad.*` labels hold Autodiscovery integration templates, not unified service tags.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-011",
+      "topic": "Tagging Best Practices",
+      "question": "A team ships a new build of its `checkout` service. How should the unified service `version` tag be handled?",
+      "choices": [
+        "Keep `version` fixed so dashboards don't break",
+        "Remove `version` and rely on the `host` tag",
+        "Set `version` to the same value as `env`",
+        "Give the new build a distinct `version` value"
+      ],
+      "answer": 3,
+      "explanation": "Datadog expects the `version` tag to change with each new application deployment, and two different versions of code should have distinct `version` tags. That is what lets you identify deployment impact by filtering traces and container metrics by version; a fixed, removed, or env-derived version would hide the difference between releases.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-012",
+      "topic": "Tagging Best Practices",
+      "question": "A non-containerized VM runs a single service. Which Agent `datadog.yaml` configuration follows Datadog's unified service tagging guidance?",
+      "choices": [
+        "`env: prod` and `tags: [\"service:billing\", \"version:2.3.1\"]`",
+        "`tags: [\"env prod\", \"service billing\"]`",
+        "`env: prod` and `tags: [\"service:billing\"]`",
+        "`hostname: billing-prod`"
+      ],
+      "answer": 2,
+      "explanation": "For a single service per host, Datadog shows `env: <ENV>` plus a `service:<SERVICE>` entry under `tags` in the Agent's main configuration file, which guarantees consistent `env` and `service` tags on all data the Agent emits. Adding `version` at the Agent level is not recommended because that configuration doesn't change with each invocation of the service. Writing `env prod` with a space produces the simple tag `env_prod` rather than a key:value tag, and a hostname creates no env or service tags.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/",
+      "difficulty": 3
+    },
+    {
+      "id": "tag-q-013",
+      "topic": "Tagging Best Practices",
+      "question": "Which tag assignment approach does Datadog describe as the most efficient?",
+      "choices": [
+        "Integration inheritance, such as AWS or Chef tags",
+        "Manually adding tags to each host from the Host Map page",
+        "Attaching tags to each metric sent via the API",
+        "Listing tags individually in each integration's conf.yaml"
+      ],
+      "answer": 0,
+      "explanation": "Datadog states that the most efficient method for assigning tags is to rely on integration inheritance: tags you assign to AWS instances, Chef recipes, and other integrations are automatically inherited by hosts and metrics sent to Datadog. Manual UI tagging, per-submission API tags, and per-file configuration all work but take more effort to keep consistent.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/assigning_tags/#integration-inheritance",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-014",
+      "topic": "Tagging Best Practices",
+      "question": "Which raw DogStatsD datagram correctly sends a count metric with the tags `env:prod` and `team:web`?",
+      "choices": [
+        "`page.views:1|c|tags:env:prod,team:web`",
+        "`page.views|c|1|#env:prod,team:web`",
+        "`#env:prod,team:web|page.views:1|c`",
+        "`page.views:1|c|#env:prod,team:web`"
+      ],
+      "answer": 3,
+      "explanation": "The datagram format is `<METRIC_NAME>:<VALUE>|<TYPE>|@<SAMPLE_RATE>|#<TAGS>`: the value follows the metric name after a colon, and tags come last after `#` as a comma-separated list with colons for key/value pairs. There is no `tags:` keyword in the datagram, the value can't be placed after the type, and the tags field can't lead the datagram.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-015",
+      "topic": "Tagging Best Practices",
+      "question": "For one service, `service` is set to `payments` in an environment variable, `checkout` in the Agent YAML, and `orders` in the tracing client configuration. How does the Datadog Agent handle this?",
+      "choices": [
+        "It keeps only the environment variable value",
+        "It emits all three `service` values with the telemetry",
+        "It keeps only the value from the Agent YAML",
+        "It keeps only the tracer value, as the most specific source"
+      ],
+      "answer": 1,
+      "explanation": "The Agent does not enforce a precedence order across tag sources; it collects every unique value for a tag key and emits all of them, so this telemetry could carry `service:payments`, `service:checkout`, and `service:orders`. Dashboards and monitors should filter explicitly on the value they expect, and each key is best configured from a single source.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#tag-precedence",
+      "difficulty": 3
+    },
+    {
+      "id": "tag-q-016",
+      "topic": "Tagging Best Practices",
+      "question": "In Kubernetes, `DD_DOGSTATSD_TAG_CARDINALITY` is changed from the default `low` to `high`. What effect does this have on DogStatsD metrics?",
+      "choices": [
+        "Container-level tags like `container_id` are added to them",
+        "They are limited to cluster-level tags such as `kube_namespace`",
+        "Pod labels are no longer extracted as tags for them",
+        "Tags attached by application code are discarded"
+      ],
+      "answer": 0,
+      "explanation": "The cardinality levels are `low` (the default, cluster-level tags such as `kube_namespace`), `orchestrator` (pod-level tags such as `pod_name`), and `high` (container-level tags such as `container_id`). Sending container tags on DogStatsD metrics can create one metric per container instead of one per host, which may impact custom metrics billing. The setting doesn't strip application tags or stop label extraction.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/assigning_tags/#environment-variables",
+      "difficulty": 3
+    },
+    {
+      "id": "tag-q-017",
+      "topic": "Tagging Best Practices",
+      "question": "Where should an engineer define a tag that must apply to all metrics, traces, and logs forwarded by the Agent on a host?",
+      "choices": [
+        "The `tags` list in one integration's `conf.yaml`",
+        "The `tags` list in the Agent's `datadog.yaml`",
+        "The Tags dropdown when creating a monitor",
+        "A template variable on the team's dashboard"
+      ],
+      "answer": 1,
+      "explanation": "Tags in the Agent's main configuration file, `datadog.yaml`, are host tags that apply to all metrics, traces, and logs forwarded by that Agent. Tags in `conf.d/<integration>.d/conf.yaml` apply only to that integration's data, monitor tags are separate from telemetry tags, and template variables only filter dashboard widgets.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/assigning_tags/#configuration-file",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-018",
+      "topic": "Using Tags",
+      "question": "Which metric query shows average user CPU for only the sources tagged `env:prod`?",
+      "choices": [
+        "`avg:system.cpu.user{*} by {env:prod}`",
+        "`avg:system.cpu.user{host:env:prod}`",
+        "`avg:system.cpu.user{env:prod}`",
+        "`avg:system.cpu.user{*}.filter(env:prod)`"
+      ],
+      "answer": 2,
+      "explanation": "Tags inside the curly braces (the 'from' scope) filter the query, so `{env:prod}` limits it to sources tagged `env:prod`. The `by {}` clause groups rather than filters and takes tag keys; `host:env:prod` would look for a `host` tag whose value is `env:prod`; and there is no `.filter()` method for tag scoping.",
+      "reference": "https://docs.datadoghq.com/metrics/advanced-filtering/",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-019",
+      "topic": "Using Tags",
+      "question": "An engineer wants one timeseries line per host showing average user CPU, limited to the production environment. Which query does this?",
+      "choices": [
+        "`avg:system.cpu.user{env:prod} by {host}`",
+        "`avg:system.cpu.user{host} by {env:prod}`",
+        "`avg:system.cpu.user{env:prod,host:*}`",
+        "`avg:system.cpu.user{*} by {env}`"
+      ],
+      "answer": 0,
+      "explanation": "The scope `{env:prod}` filters to production and `by {host}` splits the result into one line per host value. Swapping scope and grouping reverses their meaning, a `host:*` filter still returns one aggregated line, and `by {env}` produces one line per environment rather than per host.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/#dashboards",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-020",
+      "topic": "Using Tags",
+      "question": "What data does the scope in `avg:system.cpu.user{env:prod,role:db}` return?",
+      "choices": [
+        "Sources carrying at least one of the two tags",
+        "Sources tagged `env:prod` but not `role:db`",
+        "Only sources that have both tags applied",
+        "No data; commas are invalid in a scope"
+      ],
+      "answer": 2,
+      "explanation": "In metric filters the comma is the symbolic form of `AND`, and including multiple tags uses AND logic, so only data carrying both `env:prod` and `role:db` is returned. Matching either tag requires `OR`, and excluding a tag requires `!` or `NOT`.",
+      "reference": "https://docs.datadoghq.com/metrics/advanced-filtering/#boolean-filtered-queries",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-021",
+      "topic": "Using Tags",
+      "question": "Which metric query is invalid according to Datadog's advanced filtering rules?",
+      "choices": [
+        "`avg:mymetric{env:prod AND region NOT IN (us-east)}`",
+        "`avg:mymetric{env:prod,!region:us-east}`",
+        "`avg:mymetric{env:prod AND region IN (us-east, us-west)}`",
+        "`avg:mymetric{env:prod AND !region:us-east}`"
+      ],
+      "answer": 3,
+      "explanation": "Symbolic boolean syntax (`!` and `,`) cannot be combined with functional operators (`NOT`, `AND`, `OR`, `IN`, `NOT IN`), and `avg:mymetric{env:prod AND !region:us-east}` is the documented invalid example. Queries that use only functional operators (`AND ... NOT IN (...)`, `AND ... IN (...)`) or only symbolic ones (`,` with `!`) are valid.",
+      "reference": "https://docs.datadoghq.com/metrics/advanced-filtering/#boolean-filtered-queries",
+      "difficulty": 3
+    },
+    {
+      "id": "tag-q-022",
+      "topic": "Using Tags",
+      "question": "Which query keeps only `env:prod` data from hosts in either `us-east-1a` or `us-east-1b`?",
+      "choices": [
+        "`avg:system.cpu.user{env:prod AND availability-zone:us-east-1a AND availability-zone:us-east-1b}`",
+        "`avg:system.cpu.user{env:prod AND availability-zone IN (us-east-1a, us-east-1b)}`",
+        "`avg:system.cpu.user{env:prod OR availability-zone IN (us-east-1a, us-east-1b)}`",
+        "`avg:system.cpu.user{env:prod AND availability-zone NOT IN (us-east-1a, us-east-1b)}`"
+      ],
+      "answer": 1,
+      "explanation": "`key IN (value1, value2)` matches any listed value for that key, and `AND` with `env:prod` keeps only production data. Requiring both zones with `AND` matches nothing because a host sits in one zone, `OR` returns all `env:prod` data plus those zones in any environment, and `NOT IN` excludes the two zones instead.",
+      "reference": "https://docs.datadoghq.com/metrics/advanced-filtering/#boolean-filtered-query-examples",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-023",
+      "topic": "Using Tags",
+      "question": "Which query graphs disk usage per device while excluding every loop device, such as `/dev/loop0` and `/dev/loop1`?",
+      "choices": [
+        "`avg:system.disk.in_use{!device:/dev/loop*} by {device}`",
+        "`avg:system.disk.in_use{!device:/dev/loop*} by {host}`",
+        "`avg:system.disk.in_use{device NOT IN (/dev/loop0)} by {device}`",
+        "`avg:system.disk.in_use{device:/dev/loop1} by {device}`"
+      ],
+      "answer": 0,
+      "explanation": "`!` negates a tag filter and wildcard tag filtering supports prefixes, so `!device:/dev/loop*` removes every loop device while `by {device}` keeps one series per remaining device; this is an example from Datadog's docs. Grouping `by {host}` loses the per-device breakdown, `NOT IN (/dev/loop0)` excludes only one loop device, and `device:/dev/loop1` shows nothing but that loop device.",
+      "reference": "https://docs.datadoghq.com/metrics/advanced-filtering/#wildcard-filtered-query-examples",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-024",
+      "topic": "Using Tags",
+      "question": "A metric monitor uses `avg(last_5m):avg:system.cpu.user{env:prod} by {host} > 90` and keeps the default alert aggregation for that query. How does it notify when three production hosts exceed the threshold?",
+      "choices": [
+        "It sends a separate alert for each of the three hosts",
+        "It sends one alert based on the aggregate of all hosts",
+        "It alerts only for the host with the highest value",
+        "It can't alert, since `by {host}` isn't allowed in monitors"
+      ],
+      "answer": 0,
+      "explanation": "When a monitor query is grouped by any dimension (the 'avg by' field), alert aggregation changes to Multi Alert, which sends one notification per group that meets the alert condition, here one per host. A query with no grouping defaults to Simple Alert, which sends a single notification based on the aggregated value. A grouped monitor can be switched to Simple Alert manually, but that is not the default.",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/#set-alert-aggregation",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-025",
+      "topic": "Using Tags",
+      "question": "On the Manage Monitors page, which search returns monitors that have the monitor tag `team:payments`?",
+      "choices": [
+        "`scope:team:payments`",
+        "`@team:payments`",
+        "`metric:team:payments`",
+        "`tag:team:payments`"
+      ],
+      "answer": 3,
+      "explanation": "Monitor search uses the format `tag:<KEY>:<VALUE>`, and `tag:-<KEY>:<VALUE>` excludes monitors with that tag. Monitor tags are separate from metric tags: `scope:` searches the tags in a monitor query's `from` field, `metric:` searches the monitored metric name, and `@` prefixes attributes in log-style searches.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/#monitors",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-026",
+      "topic": "Using Tags",
+      "question": "A dashboard has a template variable named `env` built on the `env` tag key. What do you add to a widget's 'from' field so it follows the dropdown selection?",
+      "choices": [
+        "`env:all`",
+        "`{{env.name}}`",
+        "`$env`",
+        "`template:env`"
+      ],
+      "answer": 2,
+      "explanation": "Template variables are referenced by name with a `$` prefix, so adding `$env` to a widget's from field scopes it to whatever value is selected in the dropdown. `env:all` filters on a literal value `all`, `{{env.name}}` is monitor notification variable syntax, and `template:` is not a query keyword.",
+      "reference": "https://docs.datadoghq.com/dashboards/template_variables/",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-027",
+      "topic": "Using Tags",
+      "question": "A dashboard template variable `service` currently has `checkout` selected. A widget must filter on the tag `env:staging-checkout`, built from the selected value. Which filter does this?",
+      "choices": [
+        "`env:staging-$service`",
+        "`env:staging-$service.key`",
+        "`env:staging-$service.name`",
+        "`env:staging-$service.value`"
+      ],
+      "answer": 3,
+      "explanation": "`$<NAME>.value` inserts only the selected value, so `env:staging-$service.value` becomes `env:staging-checkout`, which is the pattern shown in Datadog's docs. A bare `$service` expands to the whole tag (`service:checkout`), `.key` returns the tag key rather than the value, and `.name` is not a template variable property.",
+      "reference": "https://docs.datadoghq.com/dashboards/template_variables/",
+      "difficulty": 3
+    },
+    {
+      "id": "tag-q-028",
+      "topic": "Using Tags",
+      "question": "On the Host Map or Infrastructure List, what happens when you enter the tag key `service` in the Group by box?",
+      "choices": [
+        "Only hosts that carry a `service` tag remain visible in the view",
+        "Hosts are grouped under a heading for each `service` value",
+        "The `service` tag is added to every displayed host",
+        "Hosts are colored by how many services they run"
+      ],
+      "answer": 1,
+      "explanation": "The Group by box groups hosts and containers by tag key, so entering `service` shows each service as a group heading. Narrowing to specific hosts is done in the separate Filter by box, tags are added from the host overlay, and color is controlled by Fill by.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/#infrastructure",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-029",
+      "topic": "Using Tags",
+      "question": "The AWS integration's 'to hosts with tag' filter is `datadog:monitored,env:production,!region:us-east-1`. Which EC2 instances are collected?",
+      "choices": [
+        "Instances with both `datadog:monitored` and `env:production`, in any region",
+        "Instances with `datadog:monitored` or `env:production`, even in `region:us-east-1`",
+        "Instances with `datadog:monitored` or `env:production`, minus `region:us-east-1`",
+        "Only instances tagged `region:us-east-1` that also have `env:production`"
+      ],
+      "answer": 2,
+      "explanation": "In the AWS integration's tag filter, inclusion tags are combined with `OR`, so an instance needs any one of them. An exclusion tag prefixed with `!` takes precedence and forms an `AND`, so instances tagged `region:us-east-1` are dropped even if they match an inclusion tag. Note this differs from metric query scopes, where a comma means AND.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/#integrations",
+      "difficulty": 3
+    },
+    {
+      "id": "tag-q-030",
+      "topic": "Using Tags",
+      "question": "In the Events Explorer, which search returns events carrying either the tag `service:coffee-house` or the tag `host:coffeehouseprod`?",
+      "choices": [
+        "`tags:(service:coffee-house OR host:coffeehouseprod)`",
+        "`tags:(service:coffee-house AND host:coffeehouseprod)`",
+        "`tags:(service:coffee-house -host:coffeehouseprod)`",
+        "`service:coffee-house host:coffeehouseprod`"
+      ],
+      "answer": 0,
+      "explanation": "The Using Tags guide shows `tags:` followed by the tags in parentheses; separating them with `OR` searches inclusively (either tag), while `AND` requires both. The `-` operator excludes the term that follows it, and space-separated terms are combined with an implicit AND, so they also require both tags.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/#events",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-031",
+      "topic": "Using Tags",
+      "question": "An engineer writes the metric query `avg:system.cpu.user{env:prod and role:web}` using a lowercase `and`. What happens?",
+      "choices": [
+        "It fails because operators must be uppercase",
+        "It treats `and` as a third tag to match",
+        "It works the same as `env:prod AND role:web`",
+        "It returns data that matches either tag"
+      ],
+      "answer": 2,
+      "explanation": "Boolean filtered metric queries accept both uppercase and lowercase forms of `NOT`, `AND`, `OR`, `IN`, and `NOT IN`, so `and` behaves exactly like `AND`. This differs from log search, where Boolean operators are case-sensitive and must be written in uppercase.",
+      "reference": "https://docs.datadoghq.com/metrics/advanced-filtering/#boolean-filtered-queries",
+      "difficulty": 3
+    },
+    {
+      "id": "tag-q-032",
+      "topic": "Using Tags",
+      "question": "Which reserved tag key does Datadog use for correlation between metrics, traces, processes, and logs from the same machine?",
+      "choices": [
+        "`source`",
+        "`device`",
+        "`version`",
+        "`host`"
+      ],
+      "answer": 3,
+      "explanation": "Datadog lists `host` as the reserved tag that allows correlation between metrics, traces, processes, and logs, and data associated with a host inherits that host's host-level tags. `source` drives log pipeline creation and span filtering, `device` segregates data by device or disk, and `version` scopes application data by release.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#overview",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-033",
+      "topic": "Log & Event Search",
+      "question": "In Datadog log search, what is `\"payment failed\"` (including the double quotes)?",
+      "choices": [
+        "Two single terms joined by an implicit OR",
+        "An attribute search on the `payment` attribute",
+        "A sequence, matching the words as a phrase",
+        "A full-text search across all log attributes"
+      ],
+      "answer": 2,
+      "explanation": "A single term is one word such as `hello`, while a sequence is a group of words surrounded by double quotes, such as `\"hello dolly\"`, and is matched as a phrase. Unquoted terms are combined with an implicit AND rather than OR, attribute searches need `@attribute:`, and searching all attributes requires the full-text `*:` syntax.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#overview",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-034",
+      "topic": "Log & Event Search",
+      "question": "Which log query returns error logs from the `checkout` service in `env:prod`, excluding logs whose `http.status_code` attribute is `404`?",
+      "choices": [
+        "`service:checkout env:prod status:error -@http.status_code:404`",
+        "`service:checkout env:prod status:error NOT http.status_code:404`",
+        "`service:checkout env:prod status:error -@http.status_code:4*`",
+        "`service:checkout OR env:prod OR status:error -@http.status_code:404`"
+      ],
+      "answer": 0,
+      "explanation": "Space-separated terms are joined with an implicit AND, reserved attributes like `service` and `status` and tags like `env` are searched without `@`, custom attributes such as `http.status_code` need the `@` prefix, and `-` excludes the following term. Dropping the `@` turns the status code into a tag search, excluding `4*` removes every status code starting with 4 rather than only 404, and `OR` broadens the results instead of narrowing them.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-035",
+      "topic": "Log & Event Search",
+      "question": "Logs contain a custom JSON attribute `user.plan`. Which query finds logs where it equals `premium`?",
+      "choices": [
+        "`@user.plan:premium`",
+        "`@plan:premium`",
+        "`tags:user.plan:premium`",
+        "`*:user.plan=premium`"
+      ],
+      "answer": 0,
+      "explanation": "To search a specific attribute, prefix its full path with `@`, as in `@url:www.datadoghq.com` or `@http.url_details.path:...`. `@plan` would look for a top-level `plan` attribute rather than the nested `user.plan`, `tags:` is meant for tags that don't use key:value format, and `*:` runs a full-text string search rather than matching an attribute value.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#attributes-search",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-036",
+      "topic": "Log & Event Search",
+      "question": "Which log query retrieves all server errors with an HTTP status code from 500 through 599?",
+      "choices": [
+        "`@http.status_code:500-599`",
+        "`@http.status_code:(500 OR 599)`",
+        "`@http.status_code:5xx`",
+        "`@http.status_code:[500 TO 599]`"
+      ],
+      "answer": 3,
+      "explanation": "Numerical ranges use square brackets with `TO`, as in Datadog's example `@http.status_code:[400 TO 499]` for 4xx errors. A hyphen is a special character rather than range syntax, `(500 OR 599)` matches only those two exact codes, and `5xx` is searched as a literal value that numeric status codes never contain.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#numerical-values",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-037",
+      "topic": "Log & Event Search",
+      "question": "A team wants to run `@http.response_time:>100` against a numerical log attribute. According to Datadog's search syntax documentation, what must be done first?",
+      "choices": [
+        "Remap it to the reserved `message` attribute",
+        "Add the numerical attribute as a facet",
+        "Wrap the value in double quotes",
+        "Convert it into a host tag with `DD_TAGS`"
+      ],
+      "answer": 1,
+      "explanation": "Datadog states that to search on a numerical attribute you first add it as a facet; you can then use `<`, `>`, `<=`, `>=`, or `[x TO y]` range searches on it. Remapping it to `message`, quoting the value (which makes it literal text), or turning it into a host tag would not enable numeric comparison.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#numerical-values",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-038",
+      "topic": "Log & Event Search",
+      "question": "The attribute `my_attribute` has the value `hello:world`. Which search matches it?",
+      "choices": [
+        "`@my_attribute:helloworld`",
+        "`@my_attribute:hello AND world`",
+        "`@my_attribute:hello\\:world`",
+        "`@my_attribute:hello%3Aworld`"
+      ],
+      "answer": 2,
+      "explanation": "`:` is a special character, so a value containing it must be escaped with a backslash (`hello\\:world`) or wrapped in double quotes (`\"hello:world\"`). Removing the colon searches for a different value, `hello AND world` splits the search into an attribute term and a separate free-text term, and URL-encoding is not supported as an escape mechanism.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#escape-special-characters-and-spaces",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-039",
+      "topic": "Log & Event Search",
+      "question": "What is the difference between the log searches `*timeout*` and `\"*timeout*\"`?",
+      "choices": [
+        "The first finds `timeout` anywhere in the message; the second finds the literal `*timeout*`",
+        "Both find `timeout` anywhere in the message; the quotes only make matching case-insensitive",
+        "The first searches every attribute; the second searches only the log message",
+        "The first matches whole words only; the second also matches `timeout` inside longer words"
+      ],
+      "answer": 0,
+      "explanation": "Wildcards only work as wildcards outside of double quotes: `*timeout*` matches logs whose message contains `timeout` anywhere, while `\"*timeout*\"` matches a message containing the literal characters `*timeout*`. Quotes don't change case sensitivity, and neither form searches every attribute; that requires the full-text `*:` syntax.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#wildcards",
+      "difficulty": 3
+    },
+    {
+      "id": "tag-q-040",
+      "topic": "Log & Event Search",
+      "question": "An engineer needs to find the string `timeout` in any log attribute, not only in the message. Which query does this?",
+      "choices": [
+        "`*:timeout`",
+        "`timeout` by itself",
+        "`message:timeout`",
+        "`tags:timeout`"
+      ],
+      "answer": 0,
+      "explanation": "The `*:search_term` syntax performs a full-text search across all log attributes, including the log message. A plain term like `timeout` is a free-text search limited to `message`, `@title`, `@error.message`, and `@error.stack`, while `message:timeout` targets only the message and `tags:timeout` looks for a tag.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#full-text-search",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-041",
+      "topic": "Log & Event Search",
+      "question": "In which of these contexts can the full-text `*:search_term` syntax be used?",
+      "choices": [
+        "A Live Tail search",
+        "A log index filter",
+        "A log monitor query",
+        "A log-based metric filter"
+      ],
+      "answer": 2,
+      "explanation": "Full-text search is available in Log Management and works in monitor, dashboard, and notebook queries. Datadog states it cannot be used in Live Tail or to define index filters, archive filters, log pipeline filters, rehydration filters, or log-based metric filters.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#full-text-search",
+      "difficulty": 3
+    },
+    {
+      "id": "tag-q-042",
+      "topic": "Log & Event Search",
+      "question": "The query `@user.name:alice` does not return logs where the value is `Alice`. Which explanation is correct?",
+      "choices": [
+        "Only faceted attributes are searchable; create a `user.name` facet first",
+        "Uppercase values are dropped at intake unless remapped",
+        "Only the 100 most recent values are searchable; shorten the range",
+        "Attribute searches are case-sensitive, unlike full-text search"
+      ],
+      "answer": 3,
+      "explanation": "Attribute searches are case-sensitive, and Datadog recommends full-text search for case-insensitive results, or applying the Grok parser's `lowercase` filter during processing. A facet is not required to search attributes, and log attribute values are neither dropped nor normalized at intake (unlike metric tags, which are lowercased).",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#reserved-attributes",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-043",
+      "topic": "Log & Event Search",
+      "question": "A team wants to graph the average and 95th percentile of the numeric `duration` log attribute and sort logs by it. What should they create?",
+      "choices": [
+        "A numeric measure on `@duration`",
+        "A string facet on `@duration`",
+        "A saved view scoped to `@duration`",
+        "An alias from `@duration` to `message`"
+      ],
+      "answer": 0,
+      "explanation": "Measures are quantitative facets used to aggregate values across logs (such as averages and percentiles), to range-filter, and to sort logs by value. Qualitative facets (dimensions) are for top values, unique counts, and frequent filtering, while saved views and aliases don't provide numeric aggregation.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/facets/#quantitative-facets",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-044",
+      "topic": "Log & Event Search",
+      "question": "An engineer creates a new log facet on an existing attribute today. According to Datadog's docs, which logs does the facet's content cover?",
+      "choices": [
+        "Retroactively, all logs within index retention",
+        "Only logs ingested after the facet exists",
+        "Only logs that stream through Live Tail",
+        "Only logs rehydrated from archives afterward"
+      ],
+      "answer": 1,
+      "explanation": "Datadog's facet docs state that once a facet is created, its content is populated for all new logs; they don't describe backfilling it onto logs indexed earlier. Older logs can still be searched with `@attribute:value` because a facet isn't required for search, and Live Tail and rehydration have nothing to do with facet population.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/facets/#create-facets",
+      "difficulty": 3
+    },
+    {
+      "id": "tag-q-045",
+      "topic": "Log & Event Search",
+      "question": "Right after a deployment, an engineer wants to watch logs arrive in near real time, including logs that index exclusion filters drop. Which Log Explorer feature fits?",
+      "choices": [
+        "Live Tail",
+        "Log Patterns",
+        "A saved view",
+        "Log Rehydration"
+      ],
+      "answer": 0,
+      "explanation": "Live Tail shows log events in near real time and gives visibility into both indexed and non-indexed logs; checking that a new deployment went smoothly is one of Datadog's example uses. Patterns cluster indexed logs, saved views store a search context, and rehydration restores logs from archives. When very many logs match, Live Tail output is uniformly sampled.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/live_tail/",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-046",
+      "topic": "Log & Event Search",
+      "question": "Which of the following does a Log Explorer Saved View keep track of?",
+      "choices": [
+        "A frozen copy of the matching logs for offline review",
+        "The pipeline processors that parsed the logs",
+        "The query, time range, visualization, and facet list",
+        "The index retention and exclusion filter settings"
+      ],
+      "answer": 2,
+      "explanation": "A Saved View stores a search query with its time range, a customized default visualization (log stream, patterns, or analytics), and a selected subset of facets. It does not store copies of logs or any pipeline or index configuration. Custom saved views are shared across the organization, while each user's default view is private.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/saved_views/",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-047",
+      "topic": "Log & Event Search",
+      "question": "In the Events Explorer, which query shows events that come from either GitHub or Chef?",
+      "choices": [
+        "`source:(github AND chef)`",
+        "`source:{github,chef}`",
+        "`source:[github TO chef]`",
+        "`source:(github OR chef)`"
+      ],
+      "answer": 3,
+      "explanation": "Events search uses the logs search syntax, so `source:(github OR chef)` matches events from either source, and `source` is a reserved attribute that needs no `@`. `AND` would require a single event to have both sources, curly-brace comma lists are metric scope syntax, and `[x TO y]` is a range query.",
+      "reference": "https://docs.datadoghq.com/service_management/events/explorer/searching/",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-048",
+      "topic": "Log & Event Search",
+      "question": "Which log query returns logs that do not have an `http.status_code` attribute at all?",
+      "choices": [
+        "`-@http.status_code:*`",
+        "`@http.status_code:missing`",
+        "`@http.status_code:null`",
+        "`NOT http.status_code`"
+      ],
+      "answer": 0,
+      "explanation": "`@http.status_code:*` matches every log that has the attribute with any value, and the leading `-` excludes those logs, leaving only logs without it; this is an example in Datadog's search syntax docs. `missing` and `null` are searched as literal values, and a bare `http.status_code` term without `@` is not an attribute search.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#reserved-attributes",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-049",
+      "topic": "Log & Event Search",
+      "question": "Which of these log fields can be searched without the `@` prefix because it is a reserved attribute?",
+      "choices": [
+        "`http.url`",
+        "`duration`",
+        "`status`",
+        "`usr.id`"
+      ],
+      "answer": 2,
+      "explanation": "Reserved attributes such as `host`, `source`, `status`, `service`, `trace_id`, and `message` don't require `@`, so `status:error` works directly. `http.url`, `duration`, and `usr.id` are standard attributes, searched as `@http.url`, `@duration`, and `@usr.id`.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#reserved-attributes",
+      "difficulty": 1
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "tag-fc-001",
+      "topic": "Tagging Best Practices",
+      "front": "Tag string rules: first character and allowed characters",
+      "back": "Must start with a letter. After that: Unicode letters, numbers, underscores, minuses, colons, periods, and forward slashes (plus @ for logs ingested over HTTP). Other characters such as spaces, commas, emoji, and backslashes are converted to underscores.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#define-tags"
+    },
+    {
+      "id": "tag-fc-002",
+      "topic": "Tagging Best Practices",
+      "front": "Maximum tag length",
+      "back": "200 characters. For <key>:<value> tags, the key, the colon, and the value all count toward the limit.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#define-tags"
+    },
+    {
+      "id": "tag-fc-003",
+      "topic": "Tagging Best Practices",
+      "front": "How are tag case and underscores normalized?",
+      "back": "Metric and span tags are lowercased, so avoid camel case in keys. Leading and trailing underscores are removed and contiguous underscores collapse into one. Log and span attributes (not tags) are case-sensitive and not normalized.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#define-tags"
+    },
+    {
+      "id": "tag-fc-004",
+      "topic": "Tagging Best Practices",
+      "front": "Reserved tag keys and what each is for",
+      "back": "host: correlate metrics, traces, processes, and logs\ndevice: segregate by device or disk\nsource: span filtering and automated Log Management pipelines\nservice / env / version: scope application data across metrics, traces, and logs\nteam: resource ownership",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#overview"
+    },
+    {
+      "id": "tag-fc-005",
+      "topic": "Tagging Best Practices",
+      "front": "Unified service tagging: tags, environment variables, and minimum Agent",
+      "back": "Tags: env, service, version.\nSet in the app runtime with DD_ENV, DD_SERVICE, DD_VERSION.\nRequires Agent 6.19.x / 7.19.x or later.\nversion should change with every deployment.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/"
+    },
+    {
+      "id": "tag-fc-006",
+      "topic": "Tagging Best Practices",
+      "front": "Unified service tagging labels: Kubernetes vs Docker",
+      "back": "Kubernetes: tags.datadoghq.com/env, /service, /version on the parent workload and the pod template (per container: tags.datadoghq.com/<CONTAINER_NAME>.env, etc.).\nDocker: com.datadoghq.tags.env, com.datadoghq.tags.service, com.datadoghq.tags.version.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/"
+    },
+    {
+      "id": "tag-fc-007",
+      "topic": "Tagging Best Practices",
+      "front": "Ways to assign tags in Datadog",
+      "back": "1. Configuration files (datadog.yaml host tags; conf.d/<integration>.d/conf.yaml integration tags)\n2. Datadog UI (Host Map, Infrastructure List, monitors, SLOs; UI host tag changes can take up to 5 minutes)\n3. Datadog API\n4. DogStatsD\nMost efficient: integration inheritance (e.g., AWS or Chef tags).",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/assigning_tags/"
+    },
+    {
+      "id": "tag-fc-008",
+      "topic": "Tagging Best Practices",
+      "front": "DD_TAGS format and its whitespace pitfall",
+      "back": "Space-separated, e.g. DD_TAGS=\"key1:val1 key2:val2\". Whitespace is not converted, so \"test:this is a test\" becomes four tags (test:this, is, a, test). Use YAML or annotations for values with spaces.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/assigning_tags/#environment-variables"
+    },
+    {
+      "id": "tag-fc-009",
+      "topic": "Tagging Best Practices",
+      "front": "Why do high-cardinality tags increase custom metric costs?",
+      "back": "A custom metric is a unique combination of metric name and tag values (including host). Every new tag value combination is a new timeseries, so avoid unbounded values such as user IDs, request IDs, or epoch timestamps.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/"
+    },
+    {
+      "id": "tag-fc-010",
+      "topic": "Tagging Best Practices",
+      "front": "DD_CHECKS_TAG_CARDINALITY and DD_DOGSTATSD_TAG_CARDINALITY levels",
+      "back": "low (default): cluster-level tags, e.g. kube_namespace\norchestrator: pod-level tags, e.g. pod_name (adds task_arn on ECS/Fargate)\nhigh: container-level tags, e.g. container_id\nHigher DogStatsD cardinality can increase custom metrics billing.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/assigning_tags/#environment-variables"
+    },
+    {
+      "id": "tag-fc-011",
+      "topic": "Tagging Best Practices",
+      "front": "Tag inheritance and tag precedence",
+      "back": "Metrics, logs, traces, and integrations inherit all host-level tags of their host. The Agent enforces no precedence between sources: it emits every unique value of a key (e.g., service:payments and service:checkout). Use distinct key names such as infra_service to avoid collisions.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#tag-inheritance"
+    },
+    {
+      "id": "tag-fc-012",
+      "topic": "Using Tags",
+      "front": "Anatomy of a tag-scoped, grouped metric query",
+      "back": "<aggregator>:<metric>{<scope>} by {<tag keys>}\nExample: avg:system.cpu.user{env:prod} by {host}\nThe scope (from) filters; by groups into one series per tag value.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/#dashboards"
+    },
+    {
+      "id": "tag-fc-013",
+      "topic": "Using Tags",
+      "front": "Boolean operators for metric tag filters",
+      "back": "Symbolic: ! (not), , (and)\nFunctional: NOT, AND, OR, IN, NOT IN (uppercase or lowercase)\nSymbolic and functional syntax can't be mixed: {env:prod AND !region:us-east} is invalid.",
+      "reference": "https://docs.datadoghq.com/metrics/advanced-filtering/"
+    },
+    {
+      "id": "tag-fc-014",
+      "topic": "Using Tags",
+      "front": "Logic used when including or excluding multiple tags",
+      "back": "Include uses AND logic; exclude uses OR logic.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/"
+    },
+    {
+      "id": "tag-fc-015",
+      "topic": "Using Tags",
+      "front": "Wildcard tag filters in metric queries",
+      "back": "Prefix (pod_name:web-*), suffix (cluster:*-trace), and substring (node:*-prod-*).\nExample: avg:system.disk.in_use{!device:/dev/loop*} by {device}",
+      "reference": "https://docs.datadoghq.com/metrics/advanced-filtering/#wildcard-filtered-queries"
+    },
+    {
+      "id": "tag-fc-016",
+      "topic": "Using Tags",
+      "front": "Tags in monitor queries: from, excluding, avg by",
+      "back": "from: limit scope to metrics with those tags\nexcluding: remove matching metrics from scope\navg by: turn the monitor into a Multi Alert (one notification per group). No grouping = Simple Alert (one notification on the aggregate).",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/#monitors"
+    },
+    {
+      "id": "tag-fc-017",
+      "topic": "Using Tags",
+      "front": "Dashboard template variable syntax",
+      "back": "$env: the full tag (e.g. env:prod), used in the from field\n$env.value: only the value (prod), e.g. env:staging-$service.value\n$env.key: only the key\nDefault value is *.",
+      "reference": "https://docs.datadoghq.com/dashboards/template_variables/"
+    },
+    {
+      "id": "tag-fc-018",
+      "topic": "Using Tags",
+      "front": "Searching monitors by monitor tag",
+      "back": "tag:<KEY>:<VALUE>, e.g. tag:service:coffee-house. Exclude with tag:-service:coffee-house. Monitor tags are separate from metric tags; scope: searches the tags in the query's from field.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/#monitors"
+    },
+    {
+      "id": "tag-fc-019",
+      "topic": "Using Tags",
+      "front": "Tag search in the Events Explorer",
+      "back": "tags: followed by the tag, e.g. tags:(service:coffee-house).\nEither tag: tags:(service:coffee-house OR host:coffeehouseprod)\nBoth tags: use AND instead of OR.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/#events"
+    },
+    {
+      "id": "tag-fc-020",
+      "topic": "Using Tags",
+      "front": "Cloud integration tag filters (e.g., AWS 'to hosts with tag')",
+      "back": "Comma-separated key:value list. Inclusion tags are combined with OR; ! exclusion tags take precedence and form an AND. Wildcards ? (one character) and * (many) are supported.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/#integrations"
+    },
+    {
+      "id": "tag-fc-021",
+      "topic": "Log & Event Search",
+      "front": "Term vs sequence in log search",
+      "back": "Term: a single word, e.g. hello.\nSequence: words in double quotes, e.g. \"hello dolly\", matched as a phrase.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#overview"
+    },
+    {
+      "id": "tag-fc-022",
+      "topic": "Log & Event Search",
+      "front": "Log search Boolean operators",
+      "back": "AND (the default when nothing is written), OR, and - (exclusion). They are case-sensitive, so write AND and OR in uppercase. Example: authentication AND -password.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#overview"
+    },
+    {
+      "id": "tag-fc-023",
+      "topic": "Log & Event Search",
+      "front": "Free-text vs full-text log search",
+      "back": "hello: free text; searches only message, @title, @error.message, and @error.stack.\n*:hello: full-text across all attributes. Not usable in Live Tail or in index, archive, pipeline, rehydration, or log-based metric filters.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#full-text-search"
+    },
+    {
+      "id": "tag-fc-024",
+      "topic": "Log & Event Search",
+      "front": "Reserved log attributes (searched without @)",
+      "back": "host, source, status, service, trace_id, message. Example: status:error. All other attributes need @, e.g. @http.url:...",
+      "reference": "https://docs.datadoghq.com/logs/log_configuration/attributes_naming_convention/#reserved-attributes"
+    },
+    {
+      "id": "tag-fc-025",
+      "topic": "Log & Event Search",
+      "front": "Attributes vs tags in log search",
+      "back": "Attributes: @path:value (e.g. @url:www.datadoghq.com), case-sensitive.\nTags inherited from hosts and integrations: key:value without @, e.g. env:(prod OR test).\nTags not in key:value form: tags:<MY_TAG>.\nNo facet is needed to search either.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/"
+    },
+    {
+      "id": "tag-fc-026",
+      "topic": "Log & Event Search",
+      "front": "Special characters that must be escaped in log search",
+      "back": "- ! && || > >= < <= ( ) { } [ ] \" * ? : \\ # and spaces. Escape with \\ or wrap the value in double quotes (e.g. @my_attribute:hello\\:world). / needs no escaping.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#escape-special-characters-and-spaces"
+    },
+    {
+      "id": "tag-fc-027",
+      "topic": "Log & Event Search",
+      "front": "Log search wildcards",
+      "back": "* matches many characters (service:web*, *NETWORK*).\n? matches a single special character or space (@my_attribute:hello?world).\nWildcards are literal inside double quotes: \"*test*\" matches the text *test*.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#wildcards"
+    },
+    {
+      "id": "tag-fc-028",
+      "topic": "Log & Event Search",
+      "front": "Numeric searches and ranges in logs",
+      "back": "Add the numeric attribute as a facet first, then use <, >, <=, >= or ranges.\nExamples: @http.response_time:>100, @http.status_code:[400 TO 499]",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#numerical-values"
+    },
+    {
+      "id": "tag-fc-029",
+      "topic": "Log & Event Search",
+      "front": "Facet (dimension) vs measure",
+      "back": "Facet/dimension (qualitative): top values, unique counts, frequent filtering; string or integer.\nMeasure (quantitative): aggregate, range-filter, and sort by numeric value; long or double, with optional units.\nFacets are populated only for new logs after creation.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/facets/"
+    },
+    {
+      "id": "tag-fc-030",
+      "topic": "Log & Event Search",
+      "front": "Live Tail and Saved Views",
+      "back": "Live Tail: near real-time stream of indexed and non-indexed logs; sampled when volume is very high.\nSaved View: query plus time range, default visualization, and displayed facets. Custom views are shared org-wide; your default view is private.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/live_tail/"
+    },
+    {
+      "id": "tag-fc-031",
+      "topic": "Log & Event Search",
+      "front": "Events Explorer search syntax",
+      "back": "Uses the logs search syntax: AND, OR, -, wildcards, escaping, key:value for tags and facets, and @ for attributes. Examples: source:(github OR chef), status:error, @evt.name:foo.",
+      "reference": "https://docs.datadoghq.com/service_management/events/explorer/searching/"
+    }
+  ]
+}

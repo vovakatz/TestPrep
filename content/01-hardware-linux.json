@@ -1,0 +1,986 @@
+{
+  "questions": [
+    {
+      "id": "hwl-q-001",
+      "topic": "Hardware Concepts",
+      "question": "In the Datadog System check, what does the `system.cpu.system` metric measure?",
+      "choices": [
+        "Percent of time the CPU spent running user space processes",
+        "Percent of time the CPU spent running the kernel",
+        "Percent of time the CPU spent waiting for I/O to complete",
+        "Percent of time the CPU spent in an idle state"
+      ],
+      "answer": 1,
+      "explanation": "Datadog documents `system.cpu.system` as the percent of time the CPU spent running the kernel (system calls, drivers, interrupt handling). Time spent in application code is `system.cpu.user`, time stalled on storage is `system.cpu.iowait`, and time with nothing to do is `system.cpu.idle`.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-002",
+      "topic": "Hardware Concepts",
+      "question": "A cloud VM becomes sluggish even though its workload has not changed. Datadog shows `system.cpu.stolen` jumping to 25%. What does this indicate?",
+      "choices": [
+        "Processes on the VM are waiting for disk reads and writes to finish",
+        "The kernel is busy handling system calls and hardware interrupts",
+        "The hypervisor is giving physical CPU time to other virtual CPUs",
+        "A low-priority (niced) process is consuming most CPU cycles"
+      ],
+      "answer": 2,
+      "explanation": "`system.cpu.stolen` is the percent of time the virtual CPU spent waiting for the hypervisor to service another virtual CPU, and it only applies to virtual machines. High steal is the classic 'noisy neighbor' symptom, fixed by resizing or moving the VM rather than tuning the app. Waiting on disk would show up as `system.cpu.iowait`, and kernel work as `system.cpu.system`.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-003",
+      "topic": "Hardware Concepts",
+      "question": "A Linux host shows low `system.cpu.user` and `system.cpu.system` but consistently high `system.cpu.iowait`. Which resource is the most likely bottleneck?",
+      "choices": [
+        "Storage I/O, such as a slow or saturated disk",
+        "CPU capacity, because all cores are fully busy",
+        "The hypervisor, which is taking CPU from this VM",
+        "The network interface, which is dropping packets"
+      ],
+      "answer": 0,
+      "explanation": "`system.cpu.iowait` is the percent of time the CPU spent waiting for I/O operations to complete, so a high value with low user and system time points to storage that cannot keep up. Busy cores would show high user or system time, hypervisor contention appears as `system.cpu.stolen`, and network problems show up in `system.net.*` metrics rather than iowait.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-004",
+      "topic": "Hardware Concepts",
+      "question": "Which statement about the Linux load average reported by `system.load.1`, `system.load.5`, and `system.load.15` is correct?",
+      "choices": [
+        "It is a percentage of CPU busy time that ranges from 0 to 100",
+        "It is collected by the Agent only on Windows hosts",
+        "It measures network requests queued per second on the host",
+        "It is a count of tasks, averaged over 1, 5, and 15 minutes"
+      ],
+      "answer": 3,
+      "explanation": "Load average is the number of tasks that are running, runnable, or waiting for disk I/O, averaged over 1, 5, and 15 minutes. It is a count, not a percentage, so it has no fixed upper limit. Datadog marks the `system.load.*` metrics as Linux only, and they have nothing to do with network request queues.",
+      "reference": "https://man7.org/linux/man-pages/man5/proc_loadavg.5.html",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-005",
+      "topic": "Hardware Concepts",
+      "question": "A Linux host reports a `system.load.1` of 12 while `system.cpu.idle` stays around 70%. What best explains a high load average with mostly idle CPUs?",
+      "choices": [
+        "Load average only counts processes owned by the root user",
+        "Load average also counts tasks blocked waiting on disk I/O",
+        "Load average counts only tasks currently running on a CPU",
+        "Load average includes time stolen by the hypervisor"
+      ],
+      "answer": 1,
+      "explanation": "On Linux, the load average counts tasks in the run queue (state R) and tasks in uninterruptible sleep waiting for disk I/O (state D). Many processes stuck on slow storage raise the load without using CPU, so check `system.cpu.iowait` and disk metrics next. Load is not limited to root processes or to tasks currently on a CPU, and steal time is reported separately as `system.cpu.stolen`.",
+      "reference": "https://man7.org/linux/man-pages/man5/proc_loadavg.5.html",
+      "difficulty": 3
+    },
+    {
+      "id": "hwl-q-006",
+      "topic": "Hardware Concepts",
+      "question": "A Linux host with 4 CPUs reports `system.load.1` = 8. What would `system.load.norm.1` show, and what does it suggest?",
+      "choices": [
+        "2; about twice as many tasks want to run as there are CPUs",
+        "32; the load is multiplied by the CPU count to show total demand",
+        "0.5; the host is using roughly half of its CPU capacity",
+        "8; normalization only changes the value on single-CPU hosts"
+      ],
+      "answer": 0,
+      "explanation": "`system.load.norm.1` is the one-minute load average normalized by the number of CPUs, so 8 / 4 = 2. A normalized value above 1 means more tasks are running or waiting than there are CPUs, so work is queuing. Normalizing lets a single monitor threshold work across hosts of different sizes.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics",
+      "difficulty": 3
+    },
+    {
+      "id": "hwl-q-007",
+      "topic": "Hardware Concepts",
+      "question": "What is the main purpose of swap space on a Linux host?",
+      "choices": [
+        "A reserved area of RAM that caches recently read disk blocks",
+        "A faster memory tier that sits between the CPU and main RAM",
+        "Disk space that holds memory pages when physical RAM is full",
+        "A temporary partition that stores files written to `/tmp`"
+      ],
+      "answer": 2,
+      "explanation": "Swap is a dedicated partition or file on disk; when RAM is full, inactive memory pages are moved there. Because disks have a much slower access time than RAM, heavy swapping hurts performance. Caching disk blocks in RAM is the page cache (`system.mem.cached`), and the tier between the CPU and RAM is the CPU cache.",
+      "reference": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_storage_devices/getting-started-with-swap_managing-storage-devices",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-008",
+      "topic": "Hardware Concepts",
+      "question": "On a Linux host, `system.swap.used` climbs steadily while application latency increases. What is the most likely explanation?",
+      "choices": [
+        "The filesystem has run out of inodes, so new files cannot be created",
+        "The CPU is overheating and throttling its clock speed to cool down",
+        "The network interface is dropping packets under heavy load",
+        "RAM is exhausted, so memory pages are being moved to slower disk"
+      ],
+      "answer": 3,
+      "explanation": "Growing swap usage means the kernel is moving memory pages out of physical RAM into swap space on disk, which is far slower than RAM, so applications slow down. Check `system.mem.usable` and per-process memory to find the cause. Inode exhaustion causes file-creation errors, and packet drops appear in `system.net.*` metrics, not in swap.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-009",
+      "topic": "Hardware Concepts",
+      "question": "Which Datadog metric best shows how much RAM is actually available for new applications on Linux, because it accounts for reclaimable cache?",
+      "choices": [
+        "`system.mem.free`",
+        "`system.mem.usable`",
+        "`system.mem.cached`",
+        "`system.mem.total`"
+      ],
+      "answer": 1,
+      "explanation": "`system.mem.usable` uses MemAvailable from `/proc/meminfo` when present, or falls back to free + buffered + cached memory. `system.mem.free` counts only completely unused RAM, which is often low on healthy Linux hosts because the kernel uses spare memory for cache. `system.mem.cached` is only the cache portion, and `system.mem.total` is all physical RAM.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics",
+      "difficulty": 3
+    },
+    {
+      "id": "hwl-q-010",
+      "topic": "Hardware Concepts",
+      "question": "Compared with a hard disk drive (HDD), what is a defining characteristic of a solid state drive (SSD)?",
+      "choices": [
+        "It uses flash memory and has no moving parts",
+        "It stores data on spinning magnetic platters",
+        "It is usually cheaper per gigabyte of capacity",
+        "It performs well only with large sequential I/O"
+      ],
+      "answer": 0,
+      "explanation": "SSDs store data in nonvolatile flash memory with no mechanical components, which makes them faster and more durable. HDDs use spinning magnetic platters and a moving read/write head, cost less per GB, and perform best with large sequential I/O, while SSDs also handle random I/O efficiently.",
+      "reference": "https://aws.amazon.com/compare/the-difference-between-ssd-hard-drive/",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-011",
+      "topic": "Hardware Concepts",
+      "question": "A database performs a very high number of small, random reads and writes. Which storage performance characteristic matters most for this workload?",
+      "choices": [
+        "Sequential throughput in MiB per second",
+        "Total raw capacity of the disk in gigabytes",
+        "IOPS (input/output operations per second)",
+        "Number of inodes available on the filesystem"
+      ],
+      "answer": 2,
+      "explanation": "IOPS counts how many read and write operations a device completes per second, which is what limits workloads made of many small, random I/Os. Throughput (bytes per second) matters more for large sequential transfers such as backups or streaming. Capacity and inode counts limit how much you can store, not how fast operations complete.",
+      "reference": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-io-characteristics.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-012",
+      "topic": "Hardware Concepts",
+      "question": "`system.disk.in_use` for `/var` shows only 40% of space used, yet applications fail with \"No space left on device\" when creating new files. Which metric should you check next?",
+      "choices": [
+        "`system.disk.write_time_pct`",
+        "`system.mem.pct_usable`",
+        "`system.swap.pct_free`",
+        "`system.fs.inodes.in_use`"
+      ],
+      "answer": 3,
+      "explanation": "Every file consumes an inode, and a filesystem holding millions of small files can run out of inodes while plenty of blocks remain; file creation then fails with \"No space left on device\". The Disk check reports `system.fs.inodes.in_use`, and `df -i` shows the same on the host. The other metrics measure disk busy time, memory, and swap, none of which explain this error.",
+      "reference": "https://docs.datadoghq.com/integrations/disk/#metrics",
+      "difficulty": 3
+    },
+    {
+      "id": "hwl-q-013",
+      "topic": "Hardware Concepts",
+      "question": "A monitor alerts when `system.disk.in_use` is above 90, but it never triggers, even when disks are nearly full. What is the most likely reason?",
+      "choices": [
+        "The metric is a fraction from 0 to 1, so the threshold should be 0.9",
+        "The metric is reported in bytes, so the threshold must be a byte count",
+        "The metric is only collected on Windows hosts, not on Linux hosts",
+        "The Disk check is disabled by default and must be enabled first"
+      ],
+      "answer": 0,
+      "explanation": "The Disk check reports `system.disk.in_use` as a fraction of total space (0 to 1), so a disk that is 95% full reports 0.95 and never exceeds 90. Use a threshold of 0.9, or use `system.disk.utilized`, which is expressed as a percentage. `system.disk.used` is the byte-based metric, and the Disk check is enabled by default.",
+      "reference": "https://docs.datadoghq.com/integrations/disk/#metrics",
+      "difficulty": 3
+    },
+    {
+      "id": "hwl-q-014",
+      "topic": "Hardware Concepts",
+      "question": "An EC2 instance has 2 physical CPU cores with simultaneous multithreading enabled (2 threads per core). How many vCPUs does its operating system see?",
+      "choices": [
+        "2",
+        "4",
+        "1",
+        "8"
+      ],
+      "answer": 1,
+      "explanation": "With simultaneous multithreading (such as Intel Hyper-Threading), each core runs two hardware threads, and each thread is presented to the OS as a vCPU: 2 cores x 2 threads = 4 vCPUs, exactly like an m5.xlarge. The OS schedules work across these 4 logical CPUs; 2 would be the physical core count only.",
+      "reference": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-optimize-cpu.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-015",
+      "topic": "Hardware Concepts",
+      "question": "What does a CPU clock speed of 3.0 GHz describe?",
+      "choices": [
+        "The CPU can hold 3 GB of data in its cache",
+        "The CPU has 3 physical cores available to the OS",
+        "The CPU can transfer 3 GB per second to RAM",
+        "The CPU runs about 3 billion cycles per second"
+      ],
+      "answer": 3,
+      "explanation": "Clock speed is the number of cycles a CPU executes per second, expressed in gigahertz (billions of cycles per second), so 3.0 GHz means about 3 billion cycles per second. It is unrelated to cache size, core count, or memory bandwidth; overall performance depends on clock speed together with cores, threads, and architecture.",
+      "reference": "https://www.intel.com/content/www/us/en/gaming/resources/cpu-clock-speed.html",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-016",
+      "topic": "Hardware Concepts",
+      "question": "What is a key architectural difference between a container and a virtual machine (VM)?",
+      "choices": [
+        "Containers need a hypervisor; VMs run directly on the host kernel",
+        "Containers include a full guest OS; VMs only package app binaries",
+        "Containers share the host's kernel; each VM runs its own OS kernel",
+        "Containers run only on bare metal; VMs run only in public clouds"
+      ],
+      "answer": 2,
+      "explanation": "A container is an isolated process that shares the host's kernel, which makes it lightweight and fast to start. A VM runs a complete operating system with its own kernel and drivers on top of a hypervisor. The other options reverse these roles, and both technologies run on-premises and in the cloud.",
+      "reference": "https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-017",
+      "topic": "Hardware Concepts",
+      "question": "What distinguishes a Type 1 (bare-metal) hypervisor from a Type 2 (hosted) hypervisor?",
+      "choices": [
+        "It runs directly on the physical hardware, not on a host OS",
+        "It runs as an application on top of a desktop operating system",
+        "It shares the host kernel with containers instead of running VMs",
+        "It can run only a single virtual machine per physical server"
+      ],
+      "answer": 0,
+      "explanation": "A Type 1 hypervisor such as KVM, Hyper-V, or VMware ESXi is installed directly on the server hardware and allocates resources to VMs itself. A Type 2 hypervisor such as VirtualBox or VMware Workstation runs as an application on a host operating system, which adds overhead. Both types can run many VMs, and sharing a kernel describes containers, not hypervisors.",
+      "reference": "https://aws.amazon.com/compare/the-difference-between-type-1-and-type-2-hypervisors/",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-018",
+      "topic": "Hardware Concepts",
+      "question": "According to Datadog's billing documentation, what counts as a host?",
+      "choices": [
+        "Only physical servers where the Datadog Agent package is installed",
+        "Any container that sends metrics to a containerized Datadog Agent",
+        "Each unique IP address that sends data to a Datadog intake endpoint",
+        "Any physical or virtual OS instance that you monitor with Datadog"
+      ],
+      "answer": 3,
+      "explanation": "Datadog defines a host as any physical or virtual OS instance that you monitor, such as a server, a VM, a Kubernetes node, an Azure App Service Plan instance, or a Heroku dyno. Physical-only is too narrow, containers monitored by a per-host Agent are not hosts themselves, and IP addresses are not the unit being counted.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/#hosts",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-019",
+      "topic": "Hardware Concepts",
+      "question": "A team installs the Datadog Agent inside every application container instead of running one containerized Agent per host. How does this affect the billable host count?",
+      "choices": [
+        "Only the underlying node counts, however many Agents run on it",
+        "Each container running its own Agent is counted as a host",
+        "Containers are never counted as hosts in any configuration",
+        "Each container counts as a fraction of the underlying node"
+      ],
+      "answer": 1,
+      "explanation": "Datadog recommends a single containerized Agent per host, which collects both container and host metrics. If you install the Agent directly in each container, each container is counted as a host from a billing perspective. That is why the per-container approach is discouraged, and why the 'never counted' and 'fraction' options are wrong.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/#containers",
+      "difficulty": 3
+    },
+    {
+      "id": "hwl-q-020",
+      "topic": "Hardware Concepts",
+      "question": "An engineer runs `uname -m` on a server and sees `x86_64`. What does this tell them?",
+      "choices": [
+        "The kernel release number is 86.64",
+        "The system has 64 GB of RAM installed",
+        "The machine uses a 64-bit x86 architecture",
+        "The host runs on 64-bit ARM (aarch64) hardware"
+      ],
+      "answer": 2,
+      "explanation": "`uname -m` prints the machine hardware name; `x86_64` means a 64-bit x86 processor, while 64-bit Arm appears as `aarch64`. The kernel release comes from `uname -r`, and installed RAM is shown by `free`. This matters for Datadog because Agent 7 is listed for 64-bit x86 and 64-bit Arm v8 platforms.",
+      "reference": "https://man7.org/linux/man-pages/man1/uname.1.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-021",
+      "topic": "Hardware Concepts",
+      "question": "Why is a 64-bit operating system preferred over a 32-bit one on a server with 32 GB of RAM?",
+      "choices": [
+        "32-bit addresses can reference only about 4 GB of memory",
+        "32-bit systems cannot run more than one process at a time",
+        "64-bit systems do not need swap space or a page cache",
+        "64-bit systems double the clock speed of the same CPU"
+      ],
+      "answer": 0,
+      "explanation": "A 32-bit address can represent 2^32 distinct byte addresses, about 4 GB, so a 32-bit OS cannot use large amounts of RAM efficiently, while a 64-bit OS handles large memory natively. Bit width does not change clock speed, 32-bit systems multitask normally, and 64-bit systems still use swap and page cache.",
+      "reference": "https://support.microsoft.com/en-us/windows/32-bit-and-64-bit-windows-frequently-asked-questions-c6ca9541-8dce-4d48-0415-94a3faa2e13d",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-022",
+      "topic": "Hardware Concepts",
+      "question": "Which Datadog metric should you graph to see inbound traffic volume on a host's network interfaces?",
+      "choices": [
+        "`system.net.bytes_sent`",
+        "`system.io.block_in`",
+        "`system.net.packets_in.error`",
+        "`system.net.bytes_rcvd`"
+      ],
+      "answer": 3,
+      "explanation": "`system.net.bytes_rcvd` is the number of bytes received on a device per second, reported by the Network check, which the Agent enables by default. `system.net.bytes_sent` measures outbound traffic, `system.net.packets_in.error` counts receive errors rather than volume, and `system.io.block_in` is disk I/O, not network.",
+      "reference": "https://docs.datadoghq.com/integrations/network/#metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-023",
+      "topic": "Hardware Concepts",
+      "question": "Which of these System check metrics does Datadog document as available on Linux only?",
+      "choices": [
+        "`system.cpu.user`",
+        "`system.mem.pct_usable`",
+        "`system.load.norm.5`",
+        "`system.swap.free`"
+      ],
+      "answer": 2,
+      "explanation": "The System check marks every `system.load.*` metric, including the CPU-normalized `system.load.norm.*` variants, as Linux only. CPU user time, memory, and swap metrics carry no Linux-only note in the metric list; CPU and memory metrics are collected on Windows hosts too.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-024",
+      "topic": "Linux Basics",
+      "question": "Which command displays the distribution name and version of a Linux host?",
+      "choices": [
+        "`cat /etc/os*`",
+        "`uname -n`",
+        "`hostname`",
+        "`cat /etc/hostname`"
+      ],
+      "answer": 0,
+      "explanation": "The glob `/etc/os*` matches `/etc/os-release`, which contains operating system identification data such as NAME, VERSION, ID, and PRETTY_NAME. `uname -n` prints the network node hostname, and both `hostname` and `/etc/hostname` give the host's name, not its distribution or version.",
+      "reference": "https://man7.org/linux/man-pages/man5/os-release.5.html",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-025",
+      "topic": "Linux Basics",
+      "question": "What is the main difference between the Linux and Windows operating systems?",
+      "choices": [
+        "Linux has no graphical desktop, while Windows does",
+        "Linux is open source, while Windows is proprietary",
+        "Linux is inherently more secure than Windows",
+        "Linux runs only on servers, while Windows runs on desktops"
+      ],
+      "answer": 1,
+      "explanation": "Linux is an open source operating system released under the GNU GPL, so anyone can run, study, modify, and redistribute its source code; Windows is proprietary Microsoft software. Linux distributions offer graphical desktops such as GNOME and KDE, security depends on configuration rather than the OS family, and both systems run on servers and desktops.",
+      "reference": "https://www.redhat.com/en/topics/linux/what-is-linux",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-026",
+      "topic": "Linux Basics",
+      "question": "On a Linux host, in which directory is the Datadog Agent's main configuration file, `datadog.yaml`, located?",
+      "choices": [
+        "`/opt/datadog-agent/`",
+        "`/var/log/datadog/`",
+        "`/etc/datadog-agent/`",
+        "`/home/dd-agent/`"
+      ],
+      "answer": 2,
+      "explanation": "Following the Linux convention that `/etc` holds machine-local configuration, the Agent's main file is `/etc/datadog-agent/datadog.yaml`, and integration configs live in `/etc/datadog-agent/conf.d/`. `/opt/datadog-agent/` is the installation directory, and `/var/log/datadog/` holds the Agent's log files.",
+      "reference": "https://docs.datadoghq.com/agent/basic_agent_usage/linux/#configure-the-agent",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-027",
+      "topic": "Linux Basics",
+      "question": "Which pairing of a Linux directory and its purpose is correct?",
+      "choices": [
+        "`/opt` - add-on application packages",
+        "`/etc` - temporary files cleared at boot",
+        "`/proc` - home directories for users",
+        "`/tmp` - machine-local configuration files"
+      ],
+      "answer": 0,
+      "explanation": "The filesystem hierarchy reserves `/opt` for add-on packages, which is why the Datadog Agent installs into `/opt/datadog-agent`. `/etc` holds machine-local configuration files, `/tmp` holds temporary files that may be deleted without notice, `/home` holds user home directories, and `/proc` is the mount point of the proc filesystem.",
+      "reference": "https://man7.org/linux/man-pages/man7/hier.7.html",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-028",
+      "topic": "Linux Basics",
+      "question": "The Agent reads memory statistics such as MemAvailable from `/proc/meminfo`. What kind of filesystem is mounted at `/proc`?",
+      "choices": [
+        "A disk partition reserved for storing program binaries",
+        "A RAM-backed folder for temporary files deleted at reboot",
+        "A network share mounted from a central configuration server",
+        "A pseudo-filesystem exposing kernel and process information"
+      ],
+      "answer": 3,
+      "explanation": "`/proc` is the mount point of the proc filesystem, a pseudo-filesystem that provides information about running processes and the kernel; its files are generated by the kernel rather than stored on disk. Tools like `free`, `top`, and the Datadog Agent read files such as `/proc/meminfo` and `/proc/loadavg`. Program binaries live in `/usr/bin`, and temporary files go in `/tmp`.",
+      "reference": "https://man7.org/linux/man-pages/man7/hier.7.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-029",
+      "topic": "Linux Basics",
+      "question": "You want to watch new entries appear in `/var/log/datadog/agent.log` in real time while restarting the Agent. Which command should you use?",
+      "choices": [
+        "`tail -n 10 /var/log/datadog/agent.log`",
+        "`tail -f /var/log/datadog/agent.log`",
+        "`head -n 20 /var/log/datadog/agent.log`",
+        "`cat /var/log/datadog/agent.log`"
+      ],
+      "answer": 1,
+      "explanation": "`tail -f` (follow) prints the end of the file and then keeps outputting appended data as the file grows, until you press Ctrl+C. `tail -n 10` prints the last 10 lines once and exits, `head -n 20` prints the first 20 lines, and `cat` prints the whole file once.",
+      "reference": "https://man7.org/linux/man-pages/man1/tail.1.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-030",
+      "topic": "Linux Basics",
+      "question": "You need every line containing \"error\" in `agent.log`, regardless of case (ERROR, Error, error). Which command does this?",
+      "choices": [
+        "`grep -v error agent.log`",
+        "`grep -c error agent.log`",
+        "`grep -i error agent.log`",
+        "`grep -l error agent.log`"
+      ],
+      "answer": 2,
+      "explanation": "`grep -i` ignores case distinctions, so it matches ERROR, Error, and error. `-v` inverts the match and prints lines that do not contain the pattern, `-c` prints only a count of matching lines, and `-l` prints only the names of files that match.",
+      "reference": "https://man7.org/linux/man-pages/man1/grep.1.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-031",
+      "topic": "Linux Basics",
+      "question": "What does the command `ps aux | grep datadog` do?",
+      "choices": [
+        "Sends the full process list to grep, which shows only lines mentioning datadog",
+        "Runs ps and grep one after the other and saves both outputs to a file named datadog",
+        "Stops every running process whose command name contains the word datadog",
+        "Starts the Datadog Agent in the background and prints its process ID"
+      ],
+      "answer": 0,
+      "explanation": "The pipe `|` connects the standard output of `ps aux` (every process on the system) to the standard input of `grep`, which filters it down to lines containing \"datadog\". It is a quick way to check whether Agent processes are running. Pipes do not write to files (that is redirection with `>`), and neither command stops or starts processes.",
+      "reference": "https://www.gnu.org/software/bash/manual/html_node/Pipelines.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-032",
+      "topic": "Linux Basics",
+      "question": "A cron job runs `echo \"check ok\" >> /tmp/health.log`. What happens if `/tmp/health.log` already exists?",
+      "choices": [
+        "The file is overwritten and now contains only the new text",
+        "The command fails because the target file already exists",
+        "The text is printed to the terminal and the file is unchanged",
+        "The text is appended to the end of the existing file"
+      ],
+      "answer": 3,
+      "explanation": "`>>` opens the file for appending, so each run adds a line to the end (and creates the file if it does not exist). A single `>` would truncate the file and overwrite its contents. Neither operator fails on an existing file, and redirection sends the output to the file instead of the terminal.",
+      "reference": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-033",
+      "topic": "Linux Basics",
+      "question": "Which signal does `kill <PID>` send when no signal is specified?",
+      "choices": [
+        "`SIGTERM`, which asks the process to terminate gracefully",
+        "`SIGKILL`, which forces the process to end immediately",
+        "`SIGHUP`, which traditionally tells a daemon to reload its config",
+        "`SIGSTOP`, which pauses the process until it is resumed"
+      ],
+      "answer": 0,
+      "explanation": "If no signal is specified, `kill` sends TERM (signal 15), which the process can catch to clean up before exiting. KILL (signal 9) must be requested explicitly, for example with `kill -9`. HUP and STOP are likewise only sent when you name them.",
+      "reference": "https://man7.org/linux/man-pages/man1/kill.1.html",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-034",
+      "topic": "Linux Basics",
+      "question": "A hung process ignores `kill 1234`. The admin then runs `kill -9 1234`, and the process exits immediately. Why did the second command work?",
+      "choices": [
+        "Signal 9 gives the process nine seconds to shut down cleanly",
+        "Signal 9 (SIGKILL) cannot be caught or ignored by the process",
+        "The -9 flag repeats the default signal nine times in a row",
+        "The -9 flag makes kill run with root privileges automatically"
+      ],
+      "answer": 1,
+      "explanation": "`kill -9` sends SIGKILL, which a process cannot catch, block, or ignore, unlike the default SIGTERM that a process may handle or ignore. Because the process gets no chance to clean up, SIGKILL should be a last resort. The number selects the signal; it is not a timeout or a repeat count, and it does not grant privileges.",
+      "reference": "https://man7.org/linux/man-pages/man7/signal.7.html",
+      "difficulty": 3
+    },
+    {
+      "id": "hwl-q-035",
+      "topic": "Linux Basics",
+      "question": "A disk space monitor fires for `/`. You want a quick, human-readable summary of used and available space on every mounted filesystem. Which command should you run?",
+      "choices": [
+        "`du -sh`",
+        "`free -h`",
+        "`df -h`",
+        "`ls -lh`"
+      ],
+      "answer": 2,
+      "explanation": "`df` displays the space available on mounted filesystems (all of them when no file is given), and `-h` prints sizes in human-readable units. `du -sh` totals the space used by files under a directory, `free -h` reports memory rather than disk, and `ls -lh` lists individual files with their sizes.",
+      "reference": "https://man7.org/linux/man-pages/man1/df.1.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-036",
+      "topic": "Linux Basics",
+      "question": "After finding `/var` nearly full, you want a single human-readable total of how much space the `/var/log` directory tree uses. Which command gives it?",
+      "choices": [
+        "`df -i /var/log`",
+        "`ls -a /var/log`",
+        "`find /var/log -type d`",
+        "`du -sh /var/log`"
+      ],
+      "answer": 3,
+      "explanation": "`du` summarizes disk usage recursively; `-s` displays only a total for each argument and `-h` uses human-readable sizes. `df -i` shows inode usage for the whole filesystem, `ls -a` just lists entries including hidden ones, and `find -type d` only lists directories.",
+      "reference": "https://man7.org/linux/man-pages/man1/du.1.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-037",
+      "topic": "Linux Basics",
+      "question": "Which command shows total, used, free, and available physical memory and swap on a Linux host?",
+      "choices": [
+        "`free -h`",
+        "`df -h`",
+        "`lscpu`",
+        "`hostnamectl`"
+      ],
+      "answer": 0,
+      "explanation": "`free` parses `/proc/meminfo` and displays used and free physical and swap memory, including buffers, cache, and an 'available' estimate; `-h` scales the units. `df -h` reports disk space, `lscpu` shows CPU architecture details, and `hostnamectl` shows the hostname and OS information.",
+      "reference": "https://man7.org/linux/man-pages/man1/free.1.html",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-038",
+      "topic": "Linux Basics",
+      "question": "A file's permissions are set with `chmod 644 app.conf`. What access does this grant?",
+      "choices": [
+        "Owner: read/write/execute; group and others: read/execute",
+        "Owner: read/write; group: read; others: read",
+        "Owner: read; group: read/write; others: read/write",
+        "Owner, group, and others: read/write"
+      ],
+      "answer": 1,
+      "explanation": "Each octal digit is the sum of read (4), write (2), and execute (1), and the three digits apply to the owner, the group, and others. So 6 means read + write for the owner, and 4 means read-only for group and others (`rw-r--r--`), which is typical for config files. `755` would be `rwxr-xr-x`, and `666` would give everyone read/write.",
+      "reference": "https://man7.org/linux/man-pages/man1/chmod.1.html",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-039",
+      "topic": "Linux Basics",
+      "question": "The Agent cannot write its logs because `/var/log/datadog/` is owned by root. Which command, from Datadog's permission troubleshooting docs, fixes the ownership?",
+      "choices": [
+        "`sudo chmod -R dd-agent:dd-agent /var/log/datadog/`",
+        "`sudo chgrp -R root:dd-agent /var/log/datadog/`",
+        "`sudo su dd-agent /var/log/datadog/`",
+        "`sudo chown -R dd-agent:dd-agent /var/log/datadog/`"
+      ],
+      "answer": 3,
+      "explanation": "`chown` changes the owner and group of files, `-R` applies the change recursively, and `dd-agent:dd-agent` sets both the user and group to the Agent's account. `chmod` changes permission bits and does not accept a user:group pair, `chgrp` changes only the group, and `su` switches users rather than changing file ownership.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/permissions/",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-040",
+      "topic": "Linux Basics",
+      "question": "You configured the Agent to tail `/var/log/apache/access.log`, but no logs arrive in Datadog. What is a common Linux-specific cause?",
+      "choices": [
+        "The Agent runs as `dd-agent`, which lacks read access to root-only logs",
+        "The Agent is only allowed to tail files located under `/opt/datadog-agent`",
+        "The Agent runs as root, and root is blocked from reading app logs",
+        "Files in `/var/log` are binary and must be converted before tailing"
+      ],
+      "answer": 0,
+      "explanation": "The Agent runs under the `dd-agent` user and group, not root, so it cannot read log files in `/var/log` that only root can access. Datadog suggests granting access, for example with `setfacl -m u:dd-agent:rx`, and making it persist across log rotation. The Agent can tail files anywhere it has read permission, and it does not run as root by default.",
+      "reference": "https://docs.datadoghq.com/logs/guide/setting-file-permissions-for-rotating-logs/",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-041",
+      "topic": "Linux Basics",
+      "question": "Datadog docs run a check with `sudo -u dd-agent -- datadog-agent check <CHECK_NAME>`. What is the purpose of `-u dd-agent`?",
+      "choices": [
+        "It updates the check to its latest version before running it",
+        "It uploads the check output using the dd-agent API key",
+        "It runs the check as the `dd-agent` user, like the Agent service",
+        "It unlocks the dd-agent account so the check can use root"
+      ],
+      "answer": 2,
+      "explanation": "`sudo -u user` runs the command as the specified user instead of the default target user, root. Running the check as `dd-agent` reproduces the permissions the Agent service actually has, so file or socket access problems show up during testing instead of being hidden by root privileges. The flag has nothing to do with updates, API keys, or unlocking accounts.",
+      "reference": "https://docs.datadoghq.com/agent/basic_agent_usage/linux/#commands",
+      "difficulty": 3
+    },
+    {
+      "id": "hwl-q-042",
+      "topic": "Linux Basics",
+      "question": "After editing `/etc/datadog-agent/datadog.yaml` on a systemd-based Ubuntu host, which command applies the change?",
+      "choices": [
+        "`sudo systemctl enable datadog-agent`",
+        "`sudo systemctl restart datadog-agent`",
+        "`sudo systemctl daemon-reload`",
+        "`sudo journalctl -u datadog-agent`"
+      ],
+      "answer": 1,
+      "explanation": "Configuration changes take effect when the Agent restarts, and `systemctl restart` stops and then starts the unit. `enable` only configures the service to start at boot, `daemon-reload` reloads systemd unit files rather than application config, and `journalctl -u` just shows the service's log entries.",
+      "reference": "https://docs.datadoghq.com/agent/basic_agent_usage/linux/#commands",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-043",
+      "topic": "Linux Basics",
+      "question": "On a systemd-based host, which command displays the journal log entries for the Datadog Agent service unit?",
+      "choices": [
+        "`systemctl enable datadog-agent`",
+        "`ps -u datadog-agent`",
+        "`tail -f /etc/datadog-agent`",
+        "`journalctl -u datadog-agent`"
+      ],
+      "answer": 3,
+      "explanation": "`journalctl` prints log entries stored by systemd-journald, and `-u` filters them to a specific unit such as the `datadog-agent` service; add `-f` to follow new entries. `systemctl enable` configures boot-time start, `ps -u` lists processes owned by a user, and `/etc/datadog-agent` is a configuration directory, not a log file.",
+      "reference": "https://man7.org/linux/man-pages/man1/journalctl.1.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-044",
+      "topic": "Linux Basics",
+      "question": "On an older Upstart-based system such as CentOS/RHEL 6 or SUSE 11, which command do Datadog docs give for starting the Agent service?",
+      "choices": [
+        "`sudo start datadog-agent`",
+        "`sudo systemctl start datadog-agent`",
+        "`sudo systemd start datadog-agent`",
+        "`sudo launchctl start datadog-agent`"
+      ],
+      "answer": 0,
+      "explanation": "Datadog's Linux docs say that on Upstart-based systems such as CentOS/RHEL 6 or SUSE 11 you swap `systemctl <action>` with `<action>`, so starting the Agent is `sudo start datadog-agent`. `systemctl` is the systemd tool used on modern distributions, `systemd` is not a service-control command, and `launchctl` is the macOS equivalent.",
+      "reference": "https://docs.datadoghq.com/agent/basic_agent_usage/linux/#commands",
+      "difficulty": 3
+    },
+    {
+      "id": "hwl-q-045",
+      "topic": "Linux Basics",
+      "question": "Which pairing of a Linux distribution and its native package manager is correct?",
+      "choices": [
+        "Ubuntu - `yum`",
+        "Red Hat Enterprise Linux - `apt-get`",
+        "SUSE Linux Enterprise - `zypper`",
+        "Debian - `dnf`"
+      ],
+      "answer": 2,
+      "explanation": "SUSE and openSUSE use `zypper`, which is why Datadog removes the Agent there with `sudo zypper remove datadog-agent`. Debian and Ubuntu use `apt`/`apt-get`, while Red Hat-family distributions (RHEL, CentOS, Rocky, AlmaLinux, Oracle Linux, Amazon Linux) use `yum` or its successor `dnf`.",
+      "reference": "https://docs.datadoghq.com/agent/basic_agent_usage/linux/#uninstall-the-agent",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-046",
+      "topic": "Linux Basics",
+      "question": "In a Bash shell, which command sets `DD_SITE` so that programs started from that shell, such as an install script, can read it?",
+      "choices": [
+        "`set DD_SITE=datadoghq.eu`",
+        "`echo DD_SITE=datadoghq.eu`",
+        "`printenv DD_SITE datadoghq.eu`",
+        "`export DD_SITE=datadoghq.eu`"
+      ],
+      "answer": 3,
+      "explanation": "`export` marks a variable to be passed to child processes in their environment; environment variables are how the Datadog install script receives values such as `DD_API_KEY` and `DD_SITE`. `set VAR=value` is Windows cmd syntax (in Bash, `set` changes shell options and positional parameters), `echo` only prints text, and `printenv` displays variables without setting them.",
+      "reference": "https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-047",
+      "topic": "Linux Basics",
+      "question": "You want to confirm that DogStatsD is listening on UDP port 8125 on a Linux host. Which command lists listening UDP sockets with numeric ports and their owning processes?",
+      "choices": [
+        "`sudo ss -ulnp`",
+        "`sudo ss -tlnp`",
+        "`ping -c 1 localhost`",
+        "`curl -I localhost:8125`"
+      ],
+      "answer": 0,
+      "explanation": "`ss` dumps socket statistics, similar to the older `netstat`: `-u` selects UDP, `-l` shows listening sockets, `-n` keeps ports numeric, and `-p` shows the owning process. `-t` would show TCP sockets instead, `ping` tests ICMP reachability rather than ports, and `curl -I` sends an HTTP HEAD request, which does not apply to a UDP listener.",
+      "reference": "https://man7.org/linux/man-pages/man8/ss.8.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-048",
+      "topic": "Linux Basics",
+      "question": "Datadog's Linux install one-liner downloads its script with `curl -L`. What does the `-L` option do?",
+      "choices": [
+        "Limits the download speed to avoid saturating the link",
+        "Lists only the HTTP response headers, without the body",
+        "Follows redirects when the server reports a new location",
+        "Logs the full request to a local file for later debugging"
+      ],
+      "answer": 2,
+      "explanation": "With `-L` (`--location`), if the server answers with a 3XX status and a Location header, curl repeats the request at the new location instead of stopping at the redirect response. Fetching only the headers is `-I`, and verbose debugging output is `-v`; `-L` has nothing to do with speed limits or log files.",
+      "reference": "https://man7.org/linux/man-pages/man1/curl.1.html",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-049",
+      "topic": "Linux Basics",
+      "question": "Which command searches `/etc/datadog-agent` and all of its subdirectories for files named `conf.yaml`?",
+      "choices": [
+        "`grep -r conf.yaml /etc/datadog-agent`",
+        "`find /etc/datadog-agent -name conf.yaml`",
+        "`ls /etc/datadog-agent/conf.yaml`",
+        "`cat /etc/datadog-agent/*/conf.yaml`"
+      ],
+      "answer": 1,
+      "explanation": "`find` walks a directory tree recursively, and `-name conf.yaml` matches files by name, so it finds every `conf.d/<integration>.d/conf.yaml`. `grep -r` searches file contents for the text rather than matching file names, `ls` checks one exact path, and the `cat` glob reaches only one directory level and prints file contents.",
+      "reference": "https://man7.org/linux/man-pages/man1/find.1.html",
+      "difficulty": 2
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "hwl-fc-001",
+      "topic": "Hardware Concepts",
+      "front": "`system.cpu.user` vs `system.cpu.system`",
+      "back": "`system.cpu.user`: percent of time the CPU spent running user space processes (application code).\n`system.cpu.system`: percent of time the CPU spent running the kernel (system calls, drivers).",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics"
+    },
+    {
+      "id": "hwl-fc-002",
+      "topic": "Hardware Concepts",
+      "front": "What does `system.cpu.iowait` measure?",
+      "back": "The percent of time the CPU spent waiting for I/O operations to complete. High iowait with low user/system time points to a storage bottleneck. Not available on Windows.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics"
+    },
+    {
+      "id": "hwl-fc-003",
+      "topic": "Hardware Concepts",
+      "front": "`system.cpu.stolen` (steal time)",
+      "back": "Percent of time a virtual CPU waited while the hypervisor serviced another virtual CPU. Only applies to VMs (not available on Windows). High steal = noisy neighbor or oversubscribed physical host.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics"
+    },
+    {
+      "id": "hwl-fc-004",
+      "topic": "Hardware Concepts",
+      "front": "CPU state fields in the `top` summary line",
+      "back": "us = un-niced user processes\nsy = kernel\nni = niced user processes\nid = idle\nwa = waiting for I/O\nhi / si = hardware / software interrupts\nst = time stolen from this VM by the hypervisor",
+      "reference": "https://man7.org/linux/man-pages/man1/top.1.html"
+    },
+    {
+      "id": "hwl-fc-005",
+      "topic": "Hardware Concepts",
+      "front": "Linux load average",
+      "back": "Number of tasks running/runnable (state R) or waiting for disk I/O (state D), averaged over 1, 5 and 15 minutes. Same numbers as `uptime` and `/proc/loadavg`. Datadog: `system.load.1`, `system.load.5`, `system.load.15` (Linux only).",
+      "reference": "https://man7.org/linux/man-pages/man5/proc_loadavg.5.html"
+    },
+    {
+      "id": "hwl-fc-006",
+      "topic": "Hardware Concepts",
+      "front": "`system.load.norm.1` / `.5` / `.15`",
+      "back": "Load average normalized by the number of CPUs (Linux only). Around 1 means the CPUs are fully subscribed; above 1 means tasks are queuing. Lets one threshold fit hosts of different sizes.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics"
+    },
+    {
+      "id": "hwl-fc-007",
+      "topic": "Hardware Concepts",
+      "front": "`system.mem.usable` vs `system.mem.free`",
+      "back": "`usable`: MemAvailable from /proc/meminfo (or free + buffered + cached if absent) - memory applications can still get.\n`free`: completely unused RAM only; often low on healthy Linux hosts because spare RAM is used as cache.\n`pct_usable`: usable as a fraction of total.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics"
+    },
+    {
+      "id": "hwl-fc-008",
+      "topic": "Hardware Concepts",
+      "front": "Swap space",
+      "back": "Disk space (a swap partition or swap file) where the kernel moves inactive memory pages when RAM is full. Much slower than RAM, so sustained swapping hurts performance. Datadog: `system.swap.used`, `system.swap.free`, `system.swap.pct_free`.",
+      "reference": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_storage_devices/getting-started-with-swap_managing-storage-devices"
+    },
+    {
+      "id": "hwl-fc-009",
+      "topic": "Hardware Concepts",
+      "front": "HDD vs SSD",
+      "back": "HDD: spinning magnetic platters and a moving read/write head; cheaper per GB; best at large sequential I/O.\nSSD: nonvolatile flash memory, no moving parts; faster and more durable; handles random I/O efficiently.",
+      "reference": "https://aws.amazon.com/compare/the-difference-between-ssd-hard-drive/"
+    },
+    {
+      "id": "hwl-fc-010",
+      "topic": "Hardware Concepts",
+      "front": "IOPS vs throughput",
+      "back": "IOPS: input/output operations per second - the limit for many small or random I/Os (databases).\nThroughput: data per second, e.g. MiB/s - the limit for large sequential transfers.\nThroughput = IOPS x I/O size. Datadog: `system.io.r_s` / `system.io.w_s` are read/write requests per second.",
+      "reference": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-io-characteristics.html"
+    },
+    {
+      "id": "hwl-fc-011",
+      "topic": "Hardware Concepts",
+      "front": "What is an inode?",
+      "back": "The structure holding a file's metadata (type, mode/permissions, owner, timestamps, size) - but not its name, which lives in the directory. Every file uses one; running out blocks new files even when blocks are free. Check with `df -i` or `system.fs.inodes.in_use`.",
+      "reference": "https://man7.org/linux/man-pages/man7/inode.7.html"
+    },
+    {
+      "id": "hwl-fc-012",
+      "topic": "Hardware Concepts",
+      "front": "`system.disk.in_use` vs `system.disk.utilized`",
+      "back": "Both describe disk space in use relative to the total.\n`in_use`: a fraction from 0 to 1 (alert at > 0.9).\n`utilized`: a percentage from 0 to 100.\nByte values: `system.disk.used`, `system.disk.free`, `system.disk.total`.",
+      "reference": "https://docs.datadoghq.com/integrations/disk/#metrics"
+    },
+    {
+      "id": "hwl-fc-013",
+      "topic": "Hardware Concepts",
+      "front": "Cores, threads, and vCPUs",
+      "back": "A core is an independent processing unit. With simultaneous multithreading (e.g. Hyper-Threading), each core runs multiple threads, and each thread appears to the OS as a vCPU. Example: m5.xlarge = 2 cores x 2 threads = 4 vCPUs.",
+      "reference": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-optimize-cpu.html"
+    },
+    {
+      "id": "hwl-fc-014",
+      "topic": "Hardware Concepts",
+      "front": "Bare metal vs virtual machine vs container",
+      "back": "Bare metal: the OS runs directly on a physical server.\nVM: a full OS with its own kernel and drivers, running on a hypervisor.\nContainer: an isolated process plus its files, sharing the host kernel; lighter and faster to start.",
+      "reference": "https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/"
+    },
+    {
+      "id": "hwl-fc-015",
+      "topic": "Hardware Concepts",
+      "front": "Type 1 vs Type 2 hypervisor",
+      "back": "Type 1 (bare-metal): installed directly on the hardware, e.g. KVM, Microsoft Hyper-V, VMware ESXi.\nType 2 (hosted): runs as an application on a host OS, e.g. Oracle VirtualBox, VMware Workstation.",
+      "reference": "https://aws.amazon.com/compare/the-difference-between-type-1-and-type-2-hypervisors/"
+    },
+    {
+      "id": "hwl-fc-016",
+      "topic": "Hardware Concepts",
+      "front": "What is a \"host\" in Datadog?",
+      "back": "Any physical or virtual OS instance you monitor: a server, VM, Kubernetes node, Azure App Service Plan instance, or Heroku dyno. If you install the Agent inside each container, each container counts as a host for billing.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/#hosts"
+    },
+    {
+      "id": "hwl-fc-017",
+      "topic": "Hardware Concepts",
+      "front": "Datadog metrics for network interfaces (NICs)",
+      "back": "`system.net.bytes_rcvd` / `system.net.bytes_sent`: bytes received/sent on a device per second.\n`system.net.packets_in.error`: receive errors.\n`system.net.tcp.retrans_segs`: retransmitted TCP segments.\nThe Network check is enabled by default.",
+      "reference": "https://docs.datadoghq.com/integrations/network/#metrics"
+    },
+    {
+      "id": "hwl-fc-018",
+      "topic": "Linux Basics",
+      "front": "Datadog Agent file locations on Linux",
+      "back": "Main config: /etc/datadog-agent/datadog.yaml\nIntegration configs: /etc/datadog-agent/conf.d/\nInstall directory: /opt/datadog-agent/\nLogs: /var/log/datadog/ (agent.log, process-agent.log, trace-agent.log, ...)",
+      "reference": "https://docs.datadoghq.com/agent/basic_agent_usage/linux/"
+    },
+    {
+      "id": "hwl-fc-019",
+      "topic": "Linux Basics",
+      "front": "Linux directories: /etc, /var/log, /opt, /tmp, /home",
+      "back": "/etc: machine-local configuration files\n/var/log: log files\n/opt: add-on software packages\n/tmp: temporary files that may be deleted without notice (e.g. at boot)\n/home: user home directories (root's is /root)",
+      "reference": "https://man7.org/linux/man-pages/man7/hier.7.html"
+    },
+    {
+      "id": "hwl-fc-020",
+      "topic": "Linux Basics",
+      "front": "What is /proc?",
+      "back": "The mount point of the proc pseudo-filesystem, which exposes information about running processes and the kernel; its files are generated by the kernel, not stored on disk. Examples: /proc/meminfo, /proc/loadavg, /proc/<PID>/.",
+      "reference": "https://man7.org/linux/man-pages/man7/hier.7.html"
+    },
+    {
+      "id": "hwl-fc-021",
+      "topic": "Linux Basics",
+      "front": "The `dd-agent` user",
+      "back": "The Linux Agent runs as the unprivileged `dd-agent` user and `dd-agent` group, not root. It needs read access to logs it tails, and must own /var/log/datadog/ and /opt/datadog-agent/run. Uninstalling the Agent does not remove the user (`sudo userdel dd-agent`).",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/permissions/"
+    },
+    {
+      "id": "hwl-fc-022",
+      "topic": "Linux Basics",
+      "front": "How do you find a Linux host's distribution and version?",
+      "back": "`cat /etc/os-release` (or `cat /etc/os*`): NAME, VERSION, ID, PRETTY_NAME.\n`lsb_release -a`: distributor ID, description, release, codename.\nNot `uname -n` or `hostname` (host name) or `uname -r` (kernel release).",
+      "reference": "https://man7.org/linux/man-pages/man5/os-release.5.html"
+    },
+    {
+      "id": "hwl-fc-023",
+      "topic": "Linux Basics",
+      "front": "chmod octal permission values",
+      "back": "read = 4, write = 2, execute = 1; add them per digit. Digits are owner, group, others.\n755 = rwxr-xr-x (scripts, directories)\n644 = rw-r--r-- (config files)\n600 = rw------- (private files)",
+      "reference": "https://man7.org/linux/man-pages/man1/chmod.1.html"
+    },
+    {
+      "id": "hwl-fc-024",
+      "topic": "Linux Basics",
+      "front": "Reading `ls -l`: `-rw-r----- 1 dd-agent dd-agent 512 ... conf.yaml`",
+      "back": "1st character: file type (- file, d directory, l symlink).\nNext 9: owner, group, other permissions (rw- / r-- / ---).\nThen: link count, owner (dd-agent), group (dd-agent), size, modification time, name.",
+      "reference": "https://www.gnu.org/software/coreutils/manual/html_node/What-information-is-listed.html"
+    },
+    {
+      "id": "hwl-fc-025",
+      "topic": "Linux Basics",
+      "front": "sudo vs su",
+      "back": "`sudo <cmd>`: run one command as another user (root by default); `sudo -u dd-agent <cmd>` runs it as dd-agent.\n`su`: start a shell as another user (root if none given); `su -` gives a login environment.",
+      "reference": "https://www.sudo.ws/docs/man/sudo.man/"
+    },
+    {
+      "id": "hwl-fc-026",
+      "topic": "Linux Basics",
+      "front": "Viewing files: tail, head, less",
+      "back": "`tail file`: last 10 lines; `tail -n 50 file`: last 50.\n`tail -f file`: keep printing new lines as the file grows (Ctrl+C to stop).\n`head -n 20 file`: first 20 lines.\n`less file`: page through a file interactively.",
+      "reference": "https://man7.org/linux/man-pages/man1/tail.1.html"
+    },
+    {
+      "id": "hwl-fc-027",
+      "topic": "Linux Basics",
+      "front": "Useful grep options",
+      "back": "-i ignore case\n-v invert match (non-matching lines)\n-r recursive through directories\n-c count matching lines\n-n show line numbers\n-l list names of matching files",
+      "reference": "https://man7.org/linux/man-pages/man1/grep.1.html"
+    },
+    {
+      "id": "hwl-fc-028",
+      "topic": "Linux Basics",
+      "front": "df vs du vs free",
+      "back": "`df -h`: used/available space per mounted filesystem (`df -i` for inodes, `df -T` for filesystem type).\n`du -sh <dir>`: total space used by a directory tree.\n`free -h`: RAM and swap usage, read from /proc/meminfo.",
+      "reference": "https://man7.org/linux/man-pages/man1/df.1.html"
+    },
+    {
+      "id": "hwl-fc-029",
+      "topic": "Linux Basics",
+      "front": "Common process signals",
+      "back": "15 SIGTERM: default for `kill`; asks the process to exit cleanly.\n9 SIGKILL: `kill -9`; cannot be caught, blocked, or ignored.\n1 SIGHUP: hangup; many daemons reload config on it.\n2 SIGINT: interrupt from the keyboard (Ctrl+C).",
+      "reference": "https://man7.org/linux/man-pages/man7/signal.7.html"
+    },
+    {
+      "id": "hwl-fc-030",
+      "topic": "Linux Basics",
+      "front": "Managing the Agent service on Linux",
+      "back": "`sudo systemctl start|stop|restart|status datadog-agent`\n`enable` = start at boot; `disable` = don't.\nUpstart (CentOS/RHEL 6, SUSE 11): `sudo start datadog-agent`.\nService logs: `journalctl -u datadog-agent` (add -f to follow).",
+      "reference": "https://docs.datadoghq.com/agent/basic_agent_usage/linux/#commands"
+    },
+    {
+      "id": "hwl-fc-031",
+      "topic": "Linux Basics",
+      "front": "Linux package managers by distribution family",
+      "back": "Debian / Ubuntu: apt, apt-get (.deb packages)\nRHEL / CentOS / Rocky / AlmaLinux / Oracle Linux / Amazon Linux / Fedora: yum or dnf (.rpm packages)\nSUSE / openSUSE: zypper (.rpm packages)",
+      "reference": "https://docs.datadoghq.com/agent/basic_agent_usage/linux/#uninstall-the-agent"
+    },
+    {
+      "id": "hwl-fc-032",
+      "topic": "Linux Basics",
+      "front": "Pipes and redirection: |, >, >>, 2>&1",
+      "back": "cmd1 | cmd2: stdout of cmd1 becomes stdin of cmd2.\n> file: write stdout to a file, truncating it.\n>> file: append stdout to a file.\n2>&1: send stderr (fd 2) wherever stdout (fd 1) goes.",
+      "reference": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html"
+    },
+    {
+      "id": "hwl-fc-033",
+      "topic": "Linux Basics",
+      "front": "Environment variables in Bash (and DD_* for the Agent)",
+      "back": "`export NAME=value`: set a variable and pass it to child processes.\n`echo $NAME` / `printenv NAME`: read it; `env`: list all.\nMost datadog.yaml options can be set as DD_* variables (e.g. DD_API_KEY); they take precedence over the file.",
+      "reference": "https://docs.datadoghq.com/agent/guide/environment-variables/"
+    },
+    {
+      "id": "hwl-fc-034",
+      "topic": "Linux Basics",
+      "front": "Connectivity commands: ping, curl, ss",
+      "back": "`ping -c 4 <host>`: send 4 ICMP echo requests, then stop.\n`curl -v https://<url>`: test HTTP(S) and show request/response headers (`-L` follows redirects).\n`ss -tulnp` (or older `netstat`): listening TCP/UDP sockets with owning processes.",
+      "reference": "https://man7.org/linux/man-pages/man8/ss.8.html"
+    },
+    {
+      "id": "hwl-fc-035",
+      "topic": "Linux Basics",
+      "front": "Linux vs Windows",
+      "back": "Linux: a free, open source OS released under the GNU GPL, shipped as many distributions (Ubuntu, Debian, RHEL, SUSE, Amazon Linux, ...).\nWindows: a proprietary Microsoft OS.\nThe key difference is open source vs proprietary.",
+      "reference": "https://www.redhat.com/en/topics/linux/what-is-linux"
+    }
+  ]
+}

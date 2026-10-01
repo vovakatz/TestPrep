@@ -1,0 +1,31 @@
+{% macro band_chip(band) -%}
+  {%- set labels = {'strong': 'Strong', 'fair': 'Fair', 'weak': 'Needs work', 'new': 'Not tried'} -%}
+  <span class="chip chip-{{ band }}">
+    {%- if band == 'strong' -%}<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>
+    {%- elif band == 'weak' -%}<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 4v5M8 11.5v.5"/></svg>
+    {%- elif band == 'fair' -%}<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 8h8"/></svg>
+    {%- else -%}<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="2.5"/></svg>
+    {%- endif -%}
+    {{ labels[band] }}
+  </span>
+{%- endmacro %}
+
+{% macro band_for(accuracy, attempts) -%}
+  {%- if not attempts -%}new{%- elif accuracy >= 0.8 -%}strong{%- elif accuracy >= 0.6 -%}fair{%- else -%}weak{%- endif -%}
+{%- endmacro %}
+
+{% macro meter(value, label=None) -%}
+  {# value: 0..1 or None #}
+  <div class="meter{{ ' meter-empty' if value is none }}" role="img"
+       aria-label="{{ label or 'Accuracy' }}: {{ value | pct }}">
+    <div class="meter-fill" style="width: {{ ((value or 0) * 100) | round(1) }}%"></div>
+  </div>
+{%- endmacro %}
+
+{% macro mode_badge(mode) -%}
+  {%- if mode == 'targeted' -%}
+    <span class="badge badge-targeted"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="2"/></svg>Targeted</span>
+  {%- else -%}
+    <span class="badge badge-random"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4.5h2.5l6 7h2.5M2.5 11.5h2.5l1.8-2.1M9.2 6.6l1.8-2.1h2.5"/></svg>Random</span>
+  {%- endif -%}
+{%- endmacro %}

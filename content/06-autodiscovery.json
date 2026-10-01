@@ -1,0 +1,729 @@
+{
+  "questions": [
+    {
+      "id": "ad-q-001",
+      "topic": "Auto-discovery",
+      "question": "Which of the following is a valid source for populating an integration template when using the Datadog Agent's Autodiscovery feature in a Docker environment?",
+      "choices": [
+        "Helm chart",
+        "ConfigMap",
+        "Kubernetes pod annotations",
+        "Key-value stores"
+      ],
+      "answer": 3,
+      "explanation": "In a Docker environment, Autodiscovery templates can come from Docker labels, a local file mounted into the Agent's conf.d, or a key-value store such as Consul, etcd or ZooKeeper. Helm charts, ConfigMaps and pod annotations are Kubernetes constructs, so they are template sources only when the Agent runs on Kubernetes.",
+      "reference": "https://docs.datadoghq.com/containers/docker/integrations/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-002",
+      "topic": "Auto-discovery",
+      "question": "What is the purpose of the auto_conf.yaml file in an integration's conf.d/<INTEGRATION>.d/ directory?",
+      "choices": [
+        "It is an example configuration to copy when setting up the integration",
+        "It makes the integration run automatically when the Agent starts",
+        "It stores the resolved configuration the Agent generated at runtime",
+        "It lets the Agent Autodiscover matching services and monitor them"
+      ],
+      "answer": 3,
+      "explanation": "auto_conf.yaml is a default Autodiscovery template: when the Agent runs as a container, it uses these files (for example for Redis or Apache) to discover matching containers and configure the integration with template variables such as %%host%%. The example configuration is conf.yaml.example, and auto_conf.yaml does not simply run a check at startup; it is applied only to containers that match its ad_identifiers.",
+      "reference": "https://docs.datadoghq.com/containers/guide/auto_conf/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-003",
+      "topic": "Auto-discovery",
+      "question": "Why does Datadog provide Autodiscovery for containerized environments?",
+      "choices": [
+        "Agent-based integrations cannot be installed in a container image without it",
+        "Container metrics can only be sent to Datadog when Autodiscovery is enabled",
+        "Containers shift between hosts and their IPs change, so static configs break",
+        "It removes the need to deploy an Agent on each host in the cluster"
+      ],
+      "answer": 2,
+      "explanation": "Containers are ephemeral and can shift from host to host, so hard-coded hosts and ports in a check's conf.yaml quickly become wrong. Autodiscovery lets you define a template once and have the Agent fill in each container's values as containers start and stop. It does not replace the per-host Agent and is not required to send basic container metrics.",
+      "reference": "https://docs.datadoghq.com/getting_started/containers/autodiscovery/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-004",
+      "topic": "Auto-discovery",
+      "question": "A new container starts on a host, and its image matches the ad_identifiers of a template the Agent has loaded. What does the Agent do?",
+      "choices": [
+        "Copies the template into conf.d and waits for the next Agent restart to run it",
+        "Substitutes the container's values into the template and schedules the check",
+        "Sends the template to Datadog so the check runs from Datadog's servers",
+        "Runs the check once, then disables it until the template file changes"
+      ],
+      "answer": 1,
+      "explanation": "The Agent watches container events such as creation, start, stop and destruction. For each container that matches a loaded template's identifier, it generates a static check configuration by substituting template variables like %%host%% with that container's values, then enables the check. No restart is needed, and checks run locally in the Agent rather than from Datadog's backend.",
+      "reference": "https://docs.datadoghq.com/getting_started/containers/autodiscovery/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-005",
+      "topic": "Auto-discovery",
+      "question": "A container exposes ports 80, 443 and 8443. What does the %%port%% template variable resolve to?",
+      "choices": [
+        "80",
+        "8443",
+        "443",
+        "The first port declared in the Dockerfile"
+      ],
+      "answer": 1,
+      "explanation": "%%port%% returns the highest exposed port, with ports sorted numerically in ascending order, so it resolves to 8443 here. To target a specific port, use %%port_<NUMBER_X>%% (an index into the sorted list) or %%port_<NAME>%% (a named port). The declaration order in the Dockerfile does not matter.",
+      "reference": "https://docs.datadoghq.com/containers/guide/template_variables/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-006",
+      "topic": "Auto-discovery",
+      "question": "A container exposes ports 80, 443 and 8443, and your check must connect to port 443. Which template variable should the instance use?",
+      "choices": [
+        "%%port_1%%",
+        "%%port%%",
+        "%%port_0%%",
+        "%%port_2%%"
+      ],
+      "answer": 0,
+      "explanation": "%%port_<NUMBER_X>%% indexes the exposed ports sorted numerically in ascending order, starting at 0: %%port_0%% is 80, %%port_1%% is 443 and %%port_2%% is 8443. Plain %%port%% returns the highest port (8443), so it would target the wrong port.",
+      "reference": "https://docs.datadoghq.com/containers/guide/template_variables/",
+      "difficulty": 3
+    },
+    {
+      "id": "ad-q-007",
+      "topic": "Auto-discovery",
+      "question": "A Redis container gets a new IP address every time it is redeployed. Which template variable should the Redis check use for its host value?",
+      "choices": [
+        "%%host%%",
+        "%%hostname%%",
+        "%%env_HOST%%",
+        "%%kube_pod_name%%"
+      ],
+      "answer": 0,
+      "explanation": "%%host%% is replaced with the container's network IP whenever the check is scheduled, so the configuration stays correct as the IP changes. %%hostname%% returns the hostname from the container configuration and is meant only for cases where %%host%% can't get a reliable IP, %%env_HOST%% reads an environment variable of the Agent process, and %%kube_pod_name%% is a pod name, not an address.",
+      "reference": "https://docs.datadoghq.com/containers/guide/template_variables/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-008",
+      "topic": "Auto-discovery",
+      "question": "On Amazon ECS with the EC2 launch type and awsvpc network mode, %%host%% cannot fetch a reliable IP for the monitored container. Which template variable does Datadog suggest using instead?",
+      "choices": [
+        "%%host_awsvpc%%",
+        "%%pid%%",
+        "%%hostname%%",
+        "%%env_HOSTNAME%%"
+      ],
+      "answer": 2,
+      "explanation": "%%hostname%% returns the hostname value from the container's configuration and is documented for cases where %%host%% cannot fetch a reliable IP, such as ECS awsvpc mode (it is supported on Docker-based hosts but not on ECS Fargate). %%env_HOSTNAME%% would read the Agent's own environment, %%host_<NETWORK NAME>%% only selects among multiple attached networks and falls back to %%host%% behavior if the network is not found, and %%pid%% is a process ID rather than an address.",
+      "reference": "https://docs.datadoghq.com/containers/guide/template_variables/",
+      "difficulty": 3
+    },
+    {
+      "id": "ad-q-009",
+      "topic": "Auto-discovery",
+      "question": "A Redis template sets \"password\": \"%%env_REDIS_PASSWORD%%\". Where must the REDIS_PASSWORD environment variable be defined for this value to resolve?",
+      "choices": [
+        "In the environment of the Redis container",
+        "As a Docker label on the Redis container",
+        "In the environment of the Datadog Agent container",
+        "In the Redis integration tile in the Datadog app"
+      ],
+      "answer": 2,
+      "explanation": "%%env_<ENV_VAR>%% is replaced with the contents of $<ENV_VAR> as seen by the Agent process, so the variable must be set on the Agent, for example with -e REDIS_PASSWORD=... on the Agent container. Defining it only on the monitored Redis container, as a label, or in the Datadog app does not make it visible to the Agent process.",
+      "reference": "https://docs.datadoghq.com/containers/guide/template_variables/",
+      "difficulty": 3
+    },
+    {
+      "id": "ad-q-010",
+      "topic": "Auto-discovery",
+      "question": "A container is attached to two Docker networks, frontend and backend, and the check must reach it over backend. Which template variable should the instance use for its host?",
+      "choices": [
+        "%%host_backend%%",
+        "%%host%%",
+        "%%hostname%%",
+        "%%env_backend%%"
+      ],
+      "answer": 0,
+      "explanation": "%%host_<NETWORK NAME>%% returns the container's IP on the named network when it is attached to several networks; if that network is not found, it behaves like %%host%%. Plain %%host%% does not let you choose the network, and %%hostname%% returns the configured hostname rather than an IP on a specific network.",
+      "reference": "https://docs.datadoghq.com/containers/guide/template_variables/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-011",
+      "topic": "Auto-discovery",
+      "question": "Which Autodiscovery template variable is supported on Kubernetes but not on plain Docker?",
+      "choices": [
+        "%%pid%%",
+        "%%hostname%%",
+        "%%kube_namespace%%",
+        "%%port%%"
+      ],
+      "answer": 2,
+      "explanation": "%%kube_namespace%%, %%kube_pod_name%% and %%kube_pod_uid%% are only available on Kubernetes. %%pid%% and %%hostname%% work the other way around: they are supported on Docker but not on Kubernetes, while %%port%% is supported on both.",
+      "reference": "https://docs.datadoghq.com/containers/guide/template_variables/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-012",
+      "topic": "Auto-discovery",
+      "question": "With Agent v7.36 or later, which single Docker label can hold a complete integration template, including instances and logs, as JSON?",
+      "choices": [
+        "com.datadoghq.ad.check_names",
+        "ad.datadoghq.com/checks",
+        "com.datadoghq.ad.instances",
+        "com.datadoghq.ad.checks"
+      ],
+      "answer": 3,
+      "explanation": "Since Agent v7.36, the com.datadoghq.ad.checks label takes a JSON object keyed by integration name that contains instances and, optionally, logs. com.datadoghq.ad.check_names and com.datadoghq.ad.instances belong to the older multi-label format, and ad.datadoghq.com/... keys are Kubernetes pod annotations, not Docker labels.",
+      "reference": "https://docs.datadoghq.com/containers/docker/integrations/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-013",
+      "topic": "Auto-discovery",
+      "question": "Your Docker hosts run Agent v7.30, which predates the single-label template format. Which Docker labels define an integration template?",
+      "choices": [
+        "com.datadoghq.ad.check_names, .init_configs and .instances",
+        "com.datadoghq.ad.checks with the integration name as the key",
+        "ad.datadoghq.com/<CONTAINER>.check_names, .init_configs and .instances",
+        "com.datadoghq.tags.service, .env and .version"
+      ],
+      "answer": 0,
+      "explanation": "Before v7.36, Docker label templates use com.datadoghq.ad.check_names, com.datadoghq.ad.init_configs and com.datadoghq.ad.instances, plus com.datadoghq.ad.logs for logs. The single com.datadoghq.ad.checks label requires v7.36+, ad.datadoghq.com/ keys are Kubernetes annotations, and com.datadoghq.tags.* labels set unified service tags rather than check configuration.",
+      "reference": "https://docs.datadoghq.com/containers/docker/integrations/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-014",
+      "topic": "Auto-discovery",
+      "question": "A Kubernetes pod has a container named web that runs the image nginx:1.25. Which Autodiscovery v2 annotation key applies an integration template to that container?",
+      "choices": [
+        "ad.datadoghq.com/nginx.checks",
+        "com.datadoghq.ad.checks",
+        "ad.datadoghq.com/service.checks",
+        "ad.datadoghq.com/web.checks"
+      ],
+      "answer": 3,
+      "explanation": "Pod annotations use the format ad.datadoghq.com/<CONTAINER_NAME>.checks, where <CONTAINER_NAME> matches spec.containers[i].name, not the image. com.datadoghq.ad.checks is the Docker label equivalent, and ad.datadoghq.com/service.checks is used on Kubernetes Services for cluster checks.",
+      "reference": "https://docs.datadoghq.com/containers/kubernetes/integrations/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-015",
+      "topic": "Auto-discovery",
+      "question": "Which of these is NOT a key-value store the Agent can use as an Autodiscovery template source?",
+      "choices": [
+        "etcd",
+        "Consul",
+        "ZooKeeper",
+        "Redis"
+      ],
+      "answer": 3,
+      "explanation": "Autodiscovery can read templates from Consul, etcd or ZooKeeper, configured under config_providers in datadog.yaml or through environment variables. Redis is a commonly monitored service (it even has a default auto_conf.yaml), but it is not a supported template store.",
+      "reference": "https://docs.datadoghq.com/containers/docker/integrations/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-016",
+      "topic": "Auto-discovery",
+      "question": "You create a template in etcd with these commands:\netcdctl set /datadog/check_configs/redis/check_names '[\"redisdb\"]'\netcdctl set /datadog/check_configs/redis/init_configs '[{}]'\netcdctl set /datadog/check_configs/redis/instances '[{\"host\": \"%%host%%\"}]'\nHow does Autodiscovery assemble the check configuration?",
+      "choices": [
+        "It applies every listed instance to every check named in check_names",
+        "It combines list items that share the same index into one check config",
+        "It reads only check_names and loads the rest from conf.yaml.example",
+        "It treats each key as a separate check, so this defines three checks"
+      ],
+      "answer": 1,
+      "explanation": "Each value is a list, and Autodiscovery builds each check configuration from the items at the same index: here check_names[0], init_configs[0] and instances[0] form the single redisdb configuration. The keys are not separate checks, and the instance settings come from the key-value store rather than from the example file.",
+      "reference": "https://docs.datadoghq.com/containers/docker/integrations/",
+      "difficulty": 3
+    },
+    {
+      "id": "ad-q-017",
+      "topic": "Auto-discovery",
+      "question": "You store Autodiscovery templates as local files in a host folder mounted to the containerized Agent's /conf.d. With default settings, what must you do after changing, adding or removing a template?",
+      "choices": [
+        "Nothing; the Agent re-reads conf.d every 10 seconds",
+        "Run agent configcheck to load the new template",
+        "Restart the Agent container",
+        "Redeploy the containers that the template targets"
+      ],
+      "answer": 2,
+      "explanation": "The docs state that you must restart your Agent containers each time you change, add or remove file-based templates. agent configcheck only displays the configurations that are loaded and resolved; it does not reload them. Redeploying the monitored containers does not make the Agent re-read its conf.d directory.",
+      "reference": "https://docs.datadoghq.com/containers/docker/integrations/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-018",
+      "topic": "Auto-discovery",
+      "question": "In a file-based Autodiscovery template, which key tells the Agent which containers the template applies to?",
+      "choices": [
+        "init_config",
+        "instances",
+        "ad_identifiers",
+        "container_include"
+      ],
+      "answer": 2,
+      "explanation": "ad_identifiers lists the container identifiers (short image names or custom identifiers) that the template should match. init_config holds settings shared by the check, instances holds per-instance settings, and container_include is an Agent-level filter setting, not a template key.",
+      "reference": "https://docs.datadoghq.com/containers/guide/ad_identifiers/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-019",
+      "topic": "Auto-discovery",
+      "question": "A file-based template has ad_identifiers: [redis]. One container runs foo/redis:latest and another runs bar/redis:v2. Which containers does the Agent apply the template to?",
+      "choices": [
+        "Both containers",
+        "Only foo/redis:latest",
+        "Neither, since the repository path must be included",
+        "Only the first one the Agent discovers"
+      ],
+      "answer": 0,
+      "explanation": "An identifier based on the short image name matches any image with that name regardless of repository or tag, so both foo/redis:latest and bar/redis:v2 get the template. The trade-off is that the Agent cannot distinguish identically named images from different sources; use a custom identifier when you need that.",
+      "reference": "https://docs.datadoghq.com/containers/guide/ad_identifiers/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-020",
+      "topic": "Auto-discovery",
+      "question": "Two Docker containers run the same httpd image, but each needs a different Apache template. How do you target them separately?",
+      "choices": [
+        "Label each with com.datadoghq.ad.check.id and use that value in ad_identifiers",
+        "Label each with com.datadoghq.ad.tags and filter the template by tag",
+        "List the full image name and tag in each template's ad_identifiers",
+        "Include one container with DD_CONTAINER_INCLUDE and exclude the other"
+      ],
+      "answer": 0,
+      "explanation": "The com.datadoghq.ad.check.id label (ad.datadoghq.com/<CONTAINER_NAME>.check.id on Kubernetes) gives a container a custom identifier that takes precedence over its image name; each template then lists that value in ad_identifiers. Tags do not select templates, a more precise image name cannot separate containers running the same image, and include/exclude rules would stop monitoring one container entirely.",
+      "reference": "https://docs.datadoghq.com/containers/guide/ad_identifiers/",
+      "difficulty": 3
+    },
+    {
+      "id": "ad-q-021",
+      "topic": "Auto-discovery",
+      "question": "Where does the containerized Agent keep the default Autodiscovery template for the Redis integration?",
+      "choices": [
+        "conf.d/redisdb.d/conf.yaml.example",
+        "conf.d/redisdb.d/auto_conf.yaml",
+        "conf.d/auto_conf.d/redisdb.yaml",
+        "checks.d/redisdb/auto_conf.yaml"
+      ],
+      "answer": 1,
+      "explanation": "Default Autodiscovery templates are files named auto_conf.yaml inside each integration's conf.d/<INTEGRATION>.d/ folder, so Redis uses conf.d/redisdb.d/auto_conf.yaml. conf.yaml.example is the sample configuration used as a reference, and checks.d holds custom check code rather than integration templates.",
+      "reference": "https://docs.datadoghq.com/containers/guide/auto_conf/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-022",
+      "topic": "Auto-discovery",
+      "question": "Which of these integrations ships with a default auto_conf.yaml template, so it can be Autodiscovered without writing your own template?",
+      "choices": [
+        "PostgreSQL",
+        "Redis",
+        "MySQL",
+        "MongoDB"
+      ],
+      "answer": 1,
+      "explanation": "The Agent ships auto_conf.yaml files for a list of common services that includes Redis, Apache, Memcached, Elastic, RabbitMQ and Tomcat. PostgreSQL, MySQL and MongoDB are not on the auto-configuration list, so you supply your own template through labels, annotations or files.",
+      "reference": "https://docs.datadoghq.com/containers/guide/auto_conf/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-023",
+      "topic": "Auto-discovery",
+      "question": "Your Docker Agent automatically runs the Redis check from its default auto_conf.yaml. You want to turn off only that default configuration without excluding the Redis containers. What should you set on the Agent container?",
+      "choices": [
+        "DD_CONTAINER_EXCLUDE=\"image:redis\"",
+        "DD_AUTOCONFIG_EXCLUDE_FEATURES=\"redisdb\"",
+        "DD_IGNORE_AUTOCONF=\"redisdb\"",
+        "DD_CONFIG_PROVIDERS=\"redisdb\""
+      ],
+      "answer": 2,
+      "explanation": "DD_IGNORE_AUTOCONF takes a space-separated list of integration names (for example \"redisdb istio\") whose auto_conf.yaml files the Agent ignores. DD_CONTAINER_EXCLUDE would stop Autodiscovery, metrics and logs for the Redis containers altogether, and autoconfig_exclude_features controls detected environment features such as docker or containerd, not individual integrations.",
+      "reference": "https://docs.datadoghq.com/containers/guide/auto_conf/#disable-auto-configuration",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-024",
+      "topic": "Auto-discovery",
+      "question": "On Kubernetes, you define a custom redisdb template in the Helm chart's datadog.confd, but the Agent keeps running the default Redis configuration. What is the most likely cause and fix?",
+      "choices": [
+        "auto_conf.yaml outranks Helm config; add redisdb to datadog.ignoreAutoConfig",
+        "Helm-defined templates need cluster_check: true to override auto_conf.yaml",
+        "datadog.confd templates are only read once the Cluster Agent is enabled",
+        "Helm templates load only after pods get the tolerate-unready annotation"
+      ],
+      "answer": 0,
+      "explanation": "auto_conf.yaml files take precedence over Autodiscovery configuration set in the Datadog Operator or Helm chart, so for an auto-configured integration you must disable auto-configuration (datadog.ignoreAutoConfig in Helm, or DD_IGNORE_AUTOCONF). cluster_check: true marks checks for Cluster Agent dispatching, and ad.datadoghq.com/tolerate-unready only controls whether unready pods are monitored.",
+      "reference": "https://docs.datadoghq.com/containers/guide/auto_conf/#override-auto-configuration",
+      "difficulty": 3
+    },
+    {
+      "id": "ad-q-025",
+      "topic": "Auto-discovery",
+      "question": "In a plain Docker environment, how does Datadog recommend overriding the default auto_conf.yaml configuration for an integration?",
+      "choices": [
+        "Mount a Kubernetes ConfigMap into the Agent container",
+        "Add Docker labels with your template to the monitored container",
+        "Create a DatadogInstrumentation custom resource",
+        "Set the template in the Helm chart's datadog.confd values"
+      ],
+      "answer": 1,
+      "explanation": "For Docker, you override auto-configuration by putting your own template in Docker labels (com.datadoghq.ad.checks, or the older check_names/init_configs/instances labels) on the monitored container. ConfigMaps, the DatadogInstrumentation CRD and Helm values are Kubernetes-only mechanisms.",
+      "reference": "https://docs.datadoghq.com/containers/guide/auto_conf/#override-auto-configuration",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-026",
+      "topic": "Auto-discovery",
+      "question": "Your Kubernetes workloads use an Amazon RDS database that is not a container in the cluster. You want exactly one Agent in the cluster to run the MySQL check against it. What should you use?",
+      "choices": [
+        "A cluster check dispatched by the Cluster Agent",
+        "A pod annotation on the Agent DaemonSet pods",
+        "An auto_conf.yaml file loaded by every node Agent",
+        "A DD_CONTAINER_INCLUDE rule for the RDS endpoint"
+      ],
+      "answer": 0,
+      "explanation": "Cluster checks extend Autodiscovery to non-containerized workloads such as RDS or CloudSQL and to Kubernetes services. The Cluster Agent holds the configuration (marked cluster_check: true) and dispatches it to a single node-based Agent, so only one instance runs even as nodes come and go. A config loaded by every node Agent would run the check once per node.",
+      "reference": "https://docs.datadoghq.com/containers/cluster_agent/clusterchecks/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-027",
+      "topic": "Auto-discovery",
+      "question": "You want the Agent to skip Autodiscovery and stop collecting metrics and logs for every container built from the image legacy-batch. Which Agent setting does this?",
+      "choices": [
+        "DD_CONTAINER_EXCLUDE=\"image:legacy-batch\"",
+        "DD_CONTAINER_EXCLUDE_LOGS=\"image:legacy-batch\"",
+        "DD_IGNORE_AUTOCONF=\"legacy-batch\"",
+        "DD_CONTAINER_EXCLUDE=\"legacy-batch\""
+      ],
+      "answer": 0,
+      "explanation": "DD_CONTAINER_EXCLUDE takes space-separated regexes prefixed with name:, image: or kube_namespace:, and excluded containers are skipped for Autodiscovery, metrics and logs. A value without a prefix does not work, DD_CONTAINER_EXCLUDE_LOGS only drops logs, and DD_IGNORE_AUTOCONF takes integration names rather than images.",
+      "reference": "https://docs.datadoghq.com/containers/guide/container-discovery-management/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-028",
+      "topic": "Auto-discovery",
+      "question": "An Agent is started with:\nDD_CONTAINER_EXCLUDE=\"image:.*\"\nDD_CONTAINER_INCLUDE=\"image:ubuntu\"\nWhat is the result for container discovery?",
+      "choices": [
+        "No containers are monitored, because exclusion always wins",
+        "Only containers whose image matches ubuntu are monitored",
+        "All containers are monitored, because the include list resets exclusion",
+        "The Agent refuses to start because the two rules conflict"
+      ],
+      "answer": 1,
+      "explanation": "Inclusion generally takes precedence over exclusion, so excluding every image and then including specific ones is the documented way to monitor only a subset of containers. The exception is a pod exclusion annotation such as ad.datadoghq.com/exclude: \"true\", which wins even over an include rule.",
+      "reference": "https://docs.datadoghq.com/containers/guide/container-discovery-management/#inclusion-and-exclusion-behavior",
+      "difficulty": 3
+    },
+    {
+      "id": "ad-q-029",
+      "topic": "Auto-discovery",
+      "question": "In Docker, you want the Agent to collect an NGINX container's logs with the log source set to nginx and the service set to webapp. Which container label does this?",
+      "choices": [
+        "com.datadoghq.ad.tags='[\"source:nginx\", \"service:webapp\"]'",
+        "com.datadoghq.ad.logs='[{\"source\": \"nginx\", \"service\": \"webapp\"}]'",
+        "com.datadoghq.ad.instances='[{\"source\": \"nginx\", \"service\": \"webapp\"}]'",
+        "ad.datadoghq.com/nginx.logs='[{\"source\": \"nginx\", \"service\": \"webapp\"}]'"
+      ],
+      "answer": 1,
+      "explanation": "The com.datadoghq.ad.logs label carries a JSON list of log configurations, and setting source to an integration name also installs that integration's log pipeline. com.datadoghq.ad.instances configures metric check instances, com.datadoghq.ad.tags only adds custom tags to the container's data rather than setting the log source and service, and ad.datadoghq.com/<CONTAINER>.logs is the Kubernetes pod annotation form.",
+      "reference": "https://docs.datadoghq.com/containers/docker/log/#log-integrations",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-030",
+      "topic": "Auto-discovery",
+      "question": "When running the Agent as a Docker container on Linux, which volume mount lets it connect to the Docker daemon to discover other containers?",
+      "choices": [
+        "-v /proc/:/host/proc/:ro",
+        "-v /sys/fs/cgroup/:/host/sys/fs/cgroup:ro",
+        "-v /var/run/docker.sock:/var/run/docker.sock:ro",
+        "-v /opt/datadog-agent/run:/opt/datadog-agent/run:rw"
+      ],
+      "answer": 2,
+      "explanation": "Mounting the Docker socket lets the Agent talk to the Docker daemon to discover containers, read their labels and collect stdout/stderr. The /proc and cgroup mounts give the Agent access to host and container resource data, and /opt/datadog-agent/run stores the last collected log positions so logs are not lost across restarts.",
+      "reference": "https://docs.datadoghq.com/containers/docker/log/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-031",
+      "topic": "Auto-discovery",
+      "question": "Which environment variable is required to run the Datadog Docker Agent?",
+      "choices": [
+        "DD_SITE",
+        "DD_HOSTNAME",
+        "DD_LOGS_ENABLED",
+        "DD_API_KEY"
+      ],
+      "answer": 3,
+      "explanation": "DD_API_KEY is the only variable marked as required, because the Agent cannot submit data without it. DD_SITE defaults to datadoghq.com (set it for other sites such as datadoghq.eu), DD_HOSTNAME is only needed if hostname autodetection fails, and DD_LOGS_ENABLED is an optional switch for log collection.",
+      "reference": "https://docs.datadoghq.com/containers/docker/#environment-variables",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-032",
+      "topic": "Auto-discovery",
+      "question": "A Docker Agent runs with DD_LOGS_ENABLED=true, but only containers with com.datadoghq.ad.logs labels send logs. Which setting makes it collect logs from every container?",
+      "choices": [
+        "DD_CONTAINER_INCLUDE_LOGS=\"name:.*\"",
+        "DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true",
+        "DD_PROCESS_CONFIG_PROCESS_COLLECTION_ENABLED=true",
+        "DD_LOGS_CONFIG_DOCKER_CONTAINER_USE_FILE=true"
+      ],
+      "answer": 1,
+      "explanation": "DD_LOGS_ENABLED turns on the Logs Agent, and DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true adds a log configuration for all containers; without it, logs come only from containers with Autodiscovery log configs. DD_CONTAINER_INCLUDE_LOGS is an allowlist filter rather than a collection switch, and the other two settings control live process collection and file-based log tailing.",
+      "reference": "https://docs.datadoghq.com/containers/docker/log/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-033",
+      "topic": "Auto-discovery",
+      "question": "An engineer migrating from Agent v5 to Agent v7 can't find the docker_daemon check. What explains this?",
+      "choices": [
+        "Agent v6+ uses a Go-based check named docker; docker_daemon is v5 only",
+        "It must now be installed with the datadog-agent integration install command",
+        "It was renamed containerd and now reports only containerd metrics",
+        "It still runs, but Agent v7 hides it from the agent status output"
+      ],
+      "answer": 0,
+      "explanation": "Starting with Agent v6, the Agent no longer loads docker_daemon; Docker monitoring is handled by a new check named docker, written in Go, while docker_daemon is maintained only for Agent v5. The agent import command can convert an old docker_daemon.yaml into docker.yaml and move the relevant settings into datadog.yaml.",
+      "reference": "https://docs.datadoghq.com/integrations/docker_daemon/#agent-v6",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-034",
+      "topic": "Auto-discovery",
+      "question": "Which Docker integration metric reports the number of containers running on a host, tagged by image?",
+      "choices": [
+        "docker.containers.running.total",
+        "docker.container.count",
+        "docker.containers.running",
+        "docker.images.available"
+      ],
+      "answer": 2,
+      "explanation": "docker.containers.running is a gauge of running containers tagged by image, while docker.containers.running.total gives the host-wide total. docker.container.count came from an Agent v5 option that Agent v6+ does not support, and docker.images.available counts top-level images rather than containers.",
+      "reference": "https://docs.datadoghq.com/containers/docker/data_collected/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-035",
+      "topic": "Auto-discovery",
+      "question": "Which Agent command prints all check configurations that the running Agent has loaded and resolved, including those built from Autodiscovery templates?",
+      "choices": [
+        "agent status",
+        "agent check <CHECK_NAME>",
+        "agent flare",
+        "agent configcheck"
+      ],
+      "answer": 3,
+      "explanation": "configcheck prints all configurations loaded and resolved by a running Agent; with -v it also lists unresolved templates and resolve warnings, which makes it the starting point for Autodiscovery troubleshooting. agent status summarizes running checks and components, agent check runs a single check, and agent flare sends diagnostics to Datadog support.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/autodiscovery/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-036",
+      "topic": "Auto-discovery",
+      "question": "Running agent configcheck -v in the Agent container shows:\n=== Resolve warnings ===\nredisdb\n* No service found with this AD identifier: redis\nWhat does this indicate?",
+      "choices": [
+        "The Redis integration is missing from the Agent image and must be installed",
+        "The template has a YAML syntax error and was rejected",
+        "The %%env_REDIS_PASSWORD%% variable is not set on the Agent",
+        "The template loaded, but no running container matched the redis identifier"
+      ],
+      "answer": 3,
+      "explanation": "This resolve warning means the Agent loaded the template (it is listed under Unresolved Configs) but no discovered container matches the identifier, so its template variables cannot be resolved yet. Compare the container's short image name or custom check.id with ad_identifiers. A syntax error would prevent the template from loading at all, and the redisdb check ships with the Agent.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/autodiscovery/",
+      "difficulty": 3
+    },
+    {
+      "id": "ad-q-037",
+      "topic": "Auto-discovery",
+      "question": "Which integration does not work with Autodiscovery because it requires process tree data or filesystem access?",
+      "choices": [
+        "Redis",
+        "Apache",
+        "PostgreSQL",
+        "Postfix"
+      ],
+      "answer": 3,
+      "explanation": "Datadog lists Ceph, Varnish, Postfix, Cassandra Nodetool and Gunicorn as incompatible with Autodiscovery because they need process tree data or filesystem access. A workaround is to expose metrics with a Prometheus exporter in the pod and collect them with the OpenMetrics integration, which supports Autodiscovery. Redis, Apache and PostgreSQL are routinely configured through Autodiscovery templates.",
+      "reference": "https://docs.datadoghq.com/containers/docker/integrations/",
+      "difficulty": 3
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "ad-fc-001",
+      "topic": "Auto-discovery",
+      "front": "What problem does Autodiscovery solve?",
+      "back": "Containers start, stop and move between hosts, so their IPs and ports keep changing. Autodiscovery lets you define an integration template once; the Agent applies it to every matching container and fills in that container's current values.",
+      "reference": "https://docs.datadoghq.com/getting_started/containers/autodiscovery/"
+    },
+    {
+      "id": "ad-fc-002",
+      "topic": "Auto-discovery",
+      "front": "How does Autodiscovery turn a template into a running check?",
+      "back": "1. The Agent watches container events (create, start, stop, destroy).\n2. It matches each container against the ad_identifiers of loaded templates.\n3. For a match, it substitutes template variables (e.g. %%host%%) with the container's values.\n4. It enables the check with the resulting static configuration.",
+      "reference": "https://docs.datadoghq.com/getting_started/containers/autodiscovery/"
+    },
+    {
+      "id": "ad-fc-003",
+      "topic": "Auto-discovery",
+      "front": "Sections of a file-based Autodiscovery template (conf.d/<INTEGRATION_NAME>.d/conf.yaml)",
+      "back": "ad_identifiers: containers to match (short image name or custom ID)\ninit_config: settings shared by the check (usually empty)\ninstances: one item per check instance\nlogs: optional log collection configuration",
+      "reference": "https://docs.datadoghq.com/containers/docker/integrations/"
+    },
+    {
+      "id": "ad-fc-004",
+      "topic": "Auto-discovery",
+      "front": "%%host%%",
+      "back": "The container's network IP. If the Agent can't find the IP, it falls back to the bridge network IP. Use %%host_<NETWORK NAME>%% to choose a network when the container is attached to several (falls back to %%host%% if not found).",
+      "reference": "https://docs.datadoghq.com/containers/guide/template_variables/"
+    },
+    {
+      "id": "ad-fc-005",
+      "topic": "Auto-discovery",
+      "front": "%%port%% vs %%port_<NUMBER_X>%% vs %%port_<NAME>%%",
+      "back": "Exposed ports are sorted numerically, ascending.\n%%port%%: the highest port (80, 443, 8443 -> 8443)\n%%port_0%%, %%port_1%%...: port by index (%%port_0%% -> 80)\n%%port_<NAME>%%: the port with that name",
+      "reference": "https://docs.datadoghq.com/containers/guide/template_variables/"
+    },
+    {
+      "id": "ad-fc-006",
+      "topic": "Auto-discovery",
+      "front": "%%env_<ENV_VAR>%%",
+      "back": "The contents of $<ENV_VAR> as seen by the Agent process, so the variable must be set on the Agent (e.g. %%env_REDIS_PASSWORD%%). Useful for keeping passwords out of labels and annotations.",
+      "reference": "https://docs.datadoghq.com/containers/guide/template_variables/"
+    },
+    {
+      "id": "ad-fc-007",
+      "topic": "Auto-discovery",
+      "front": "Which template variables depend on the platform?",
+      "back": "%%pid%% (container process ID from docker inspect) and %%hostname%% (hostname from the container config, for when %%host%% can't get a reliable IP, e.g. ECS awsvpc): Docker, not Kubernetes.\n%%kube_namespace%%, %%kube_pod_name%%, %%kube_pod_uid%%: Kubernetes only.",
+      "reference": "https://docs.datadoghq.com/containers/guide/template_variables/"
+    },
+    {
+      "id": "ad-fc-008",
+      "topic": "Auto-discovery",
+      "front": "Autodiscovery template sources on Docker",
+      "back": "Docker labels on the monitored container, local files mounted into the Agent's conf.d, and key-value stores (Consul, etcd, ZooKeeper).",
+      "reference": "https://docs.datadoghq.com/containers/docker/integrations/"
+    },
+    {
+      "id": "ad-fc-009",
+      "topic": "Auto-discovery",
+      "front": "Autodiscovery template sources on Kubernetes",
+      "back": "Pod annotations, local files, ConfigMaps, key-value stores, the Datadog Operator manifest (extraConfd.configDataMap), the Helm chart (datadog.confd), and the DatadogInstrumentation custom resource.",
+      "reference": "https://docs.datadoghq.com/containers/kubernetes/integrations/"
+    },
+    {
+      "id": "ad-fc-010",
+      "topic": "Auto-discovery",
+      "front": "Docker label formats for Autodiscovery templates",
+      "back": "Agent v7.36+: com.datadoghq.ad.checks='{\"<INTEGRATION_NAME>\": {\"instances\": [...], \"logs\": [...]}}'\nEarlier Agents: com.datadoghq.ad.check_names, com.datadoghq.ad.init_configs, com.datadoghq.ad.instances (plus com.datadoghq.ad.logs)",
+      "reference": "https://docs.datadoghq.com/containers/docker/integrations/"
+    },
+    {
+      "id": "ad-fc-011",
+      "topic": "Auto-discovery",
+      "front": "Kubernetes pod annotation formats for Autodiscovery",
+      "back": "v2 (Agent 7.36+): ad.datadoghq.com/<CONTAINER_NAME>.checks\nv1: ad.datadoghq.com/<CONTAINER_NAME>.check_names / .init_configs / .instances\nLogs: ad.datadoghq.com/<CONTAINER_NAME>.logs\n<CONTAINER_NAME> is the container's name, not its image; for Deployments, annotate spec.template.metadata.",
+      "reference": "https://docs.datadoghq.com/containers/kubernetes/integrations/"
+    },
+    {
+      "id": "ad-fc-012",
+      "topic": "Auto-discovery",
+      "front": "Key-value store templates: where does the Agent look?",
+      "back": "Enable etcd, Consul or ZooKeeper under config_providers in datadog.yaml (or with env vars). Templates live under /datadog/check_configs/<CONTAINER_IMAGE>/ with check_names, init_configs and instances (and logs) lists; items at the same index form one check.",
+      "reference": "https://docs.datadoghq.com/containers/docker/integrations/"
+    },
+    {
+      "id": "ad-fc-013",
+      "topic": "Auto-discovery",
+      "front": "What is auto_conf.yaml?",
+      "back": "A default Autodiscovery template in conf.d/<INTEGRATION>.d/ for common services (e.g. Redis, Apache, Memcached, Elastic, RabbitMQ, Tomcat). When the Agent runs as a container, it uses these to discover and monitor matching containers with no extra setup.",
+      "reference": "https://docs.datadoghq.com/containers/guide/auto_conf/"
+    },
+    {
+      "id": "ad-fc-014",
+      "topic": "Auto-discovery",
+      "front": "How do you disable an integration's auto_conf.yaml?",
+      "back": "Containerized Agent (Docker, ECS, manual DaemonSet): DD_IGNORE_AUTOCONF=\"redisdb istio\" (space-separated integration names).\nHelm: datadog.ignoreAutoConfig list.\nOperator: set DD_IGNORE_AUTOCONF in override.nodeAgent.containers.agent.env.",
+      "reference": "https://docs.datadoghq.com/containers/guide/auto_conf/#disable-auto-configuration"
+    },
+    {
+      "id": "ad-fc-015",
+      "topic": "Auto-discovery",
+      "front": "Autodiscovery configuration precedence on Kubernetes",
+      "back": "Pod annotations > DatadogInstrumentation resources > auto_conf.yaml > Operator/Helm configuration. To configure an auto-configured integration through Helm or the Operator, disable its auto-configuration first.",
+      "reference": "https://docs.datadoghq.com/containers/guide/auto_conf/#override-auto-configuration"
+    },
+    {
+      "id": "ad-fc-016",
+      "topic": "Auto-discovery",
+      "front": "Custom Autodiscovery container identifiers",
+      "back": "Give a container a custom ID with the Docker label com.datadoghq.ad.check.id=\"foo\" or the annotation ad.datadoghq.com/<CONTAINER_NAME>.check.id: 'foo', then list foo in ad_identifiers. The custom ID takes precedence over the image name, so containers from the same image can get different templates.",
+      "reference": "https://docs.datadoghq.com/containers/guide/ad_identifiers/"
+    },
+    {
+      "id": "ad-fc-017",
+      "topic": "Auto-discovery",
+      "front": "Cluster checks",
+      "back": "Extend Autodiscovery to non-containerized or cluster-level targets (e.g. RDS, CloudSQL, Kubernetes services). The Cluster Agent holds configs marked cluster_check: true and dispatches each one to a single node Agent (clusterchecks config provider). Metrics are sent without a hostname and get a kube_cluster_name tag.",
+      "reference": "https://docs.datadoghq.com/containers/cluster_agent/clusterchecks/"
+    },
+    {
+      "id": "ad-fc-018",
+      "topic": "Auto-discovery",
+      "front": "Container include/exclude environment variables",
+      "back": "DD_CONTAINER_INCLUDE / DD_CONTAINER_EXCLUDE (all data), plus _METRICS and _LOGS variants. Values are space-separated regexes prefixed with name:, image: or kube_namespace:, e.g. DD_CONTAINER_EXCLUDE=\"name:^dd-agent$\". Inclusion generally wins over exclusion; docker.containers.running still counts every container.",
+      "reference": "https://docs.datadoghq.com/containers/guide/container-discovery-management/"
+    },
+    {
+      "id": "ad-fc-019",
+      "topic": "Auto-discovery",
+      "front": "Pod exclusion annotations (Agent 7.45+)",
+      "back": "Set to \"true\": ad.datadoghq.com/exclude, ad.datadoghq.com/logs_exclude, ad.datadoghq.com/metrics_exclude (whole pod), or ad.datadoghq.com/<CONTAINER_NAME>.exclude / .logs_exclude / .metrics_exclude (one container). They take priority even over DD_CONTAINER_INCLUDE.",
+      "reference": "https://docs.datadoghq.com/containers/guide/container-discovery-management/#pod-exclude-configuration"
+    },
+    {
+      "id": "ad-fc-020",
+      "topic": "Auto-discovery",
+      "front": "Log collection with Autodiscovery labels and annotations",
+      "back": "Docker: com.datadoghq.ad.logs='[{\"source\": \"nginx\", \"service\": \"webapp\"}]'\nKubernetes: ad.datadoghq.com/<CONTAINER_NAME>.logs\nWithout them, source and service default to the short_image tag (Agent 6.8+). Requires DD_LOGS_ENABLED=true; DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true collects from all containers.",
+      "reference": "https://docs.datadoghq.com/containers/docker/log/"
+    },
+    {
+      "id": "ad-fc-021",
+      "topic": "Auto-discovery",
+      "front": "Basic docker run requirements for the Linux Docker Agent",
+      "back": "Mounts (read-only): /var/run/docker.sock (container discovery), /proc -> /host/proc, /sys/fs/cgroup -> /host/sys/fs/cgroup.\nEnv: DD_API_KEY (required), DD_SITE (defaults to datadoghq.com).\nImage: registry.datadoghq.com/agent:7",
+      "reference": "https://docs.datadoghq.com/containers/docker/"
+    },
+    {
+      "id": "ad-fc-022",
+      "topic": "Auto-discovery",
+      "front": "docker_daemon vs the docker check",
+      "back": "docker_daemon is the Agent v5 Docker check. Agent v6+ uses a Go-based check named docker that reports docker.* metrics such as docker.containers.running, docker.cpu.usage and docker.mem.rss. agent import converts docker_daemon.yaml to docker.yaml.",
+      "reference": "https://docs.datadoghq.com/integrations/docker_daemon/#agent-v6"
+    },
+    {
+      "id": "ad-fc-023",
+      "topic": "Auto-discovery",
+      "front": "How do you verify Autodiscovery templates?",
+      "back": "Run agent configcheck -v (e.g. docker exec -it <AGENT_CONTAINER_NAME> agent configcheck -v). It shows each resolved config with its provider (e.g. Docker container labels) and, with -v, unresolved templates and resolve warnings such as \"No service found with this AD identifier\".",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/autodiscovery/"
+    },
+    {
+      "id": "ad-fc-024",
+      "topic": "Auto-discovery",
+      "front": "Autodiscovery config providers",
+      "back": "docker: templates in container labels\nkubelet: templates in pod annotations\nclusterchecks: cluster-level configs from the Cluster Agent\nkube_services: watches Kubernetes services for cluster checks\netcd / consul / zookeeper: key-value store templates",
+      "reference": "https://docs.datadoghq.com/containers/docker/#autodiscovery"
+    }
+  ]
+}

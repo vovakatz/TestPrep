@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% from "_macros.html" import band_chip, band_for, meter %}
+{% block title %}Progress{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Progress</p>
+    <h1>How you're tracking</h1>
+    <p class="lede-dark">Accuracy per topic comes from every exam answer you've submitted. Targeted exams and decks use these same numbers to decide what to show you.</p>
+  </div>
+</header>
+
+<section class="stat-row">
+  <div class="stat"><span class="stat-label">Exams completed</span><span class="stat-value">{{ summary.completed }}</span></div>
+  <div class="stat"><span class="stat-label">Average score</span><span class="stat-value">{{ (summary.avg_score | round | int ~ '%') if summary.avg_score is not none else '—' }}</span></div>
+  <div class="stat"><span class="stat-label">Best score</span><span class="stat-value">{{ (summary.best | round | int ~ '%') if summary.best is not none else '—' }}</span></div>
+  <div class="stat"><span class="stat-label">Questions answered</span><span class="stat-value">{{ summary.answered }}</span></div>
+  <div class="stat"><span class="stat-label">Cards reviewed</span><span class="stat-value">{{ summary.reviews }}</span></div>
+</section>
+
+<section class="card">
+  <header class="card-head">
+    <div>
+      <h2>Exam score over time</h2>
+      <p class="muted small">Score of each completed exam, oldest to newest</p>
+    </div>
+    {% if trend %}<button type="button" class="btn btn-ghost btn-sm" id="trend-table-toggle" aria-expanded="false">Show table</button>{% endif %}
+  </header>
+  {% if trend %}
+    <div class="chart" id="trend-chart" aria-describedby="trend-table-wrap"></div>
+    <div id="trend-table-wrap" hidden>
+      <table class="table">
+        <thead><tr><th>#</th><th>Completed</th><th>Type</th><th class="num">Score</th><th class="num">Correct</th></tr></thead>
+        <tbody>
+          {% for t in trend %}
+            <tr><td>{{ loop.index }}</td><td>{{ t.date }}</td><td>{{ t.mode | capitalize }}</td>
+                <td class="num">{{ t.score | round | int }}%</td><td class="num">{{ t.correct }}/{{ t.total }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <script type="application/json" id="trend-data">{{ trend | tojson }}</script>
+  {% else %}
+    <div class="empty"><p>Finish an exam to start your trend line.</p></div>
+  {% endif %}
+</section>
+
+{% if focus %}
+<section class="card">
+  <header class="card-head"><h2>Weakest topics</h2><span class="muted small">Estimated accuracy, lowest first</span></header>
+  <ul class="focus-grid">
+    {% for t in focus %}
+      <li class="focus-tile">
+        <span class="muted small">{{ t.domain }}</span>
+        <strong>{{ t.topic }}</strong>
+        <span class="focus-tile-num">{{ t.accuracy | pct }} <span class="muted small">· {{ t.correct }}/{{ t.attempts }} correct</span></span>
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('main.flashcard_hub', topic=t.topic_id) }}">Study cards</a>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<section class="card">
+  <header class="card-head"><h2>Topic mastery</h2></header>
+  <div class="mastery">
+    {% for d in domains %}
+      <div class="mastery-domain">
+        <div class="mastery-domain-head">
+          <h3>{{ d.name }}</h3>
+          <span class="num">{{ d.accuracy | pct }}</span>
+          <span class="muted small num">{{ d.correct }}/{{ d.attempts }} correct</span>
+        </div>
+        <table class="table table-compact mastery-table">
+          <thead>
+            <tr><th>Topic</th><th class="w-bar">Exam accuracy</th><th class="num">Answered</th><th>Status</th><th class="num">Cards known</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for t in d.topics %}
+              {% set r = card_ratings.get(t.topic_id, {}) %}
+              <tr>
+                <td>{{ t.topic }} <span class="muted small">· {{ question_totals.get(t.topic_id, 0) }} q</span></td>
+                <td class="w-bar"><div class="bar-cell">{{ meter(t.accuracy, t.topic) }}<span class="num">{{ t.accuracy | pct }}</span></div></td>
+                <td class="num">{{ t.attempts }}</td>
+                <td>{{ band_chip(t.band) }}</td>
+                <td class="num">{{ r.get('known', 0) or 0 }}/{{ card_totals.get(t.topic_id, 0) }}</td>
+                <td class="actions"><a class="link" href="{{ url_for('main.flashcard_hub', topic=t.topic_id) }}">Study</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/trend.js') }}"></script>{% endblock %}

@@ -1,0 +1,1328 @@
+{
+  "questions": [
+    {
+      "id": "dc-q-001",
+      "topic": "DogStatsD",
+      "question": "Why does DogStatsD accept metrics over UDP rather than TCP?",
+      "choices": [
+        "UDP guarantees that every metric datagram reaches the Agent",
+        "UDP is connection-oriented, so the app waits if DogStatsD is down",
+        "UDP encrypts each datagram, so metrics stay private on the network",
+        "The app can send metrics and resume work without waiting for a reply"
+      ],
+      "answer": 3,
+      "explanation": "Because DogStatsD uses UDP, an application can fire off a metric and resume its work without waiting for a response, and it is not interrupted if DogStatsD becomes unavailable. UDP is connectionless and does not guarantee delivery; TCP is the connection-oriented protocol. UDP itself provides no encryption.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/#how-it-works",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-002",
+      "topic": "DogStatsD",
+      "question": "In Agent v6 and later, on which port and protocol does the DogStatsD server listen by default?",
+      "choices": [
+        "UDP 8125",
+        "TCP 8125",
+        "UDP 8126",
+        "TCP 10516"
+      ],
+      "answer": 0,
+      "explanation": "The DogStatsD server is enabled by default over UDP port 8125 for Agent v6+. Port 8126 is the APM trace receiver (TCP) and 10516 is a TCP port used for log forwarding, not DogStatsD.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/#setup",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-003",
+      "topic": "DogStatsD",
+      "question": "DogStatsD implements the StatsD protocol. Which capability is a Datadog-specific extension that plain StatsD does not provide?",
+      "choices": [
+        "Tags attached to each metric",
+        "Datagrams sent over UDP",
+        "Counter and gauge metric types",
+        "Client-side sampling rates"
+      ],
+      "answer": 0,
+      "explanation": "DogStatsD adds a few Datadog-specific extensions to StatsD: the histogram metric type, service checks, events, and tagging. UDP transport, counters, gauges, and sample rates are already part of the standard StatsD protocol.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-004",
+      "topic": "DogStatsD",
+      "question": "An application already sends custom metrics to the Agent with a standard StatsD client. The team now wants to send histogram metrics. What is needed?",
+      "choices": [
+        "Keep the StatsD client and send the values with a histogram type",
+        "Add DogStatsD instrumentation to send the histogram metric type",
+        "Calculate the histogram values in the app and send them via StatsD",
+        "Enable histogram_aggregates in datadog.yaml for the StatsD client"
+      ],
+      "answer": 1,
+      "explanation": "Any compliant StatsD client works with DogStatsD, but it does not include the Datadog-specific extensions, and the histogram type is one of those extensions. Instrumenting with a DogStatsD client lets the app submit histograms that the Agent aggregates. Computing statistics in the app bypasses Agent-side histogram aggregation, and histogram_aggregates only tunes histograms that DogStatsD already receives.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-005",
+      "topic": "DogStatsD",
+      "question": "An app calls a DogStatsD increment on the same metric, with the same tags, 500 times within a few seconds. How does DogStatsD handle these before forwarding them to Datadog?",
+      "choices": [
+        "It aggregates them into one data point per 10-second flush interval",
+        "It forwards each increment to Datadog as a separate API request",
+        "It buffers them for 60 seconds and forwards only the last value",
+        "It samples 10% of them and discards the rest to save bandwidth"
+      ],
+      "answer": 0,
+      "explanation": "DogStatsD aggregates multiple data points for each unique metric (same name and tags) into a single data point over the flush interval, which is 10 seconds. This reduces the number of API calls. It does not forward every point individually, wait 60 seconds, or drop points unless the client itself applies a sample rate.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/data_aggregation/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-006",
+      "topic": "DogStatsD",
+      "question": "Which is a correctly formatted DogStatsD datagram for a gauge named queue.depth with value 42 and the tag env:prod?",
+      "choices": [
+        "queue.depth:42|gauge|#env:prod",
+        "queue.depth:42|g|#env:prod",
+        "queue.depth:g|42|#env:prod",
+        "queue.depth:42|#env:prod|g"
+      ],
+      "answer": 1,
+      "explanation": "The metric datagram format is <METRIC_NAME>:<VALUE>|<TYPE>|@<SAMPLE_RATE>|#<TAGS>, and the gauge type identifier is g. The value follows the name after a colon, the type is a short letter code rather than a word, and the # tag list comes after the type.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-007",
+      "topic": "DogStatsD",
+      "question": "A client sends this DogStatsD datagram:\npage.views:1|c|@0.5|#env:prod,team:web\nWhat does @0.5 mean for how the value is counted?",
+      "choices": [
+        "The metric should be flushed every 0.5 seconds instead of 10",
+        "The value 1 is multiplied by 0.5 before it is stored",
+        "It was sent half the time, so the Agent counts this value as 2",
+        "Half of the tags are dropped to reduce the metric's cardinality"
+      ],
+      "answer": 2,
+      "explanation": "@0.5 is the sample rate: the client only sends the point half of the time. For COUNT metrics, DogStatsD corrects for sampling by multiplying the received value by 1/<SAMPLE_RATE>, so a value of 1 counts as 2. The sample rate does not change the flush interval or the tags.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/#sample-rates",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-008",
+      "topic": "DogStatsD",
+      "question": "A developer applies a sample rate of 0.25 to both a COUNT and a GAUGE sent through DogStatsD. How are the received values corrected?",
+      "choices": [
+        "Both values are multiplied by 4 to compensate for sampling",
+        "The GAUGE is multiplied by 4; the COUNT is kept as received",
+        "Neither is corrected; sample rates only apply to histograms",
+        "The COUNT is multiplied by 4; the GAUGE is kept as received"
+      ],
+      "answer": 3,
+      "explanation": "COUNT values are multiplied by 1/<SAMPLE_RATE> (here 4), while GAUGE and SET values get no correction and are kept as received. DISTRIBUTION values are counted 1/<SAMPLE_RATE> times, and for a HISTOGRAM only the .count statistic is corrected, so sample rates are not limited to histograms.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/#sample-rates",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-009",
+      "topic": "DogStatsD",
+      "question": "In a DogStatsD metric datagram, which type identifier submits a DISTRIBUTION?",
+      "choices": [
+        "h",
+        "ms",
+        "d",
+        "s"
+      ],
+      "answer": 2,
+      "explanation": "The type identifiers are c (COUNT), g (GAUGE), ms (TIMER), h (HISTOGRAM), s (SET) and d (DISTRIBUTION). So h is a histogram, ms a timer and s a set.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-010",
+      "topic": "DogStatsD",
+      "question": "An application submits request.latency as a DogStatsD HISTOGRAM and the Agent uses its default histogram settings. Which metrics appear in Datadog?",
+      "choices": [
+        "request.latency.p50, .p75, .p90, .p95, .p99",
+        "request.latency.min, .max, .sum, .avg, .count",
+        "request.latency.avg, .count, .median, .99percentile, .min",
+        "request.latency.avg, .count, .median, .95percentile, .max"
+      ],
+      "answer": 3,
+      "explanation": "By default a histogram produces .avg, .count, .median, .95percentile and .max, driven by the histogram_aggregates default (max, median, avg, count) and histogram_percentiles default (0.95). Percentiles such as p50–p99 are distribution aggregations, and min or sum must be added to histogram_aggregates explicitly.",
+      "reference": "https://docs.datadoghq.com/metrics/types/?tab=histogram",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-011",
+      "topic": "DogStatsD",
+      "question": "A team wants every DogStatsD histogram received by one Agent to also report .min and .sum. What should they change?",
+      "choices": [
+        "Add min and sum to histogram_percentiles in datadog.yaml",
+        "Add min and sum to histogram_aggregates in datadog.yaml",
+        "Switch the clients to the timer type, which reports both",
+        "Append |@min,sum to each histogram datagram that is sent"
+      ],
+      "answer": 1,
+      "explanation": "histogram_aggregates in datadog.yaml controls which aggregated values the Agent computes; possible values are min, max, median, avg, sum and count (default: max, median, avg, count). histogram_percentiles only accepts percentile values between 0 and 1, such as \"0.95\". Timers are an implementation of histograms with the same outputs, and the @ field in a datagram is the sample rate.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/#histogram",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-012",
+      "topic": "DogStatsD",
+      "question": "How is the DogStatsD TIMER (ms) metric type implemented?",
+      "choices": [
+        "As a gauge that keeps only the last duration per flush",
+        "As a distribution calculated server-side across all hosts",
+        "As a histogram, producing the same aggregations as HISTOGRAM",
+        "As a count of how many timings were recorded per flush"
+      ],
+      "answer": 2,
+      "explanation": "The TIMER type in DogStatsD is an implementation of the HISTOGRAM type (not to be confused with timers in standard StatsD). It generates the same .count, .avg, .median, .max and .95percentile metrics. It is aggregated Agent-side, not globally like a distribution.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/#timer",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-013",
+      "topic": "DogStatsD",
+      "question": "An app sends each visitor's user ID to DogStatsD as a SET metric named site.unique_visitors. What value is reported for each flush interval?",
+      "choices": [
+        "The total number of user IDs received, including repeats",
+        "The number of unique user IDs received during the interval",
+        "The most recent user ID received during the interval",
+        "A list of the user IDs received, stored as tag values"
+      ],
+      "answer": 1,
+      "explanation": "A SET counts the number of unique values submitted for a metric over the flush period, and it is stored as a GAUGE in Datadog. Repeated IDs are counted once. Counting every submission would be a COUNT, and keeping the latest value is how a GAUGE behaves.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/#set",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-014",
+      "topic": "DogStatsD",
+      "question": "The Agent v7 runs on host A with the default datadog.yaml. An application on host B must send custom metrics to host A's DogStatsD server over UDP. What change is required in host A's datadog.yaml?",
+      "choices": [
+        "Un-comment use_dogstatsd and set it to true",
+        "Un-comment dogstatsd_port and set it to 8125",
+        "Set dogstatsd_non_local_traffic to true",
+        "Set dogstatsd_socket to a Unix socket path"
+      ],
+      "answer": 2,
+      "explanation": "use_dogstatsd already defaults to true and dogstatsd_port already defaults to 8125, so un-commenting them changes nothing. By default DogStatsD only listens to local traffic; dogstatsd_non_local_traffic: true (DD_DOGSTATSD_NON_LOCAL_TRAFFIC in containers) makes it listen to non-local UDP traffic. A Unix domain socket only accepts local connections.",
+      "reference": "https://github.com/DataDog/datadog-agent/blob/main/pkg/config/example/datadog-agent_linux.yaml.example",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-015",
+      "topic": "DogStatsD",
+      "question": "A freshly installed Agent v7 runs with the default datadog.yaml. An application on the same host wants to send custom metrics with DogStatsD. What must be changed in the Agent configuration first?",
+      "choices": [
+        "Un-comment use_dogstatsd and dogstatsd_port, then restart",
+        "Set use_dogstatsd to true, because it defaults to false",
+        "Add a dogstatsd.d/conf.yaml file in conf.d, then restart",
+        "Nothing; DogStatsD is enabled by default on UDP port 8125"
+      ],
+      "answer": 3,
+      "explanation": "The DogStatsD server is enabled by default over UDP port 8125 for Agent v6+, so a local application can send metrics immediately. In the configuration template, use_dogstatsd defaults to true and dogstatsd_port defaults to 8125, so un-commenting them is unnecessary. DogStatsD is configured in datadog.yaml, not through a conf.d check file. Exam tip: if a question insists that datadog.yaml must be edited to send custom metrics and offers only edit options, pick the one that un-comments both use_dogstatsd and dogstatsd_port, which explicitly enables the listener on its port.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/#setup",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-016",
+      "topic": "DogStatsD",
+      "question": "The Agent runs as a Docker container that publishes 8125/udp, but DogStatsD metrics sent from other application containers never arrive. Which Agent environment variable is most likely missing?",
+      "choices": [
+        "DD_USE_DOGSTATSD=true",
+        "DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true",
+        "DD_DOGSTATSD_PORT=8125",
+        "DD_DOGSTATSD_ORIGIN_DETECTION_CLIENT=true"
+      ],
+      "answer": 1,
+      "explanation": "If StatsD metrics come from outside localhost, the containerized Agent must have DD_DOGSTATSD_NON_LOCAL_TRAFFIC set to true to accept them. DogStatsD is already enabled by default and already listens on port 8125. Origin detection only enriches metrics with container tags; it does not open DogStatsD to non-local traffic.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/?tab=containeragent#setup",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-017",
+      "topic": "DogStatsD",
+      "question": "In Kubernetes, the Agent DaemonSet exposes DogStatsD through a hostPort on 8125/UDP. How should application pods find the Agent on their node?",
+      "choices": [
+        "Send metrics to localhost:8125 inside the application pod",
+        "Set DD_AGENT_HOST to the address of the Kubernetes API server",
+        "Set DD_AGENT_HOST from status.hostIP with the downward API",
+        "Use the Datadog intake hostname as the DogStatsD host"
+      ],
+      "answer": 2,
+      "explanation": "With a hostPort, the Agent is reachable on the node's IP, so pods inject it with the downward API (fieldPath: status.hostIP) into DD_AGENT_HOST and send to that address on port 8125. Inside a pod, localhost refers to the pod's own network namespace, not the node. The API server and the Datadog intake do not receive DogStatsD traffic.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/?tab=kubernetes#setup",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-018",
+      "topic": "DogStatsD",
+      "question": "Why might a team switch DogStatsD from UDP to a Unix Domain Socket (UDS) on a busy Linux host?",
+      "choices": [
+        "It allows applications on other hosts to reach the Agent over TLS",
+        "It makes each client block until the Agent acknowledges the metric",
+        "It skips the network stack and the Agent can detect dropped packets",
+        "It lets DogStatsD accept metrics coming from Windows hosts too"
+      ],
+      "answer": 2,
+      "explanation": "Bypassing the networking stack brings a significant performance improvement for high traffic, and unlike UDP, UDS lets the Agent detect dropped packets and connection errors while remaining non-blocking. It also enables container origin detection. A Unix socket is local-only, is not blocking per metric, and UDS is not supported on Windows.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/unix_socket/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-019",
+      "topic": "DogStatsD",
+      "question": "A DogStatsD service check is sent as:\n_sc|Redis connection|1|#env:dev\nWhat status does the value 1 represent?",
+      "choices": [
+        "OK",
+        "CRITICAL",
+        "UNKNOWN",
+        "WARNING"
+      ],
+      "answer": 3,
+      "explanation": "In the service check datagram _sc|<NAME>|<STATUS>|..., the status values are 0 = OK, 1 = WARNING, 2 = CRITICAL and 3 = UNKNOWN. So 1 is WARNING.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/?tab=servicechecks",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-020",
+      "topic": "Crawlers",
+      "question": "How do Datadog authentication-based (crawler) integrations collect data?",
+      "choices": [
+        "They are installed with the Agent and use a Python check method",
+        "Datadog uses credentials you provide in Datadog to pull data by API",
+        "They use the Datadog API to monitor apps based on their language",
+        "The service pushes its metrics to the local DogStatsD port 8125"
+      ],
+      "answer": 1,
+      "explanation": "Authentication (crawler) based integrations are set up in Datadog, where you provide credentials that Datadog uses to obtain metrics with the provider's API. Being installed with the Agent and using a Python check method describes Agent-based integrations, and monitoring applications by language describes library integrations.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-021",
+      "topic": "Crawlers",
+      "question": "Which statement about the Datadog AWS integration and the Datadog Agent is correct?",
+      "choices": [
+        "An EC2 instance running the Agent and picked up by the AWS integration is not billed twice",
+        "Host-level metrics arrive with almost no delay when you rely on cloud-provider metrics",
+        "Host-level metrics have higher resolution from cloud-provider metrics than from the Agent",
+        "The AWS integration needs the Agent on every EC2 instance to collect CloudWatch metrics"
+      ],
+      "answer": 0,
+      "explanation": "Datadog bills AWS hosts running the Agent and EC2 instances picked up by the AWS integration, but you are not billed twice for an instance covered by both. Cloud-provider metrics are crawled by API with delays of several minutes and lower resolution; the Agent is what provides near-zero-delay, higher-resolution host metrics. The AWS integration collects CloudWatch metrics without any Agent.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/aws/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-022",
+      "topic": "Crawlers",
+      "question": "A team wants to start collecting Azure metrics in Datadog. Where is an authentication-based integration like Azure set up?",
+      "choices": [
+        "In Datadog, on the integration tile, with Azure app credentials",
+        "In conf.d/azure.d/conf.yaml on an Agent host, then restarting it",
+        "In a Python check placed in checks.d on an Agent host in the tenant",
+        "In application code, by importing a Datadog Azure tracing library"
+      ],
+      "answer": 0,
+      "explanation": "Crawler integrations are configured in Datadog itself: the Azure integration uses an app registration with access to your subscriptions, and the app's credentials are configured in Datadog. No Agent configuration file or custom check is involved, and tracing libraries are library integrations, not crawlers.",
+      "reference": "https://docs.datadoghq.com/integrations/azure/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-023",
+      "topic": "Crawlers",
+      "question": "EC2 CPU metrics collected only through the AWS integration show up in Datadog 10–20 minutes late. What does Datadog recommend to get system-level metrics with virtually no delay?",
+      "choices": [
+        "Install the Datadog Agent on the EC2 instances",
+        "Lower the AWS integration's polling interval to 15 seconds",
+        "Enable CloudWatch detailed monitoring for 1-second data",
+        "Forward the CloudWatch metrics through DogStatsD instead"
+      ],
+      "answer": 0,
+      "explanation": "Cloud integrations pull metrics by API with a crawler, so delays are expected; to obtain system-level metrics with virtually zero delay, Datadog recommends installing the Agent on cloud hosts. The crawler polling interval is not a 15-second user setting, CloudWatch detailed monitoring provides 1-minute data, not 1-second data (and 1-minute metrics still have ~10–12 minutes of total latency), and DogStatsD cannot speed up CloudWatch.",
+      "reference": "https://docs.datadoghq.com/integrations/guide/cloud-metric-delay/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-024",
+      "topic": "Crawlers",
+      "question": "Why do metrics from cloud (crawler) integrations such as AWS, Azure, and Google Cloud often arrive later than Agent metrics?",
+      "choices": [
+        "They are routed through DogStatsD, which flushes every 10 minutes",
+        "They are held until the host's Agent confirms the same values",
+        "Datadog pulls them by API, constrained by the cloud provider's API",
+        "Datadog processes them in a low-priority queue with 1-day retention"
+      ],
+      "answer": 2,
+      "explanation": "With any cloud integration, metrics are pulled in by API with a crawler, and delays come from constraints of the cloud provider API (such as CloudWatch's own publishing latency and metric-by-metric crawl). DogStatsD flushes every 10 seconds and is not involved, crawled metrics do not wait for the Agent, and metrics are retained for 15 months.",
+      "reference": "https://docs.datadoghq.com/integrations/guide/cloud-metric-delay/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-025",
+      "topic": "Crawlers",
+      "question": "A team uses the AWS integration's default API polling for CloudWatch metrics and wants lower latency without installing any Agents. Which option does Datadog document for this?",
+      "choices": [
+        "Set the AWS integration's collection interval to 15 seconds",
+        "Configure CloudWatch Metric Streams with Amazon Data Firehose",
+        "Enable dogstatsd_non_local_traffic on one EC2 proxy instance",
+        "Switch the integration from role delegation to access keys"
+      ],
+      "answer": 1,
+      "explanation": "Default API polling pulls new CloudWatch metrics about every ten minutes on average. Datadog documents CloudWatch Metric Streams with Amazon Data Firehose as a separately configured alternative with a two to three minute latency. There is no 15-second crawler setting, DogStatsD settings do not affect CloudWatch, and the authentication method does not change latency.",
+      "reference": "https://docs.datadoghq.com/integrations/amazon_web_services/",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-026",
+      "topic": "Crawlers",
+      "question": "With the default API polling method, how often does the Datadog AWS integration pull new CloudWatch metrics, on average?",
+      "choices": [
+        "Every 15 seconds",
+        "Every 10 minutes",
+        "Every minute",
+        "Every hour"
+      ],
+      "answer": 1,
+      "explanation": "The default method is a metric-by-metric crawl of the CloudWatch API, and new metrics are pulled every ten minutes on average (RDS metrics every 3 minutes). Fifteen seconds is the Agent's default check interval, not the AWS crawler's.",
+      "reference": "https://docs.datadoghq.com/integrations/amazon_web_services/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-027",
+      "topic": "Crawlers",
+      "question": "Which method lets the Datadog AWS integration authenticate to a commercial AWS account without storing long-lived AWS access keys in Datadog?",
+      "choices": [
+        "IAM role delegation, with a role that Datadog can assume",
+        "An SSH key pair so Datadog can log in to each EC2 instance",
+        "A Datadog API key stored in every instance's user data",
+        "The AWS account root password saved on the integration tile"
+      ],
+      "answer": 0,
+      "explanation": "The AWS integration supports IAM role delegation (for commercial accounts on any Datadog site, and GovCloud accounts on the Datadog for Government site) and access keys (required for AWS China and for GovCloud on commercial Datadog sites). Role delegation grants Datadog a role to assume, so no long-lived keys are stored. Datadog never logs in to instances over SSH, and API keys authenticate to Datadog, not to AWS.",
+      "reference": "https://docs.datadoghq.com/integrations/amazon_web_services/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-028",
+      "topic": "Crawlers",
+      "question": "How does Datadog authenticate to a Google Cloud project when the Google Cloud integration is configured?",
+      "choices": [
+        "By running the Agent on every Compute Engine VM in the project",
+        "By receiving metrics sent from Cloud Monitoring to DogStatsD",
+        "By using a personal Google account's username and password",
+        "By impersonating a service account granted read-only IAM roles"
+      ],
+      "answer": 3,
+      "explanation": "The Google Cloud integration uses service account impersonation; the service account is granted read-only roles such as Compute Viewer, Monitoring Viewer, Cloud Asset Viewer and Browser, and APIs like the Cloud Monitoring API must be enabled. It is agentless, it pulls from Google's APIs rather than receiving DogStatsD traffic, and it does not use personal credentials.",
+      "reference": "https://docs.datadoghq.com/integrations/google_cloud_platform/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-029",
+      "topic": "Crawlers",
+      "question": "An organization wants certain EC2 instances discovered by the AWS integration to not be monitored or billed in Datadog. What should it do?",
+      "choices": [
+        "Uninstall the Agent from those instances so they are ignored",
+        "Hide the instances from the Host Map in the Datadog UI",
+        "Set the Agent hostname to an empty value on those instances",
+        "Limit collection with tag filters on the AWS integration page"
+      ],
+      "answer": 3,
+      "explanation": "Datadog bills all EC2 instances picked up by the AWS integration, whether or not the Agent is installed. To restrict this, add tag-based filters (for example !datadog:no) for EC2 on the AWS integration page. Removing the Agent or changing Host Map views does not stop the crawler from discovering the instances.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/aws/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-030",
+      "topic": "Crawlers",
+      "question": "A team uses Amazon RDS and cannot deploy a Datadog Agent anywhere. How can it still get the database's metrics into Datadog?",
+      "choices": [
+        "Write a custom Agent check and place it in the database's checks.d",
+        "Enable the AWS integration so Datadog crawls CloudWatch for RDS",
+        "Point the database's StatsD output at the Agent's UDP port 8125",
+        "Install the Agent through the database engine's plugin manager"
+      ],
+      "answer": 1,
+      "explanation": "Crawler integrations are agentless: once the AWS integration is configured with credentials in Datadog, it crawls the CloudWatch API for services such as RDS (collected every 3 minutes). Custom checks, DogStatsD and any Agent installation all require an Agent, which the scenario rules out.",
+      "reference": "https://docs.datadoghq.com/integrations/amazon_web_services/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-031",
+      "topic": "Crawlers",
+      "question": "An EC2 instance reports CPU both through the AWS integration (CloudWatch basic 5-minute metrics) and through the Agent's system checks. How do the two sources compare?",
+      "choices": [
+        "The Agent data is higher resolution and arrives sooner",
+        "The CloudWatch data is higher resolution and arrives sooner",
+        "Both have the same resolution, but the Agent data arrives later",
+        "Both arrive at the same time, but CloudWatch has more detail"
+      ],
+      "answer": 0,
+      "explanation": "Agent checks collect every 15 seconds by default and report with virtually zero delay, while 5-minute CloudWatch metrics can take ~15–20 minutes to appear in Datadog. So the Agent provides both higher resolution and lower latency for host-level metrics.",
+      "reference": "https://docs.datadoghq.com/integrations/guide/cloud-metric-delay/",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-032",
+      "topic": "Crawlers",
+      "question": "Which of these is an authentication-based (crawler) integration rather than an Agent-based one?",
+      "choices": [
+        "NGINX",
+        "Slack",
+        "PostgreSQL",
+        "Redis"
+      ],
+      "answer": 1,
+      "explanation": "Datadog lists Slack, AWS, Azure and PagerDuty as examples of authentication-based integrations that you set up in Datadog with credentials. NGINX, PostgreSQL and Redis are monitored by Agent-based integrations that run checks against software on your own infrastructure.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-033",
+      "topic": "Agent Integrations",
+      "question": "On a Linux host, which file enables the Agent's Apache integration?",
+      "choices": [
+        "/etc/datadog-agent/checks.d/apache.py",
+        "/etc/datadog-agent/datadog.yaml, under integrations:",
+        "/etc/datadog-agent/conf.d/apache.d/conf.yaml",
+        "/etc/datadog-agent/apache.d/datadog.yaml"
+      ],
+      "answer": 2,
+      "explanation": "Each Agent-based integration has its own <INTEGRATION_NAME>.d folder inside conf.d, where you create conf.yaml (usually from conf.yaml.example). checks.d holds custom check Python code, and datadog.yaml is the main Agent configuration, not where integration instances are defined.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/#configuring-agent-integrations",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-034",
+      "topic": "Agent Integrations",
+      "question": "The Agent ships a conf.yaml.example file for the Redis integration. What are the documented steps to activate the integration?",
+      "choices": [
+        "Rename it to conf.yaml, set the required options, restart the Agent",
+        "Leave it in place; the Agent loads .example files after a restart",
+        "Copy it into checks.d as redisdb.py and run the check command",
+        "Upload it on the Redis integration tile in the Datadog UI"
+      ],
+      "answer": 0,
+      "explanation": "To activate an integration, rename conf.yaml.example to conf.yaml in the integration's .d folder, update the required parameters, and restart the Agent. Example files are ignored, checks.d is for custom Python checks, and Agent-based integrations are not configured by uploading files in the UI.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/#configuring-agent-integrations",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-035",
+      "topic": "Agent Integrations",
+      "question": "Besides an optional logs section, which two top-level keys make up an Agent integration's conf.yaml?",
+      "choices": [
+        "init_config and instances",
+        "global and checks",
+        "logs_config and apm_config",
+        "defaults and targets"
+      ],
+      "answer": 0,
+      "explanation": "An integration configuration file has an init_config section for settings shared by the check and an instances list where each entry describes one thing to monitor. logs_config and apm_config are datadog.yaml sections, and the other pairs are not Agent check keys.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/#configuring-agent-integrations",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-036",
+      "topic": "Agent Integrations",
+      "question": "One Agent must monitor two separate PostgreSQL servers with the Postgres integration. How should this be configured?",
+      "choices": [
+        "Add a second entry to the instances list in postgres.d/conf.yaml",
+        "Install a second Agent on the host, one per database server",
+        "List both servers in init_config and leave instances empty",
+        "Create postgres2.d/conf.yaml with a copy of the init_config"
+      ],
+      "answer": 0,
+      "explanation": "To monitor multiple instances with the same Agent check, add additional entries to the instances section; each instance runs as its own check instance. One Agent per host is enough, init_config is for shared settings rather than targets, and a folder named postgres2.d does not map to the Postgres check.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/#configuring-agent-integrations",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-037",
+      "topic": "Agent Integrations",
+      "question": "A custom Agent check is saved as checks.d/custom_queue.py. What must its configuration file be named?",
+      "choices": [
+        "conf.d/queue.yaml",
+        "checks.d/custom_queue.conf",
+        "conf.d/custom_queue.yaml",
+        "conf.d/custom_check.yaml"
+      ],
+      "answer": 2,
+      "explanation": "The names of the configuration and check files must match: if the check is custom_checkvalue.py, the configuration file must be custom_checkvalue.yaml in conf.d. So custom_queue.py needs conf.d/custom_queue.yaml. Configuration never goes in checks.d.",
+      "reference": "https://docs.datadoghq.com/developers/custom_checks/write_agent_check/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-038",
+      "topic": "Agent Integrations",
+      "question": "What does this custom Agent check do each time it runs?\nfrom datadog_checks.base import AgentCheck\n\nclass HelloCheck(AgentCheck):\n    def check(self, instance):\n        self.gauge('hello.world', 1, tags=['env:dev'])",
+      "choices": [
+        "Increments a counter named hello.world by 1 on every run",
+        "Submits a gauge hello.world with value 1 and tag env:dev",
+        "Sends a service check hello.world with status 1 (WARNING)",
+        "Emits an event titled hello.world with the tag env:dev"
+      ],
+      "answer": 1,
+      "explanation": "The class inherits from AgentCheck and implements the check method, which the Agent calls on every run. self.gauge submits a GAUGE metric named hello.world with value 1 and the env:dev tag. Counters, service checks and events use other methods (count/monotonic_count, service_check and event).",
+      "reference": "https://docs.datadoghq.com/developers/custom_checks/write_agent_check/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-039",
+      "topic": "Agent Integrations",
+      "question": "A custom check's YAML contains:\ninit_config:\n\ninstances:\n  - min_collection_interval: 30\nWhat does this setting do?",
+      "choices": [
+        "The Agent tries to run it every 30 s; runs may be delayed",
+        "The check is guaranteed to run exactly every 30 seconds",
+        "Its metrics are rolled up into 30-second buckets in Datadog",
+        "The check is stopped if a single run exceeds 30 seconds"
+      ],
+      "answer": 0,
+      "explanation": "min_collection_interval (in seconds) changes how often the collector tries to run the check; the default is 15 seconds. Setting it to 30 does not guarantee a run every 30 seconds, because the check might be queued behind other integrations and checks on the same Agent. It is not a timeout or a rollup setting.",
+      "reference": "https://docs.datadoghq.com/developers/custom_checks/write_agent_check/#collection-interval",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-040",
+      "topic": "Agent Integrations",
+      "question": "By default, how often does the Agent run a check, whether it is a standard integration or a custom check?",
+      "choices": [
+        "Every 10 seconds",
+        "Every 60 seconds",
+        "Every 15 seconds",
+        "Every 5 minutes"
+      ],
+      "answer": 2,
+      "explanation": "The default collection interval for Datadog standard integrations is 15 seconds, and custom checks also default to 15 seconds unless min_collection_interval is set. Ten seconds is the DogStatsD flush interval, which is a different mechanism.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-041",
+      "topic": "Agent Integrations",
+      "question": "Why does Datadog recommend prefixing a custom check's name with custom_, as in custom_mysql.py?",
+      "choices": [
+        "Because the Agent only loads checks.d files starting with custom_",
+        "So its metrics are excluded from custom metrics billing",
+        "So the check runs before the bundled core integrations",
+        "To avoid conflicts with the name of an existing Agent integration"
+      ],
+      "answer": 3,
+      "explanation": "Prefixing custom checks with custom_ avoids conflicts with the name of a pre-existing Datadog Agent integration, such as mysql. The prefix is a convention, not a loading requirement, and it has no effect on billing or scheduling order; custom check metrics are always custom metrics.",
+      "reference": "https://docs.datadoghq.com/developers/custom_checks/write_agent_check/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-042",
+      "topic": "Agent Integrations",
+      "question": "A team wants metrics from a widely used open-source database that has no Datadog integration yet. What does Datadog recommend building?",
+      "choices": [
+        "A custom Agent check placed in checks.d",
+        "A full-fledged Agent integration",
+        "A cron job that polls the Metrics API",
+        "A crawler integration set up in the UI"
+      ],
+      "answer": 1,
+      "explanation": "Custom checks are meant for your own custom systems or applications; for a generally available application, public service, or open-source project, Datadog recommends creating a full-fledged Agent integration. Crawler integrations are built by Datadog for SaaS/cloud APIs, and a cron job against the API is not the documented approach.",
+      "reference": "https://docs.datadoghq.com/developers/custom_checks/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-043",
+      "topic": "Agent Integrations",
+      "question": "Where are community-developed Agent integrations stored, and are they packaged with the Agent?",
+      "choices": [
+        "In integrations-core; they ship with every Agent release",
+        "In the Marketplace; they ship with the Agent but need a license",
+        "In checks.d; the Agent downloads them automatically at startup",
+        "In integrations-extras; they are installed separately as add-ons"
+      ],
+      "answer": 3,
+      "explanation": "Community-developed integrations live in the integrations-extras GitHub repository; they are not packaged with the Agent but can be installed as add-ons. integrations-core holds the officially supported integrations that ship with the Agent, and Marketplace integrations are paid offerings.",
+      "reference": "https://docs.datadoghq.com/agent/guide/use-community-integrations/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-044",
+      "topic": "Agent Integrations",
+      "question": "Which command installs version 1.0.0 of a community integration named foo on a Linux host running Agent v7?",
+      "choices": [
+        "sudo -u dd-agent datadog-agent integration install -t datadog-foo==1.0.0",
+        "sudo -u dd-agent datadog-agent integration install --community foo==1.0.0",
+        "sudo -u dd-agent datadog-agent check install -t datadog-foo==1.0.0",
+        "sudo apt-get install datadog-agent-integration-foo=1.0.0"
+      ],
+      "answer": 0,
+      "explanation": "For Agent v7.21+/v6.21+, community integrations are installed with sudo -u dd-agent datadog-agent integration install -t datadog-<INTEGRATION_NAME>==<INTEGRATION_VERSION>. There is no --community flag, the check subcommand runs checks rather than installing them, and community integrations are not distributed as OS packages.",
+      "reference": "https://docs.datadoghq.com/agent/guide/use-community-integrations/",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-045",
+      "topic": "Agent Integrations",
+      "question": "A team adds a Datadog client library to its Python application so the application itself sends telemetry to Datadog. Which integration type is this?",
+      "choices": [
+        "Agent-based integration",
+        "Authentication-based integration",
+        "Library integration",
+        "Crawler-based integration"
+      ],
+      "answer": 2,
+      "explanation": "Library integrations use the Datadog API to monitor applications based on the language they are written in, such as Node.js or Python. Agent-based integrations run checks from the Agent, and authentication (crawler) based integrations pull data from a service's API using credentials entered in Datadog.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-046",
+      "topic": "Agent Integrations",
+      "question": "After you install an integration such as Redis, where do the dashboards Datadog creates for it automatically appear?",
+      "choices": [
+        "In the All Custom list, since you configured the integration",
+        "Nowhere; you must import the dashboard JSON from GitHub",
+        "In the Security and Compliance preset list",
+        "In the All Integrations preset list on the Dashboard List page"
+      ],
+      "answer": 3,
+      "explanation": "The All Integrations preset list contains automatic dashboards created by Datadog when you install an integration. All Custom holds dashboards users create, and Security and Compliance holds out-of-the-box security dashboards. No manual import is needed.",
+      "reference": "https://docs.datadoghq.com/dashboards/list/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-047",
+      "topic": "Agent Integrations",
+      "question": "An admin used datadog-agent integration install to upgrade the bundled Datadog vSphere integration to a newer version. What happens to it when the Agent itself is later upgraded?",
+      "choices": [
+        "It is replaced by the version shipped with the new Agent",
+        "The manually installed newer version is always kept",
+        "The Agent upgrade fails until the integration is removed",
+        "Both versions run side by side under different check names"
+      ],
+      "answer": 0,
+      "explanation": "Upon Agent upgrade, every official integration you individually upgraded with the integration command is overwritten by the integration shipped within the Agent. (Starting with Agent 7.69, community, partner and Marketplace integrations are retained, but vSphere is an official bundled integration.) Upgrades do not fail or run duplicate versions.",
+      "reference": "https://docs.datadoghq.com/agent/guide/integration-management/",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-048",
+      "topic": "Agent Integrations",
+      "question": "Why do many custom checks start with this import?\ntry:\n    from datadog_checks.base import AgentCheck\nexcept ImportError:\n    from checks import AgentCheck",
+      "choices": [
+        "To work on both newer and older Agent versions",
+        "To fall back to DogStatsD if the Agent is down",
+        "To load the check only when a conf.yaml exists",
+        "To prefer AgentCheck from integrations-extras"
+      ],
+      "answer": 0,
+      "explanation": "Newer Agents expose AgentCheck from datadog_checks.base, while older Agents used the checks module. The try/except tries the newer import first and falls back to the legacy one, so the check works across Agent versions. It has nothing to do with DogStatsD, config files, or integrations-extras.",
+      "reference": "https://docs.datadoghq.com/developers/custom_checks/write_agent_check/#agent-versions",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-049",
+      "topic": "Agent Integrations",
+      "question": "Which statement describes an Agent-based integration?",
+      "choices": [
+        "It is set up in Datadog with credentials and data is pulled by API",
+        "It is added to app code and uses the Datadog API by language",
+        "It is installed with the Agent and uses a Python check method",
+        "It is configured on a cloud provider to push data to Datadog"
+      ],
+      "answer": 2,
+      "explanation": "Agent-based integrations are installed with the Datadog Agent and use a Python class method called check to define the metrics to collect. Credentials entered in Datadog describe authentication (crawler) based integrations, and language-based monitoring through the API describes library integrations.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-050",
+      "topic": "Agent Integrations",
+      "question": "Which statement about the integrations bundled in the Agent package (integrations-core) is correct?",
+      "choices": [
+        "They are community-maintained and installed as separate add-ons",
+        "They are paid Marketplace offerings activated by a license key",
+        "They must be downloaded from GitHub before the Agent first starts",
+        "They are Datadog-supported and can be upgraded independently"
+      ],
+      "answer": 3,
+      "explanation": "The Agent package includes the integrations officially supported by Datadog (integrations-core). They are single Python packages that can be upgraded independently of Agent releases with datadog-agent integration install. Community integrations (integrations-extras) are the separately installed add-ons, and Marketplace integrations carry additional fees.",
+      "reference": "https://docs.datadoghq.com/agent/guide/integration-management/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-051",
+      "topic": "Metrics & Timeseries",
+      "question": "What happens to a metric point submitted with a timestamp that includes a fraction of a second?",
+      "choices": [
+        "It is stored with millisecond precision",
+        "It is rejected by the Datadog intake",
+        "It is truncated to the start of the minute",
+        "It is rounded to the nearest whole second"
+      ],
+      "answer": 3,
+      "explanation": "Datadog rounds any metric with a fractional-second timestamp to the nearest second. Metrics are not stored with sub-second precision, such points are not rejected, and they are not truncated to the minute.",
+      "reference": "https://docs.datadoghq.com/metrics/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-052",
+      "topic": "Metrics & Timeseries",
+      "question": "Two points for the same metric and tags are submitted with the same timestamp: first 12.0, then 15.0. What does Datadog keep?",
+      "choices": [
+        "12.0, because the first point received is kept",
+        "27.0, because points sharing a timestamp are summed",
+        "13.5, because points sharing a timestamp are averaged",
+        "15.0, because the latest point overwrites the earlier one"
+      ],
+      "answer": 3,
+      "explanation": "If any points have the same timestamp, the latest point overwrites the previous ones, so 15.0 is kept. Datadog does not keep the first value, sum, or average points that share a timestamp.",
+      "reference": "https://docs.datadoghq.com/metrics/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-053",
+      "topic": "Metrics & Timeseries",
+      "question": "In Datadog, what is a metric?",
+      "choices": [
+        "A numerical value tracked over time, such as latency or error rate",
+        "A text record of an event, such as a log line or stack trace",
+        "A record of one request's path through services, made of spans",
+        "A status reported by a check, such as OK, WARNING or CRITICAL"
+      ],
+      "answer": 0,
+      "explanation": "Metrics are numerical values that can track anything about your environment over time, from latency to error rates to user signups. Text records are logs, a request's path made of spans is a trace, and OK/WARNING/CRITICAL statuses are service checks.",
+      "reference": "https://docs.datadoghq.com/metrics/#what-are-metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-054",
+      "topic": "Metrics & Timeseries",
+      "question": "Which BEST describes custom metrics in Datadog?",
+      "choices": [
+        "All non-Agent metrics, such as those from a cloud integration",
+        "Only metrics submitted by community (integrations-extras) integrations",
+        "Any metric submitted using DogStatsD or a custom Agent check",
+        "Any metric whose unit or description was edited in Metrics Summary"
+      ],
+      "answer": 2,
+      "explanation": "In general, any metric submitted through DogStatsD or a custom Agent check is a custom metric, as are metrics from Marketplace integrations and from integrations outside the 1,000+ Datadog integrations. Standard metrics from cloud integrations such as AWS are not custom metrics, and editing metadata does not change a metric's classification.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-055",
+      "topic": "Metrics & Timeseries",
+      "question": "checkout.duration is submitted from 2 hosts. Every point carries env:prod, and each host sends some points tagged payment:card and others tagged payment:paypal. How many custom metrics (timeseries) does this create?",
+      "choices": [
+        "2",
+        "6",
+        "8",
+        "4"
+      ],
+      "answer": 3,
+      "explanation": "A custom metric is identified by a unique combination of metric name and tag values, including the host tag. Here that is 2 hosts × 1 env value × 2 payment values = 4 distinct combinations. The constant env:prod tag adds no extra combinations.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/custom_metrics/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-056",
+      "topic": "Metrics & Timeseries",
+      "question": "From one host, an app sends temperature tagged country:USA,city:Miami in some calls and city:Miami,country:USA in others. How many custom metrics do these submissions produce?",
+      "choices": [
+        "2",
+        "1",
+        "3",
+        "4"
+      ],
+      "answer": 1,
+      "explanation": "Reordering tag values does not add uniqueness: temperature{country:USA, city:Miami} and temperature{city:Miami, country:USA} are the same combination of metric name and tag values. With one host, this is a single custom metric.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/custom_metrics/",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-057",
+      "topic": "Metrics & Timeseries",
+      "question": "A DogStatsD HISTOGRAM using the default Agent settings is submitted with 3 unique tag-value combinations (host included). How many custom metrics does it generate?",
+      "choices": [
+        "3",
+        "9",
+        "15",
+        "30"
+      ],
+      "answer": 2,
+      "explanation": "By default a HISTOGRAM generates five custom metrics for each unique combination of metric name and tag values, one each for .avg, .count, .median, .95percentile and .max. Three combinations × 5 = 15.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/custom_metrics/",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-058",
+      "topic": "Metrics & Timeseries",
+      "question": "An application tracks how many failed logins occurred during each time interval, not a per-second value. Which metric type fits best?",
+      "choices": [
+        "RATE",
+        "COUNT",
+        "GAUGE",
+        "DISTRIBUTION"
+      ],
+      "answer": 1,
+      "explanation": "A COUNT represents the total number of event occurrences in one time interval. A RATE is the number of occurrences per second, a GAUGE is a snapshot of the last value in the interval, and a DISTRIBUTION describes the statistical spread of values such as latencies.",
+      "reference": "https://docs.datadoghq.com/metrics/types/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-059",
+      "topic": "Metrics & Timeseries",
+      "question": "A team needs an accurate p99 latency computed across all 50 hosts that serve an API. Which metric type should it submit?",
+      "choices": [
+        "DISTRIBUTION, aggregated globally on the Datadog side",
+        "HISTOGRAM, with percentiles computed by each host's Agent",
+        "GAUGE, reporting the last latency seen in each flush",
+        "COUNT, reporting the number of slow requests per flush"
+      ],
+      "answer": 0,
+      "explanation": "A DISTRIBUTION represents the global statistical distribution of values calculated across your entire distributed infrastructure, so percentiles are accurate across all hosts. A HISTOGRAM is calculated Agent-side per host, and percentiles from separate hosts cannot be combined accurately. Gauges and counts do not capture the latency distribution.",
+      "reference": "https://docs.datadoghq.com/metrics/types/?tab=distribution",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-060",
+      "topic": "Metrics & Timeseries",
+      "question": "An app calls statsd.increment('orders.placed') with DogStatsD. Which in-app metric type does orders.placed show in the Metrics Summary?",
+      "choices": [
+        "COUNT",
+        "GAUGE",
+        "RATE",
+        "DISTRIBUTION"
+      ],
+      "answer": 2,
+      "explanation": "increment submits a COUNT, but a COUNT submitted through DogStatsD appears as a RATE in-app to ensure relevant comparison across different Agents. By contrast, a COUNT submitted through an Agent check or the API is stored as COUNT, and a DogStatsD SET or GAUGE is stored as GAUGE.",
+      "reference": "https://docs.datadoghq.com/metrics/types/#submission-types-and-datadog-in-app-types",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-061",
+      "topic": "Metrics & Timeseries",
+      "question": "A custom Agent check calls self.rate('net.bytes', value), passing the raw, ever-increasing byte counter each run. What does the Agent submit?",
+      "choices": [
+        "The raw counter value from every run, stored in-app as a RATE",
+        "The sum of values seen during the run, stored in-app as a COUNT",
+        "The number of distinct values per run, stored in-app as a SET",
+        "A per-second rate between runs, stored in-app as a GAUGE"
+      ],
+      "answer": 3,
+      "explanation": "rate() submits the sampled raw value; the Agent calculates the delta between two submissions and divides it by the interval to get a rate, which is stored in-app as a GAUGE. The raw value itself is not sent, summing samples is what count() does, and SET is not an in-app type.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/agent_metrics_submission/",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-062",
+      "topic": "Metrics & Timeseries",
+      "question": "Which metric name follows Datadog's naming rules without needing any character conversion?",
+      "choices": [
+        "2xx.responses.total",
+        "app.requests_total",
+        "app.requêtes_total",
+        "web-app.requests"
+      ],
+      "answer": 1,
+      "explanation": "Metric names must start with a letter and contain only ASCII alphanumerics, underscores and periods; other characters are converted to underscores and Unicode is not supported. 2xx.responses.total starts with a digit, app.requêtes_total contains a non-ASCII character, and the hyphen in web-app.requests would be converted.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/#naming-custom-metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-063",
+      "topic": "Metrics & Timeseries",
+      "question": "A developer submits a metric named checkout latency.ms, with a space in it. According to Datadog's naming rules, what happens to the name?",
+      "choices": [
+        "The whole metric is rejected",
+        "The space is simply removed",
+        "The text after the space becomes a tag",
+        "The space becomes an underscore"
+      ],
+      "answer": 3,
+      "explanation": "Metric names may only contain ASCII alphanumerics, underscores and periods; other characters, including spaces, are converted to underscores. The metric is not rejected, the space is not dropped, and nothing is turned into a tag.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/#naming-custom-metrics",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-064",
+      "topic": "Metrics & Timeseries",
+      "question": "What is the maximum length of a Datadog metric name?",
+      "choices": [
+        "200 characters",
+        "100 characters",
+        "255 characters",
+        "64 characters"
+      ],
+      "answer": 0,
+      "explanation": "Metric names must not exceed 200 characters. Fewer than 100 is preferred from a UI perspective, but 100 is a recommendation rather than the limit.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/#naming-custom-metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-065",
+      "topic": "Metrics & Timeseries",
+      "question": "How long does Datadog retain metric tags and values?",
+      "choices": [
+        "15 days",
+        "15 months",
+        "3 months",
+        "13 months"
+      ],
+      "answer": 1,
+      "explanation": "Datadog's data retention periods list metric tags and values as retained for 15 months. Shorter periods such as 15 days apply to other data types, not metrics.",
+      "reference": "https://docs.datadoghq.com/data_security/data_retention_periods/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-066",
+      "topic": "Metrics & Timeseries",
+      "question": "A custom metric payload.size is submitted in bytes, but graphs show bare numbers with no unit. How can the team make graphs show readable units such as KiB and MiB?",
+      "choices": [
+        "Rename the metric to include the unit, e.g. payload.size.bytes",
+        "Add a unit:byte tag to every point that is submitted",
+        "Set the metric's unit in its Metrics Summary metadata",
+        "Resubmit the metric using the DISTRIBUTION type instead"
+      ],
+      "answer": 2,
+      "explanation": "Units are part of a metric's metadata: in the Metrics Summary, select the metric, edit its metadata and choose a unit. Once a unit is set, raw data is automatically converted to readable display units with the relevant order of magnitude. Names, tags and metric types do not set a display unit.",
+      "reference": "https://docs.datadoghq.com/metrics/units/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-067",
+      "topic": "Metrics & Timeseries",
+      "question": "An admin changes a metric's type from GAUGE to COUNT in the Metrics Summary details panel. What is the effect?",
+      "choices": [
+        "Nothing; the type field is descriptive and not used by queries",
+        "Clients must be updated, or Datadog rejects their submissions",
+        "The metric's behavior changes in all existing dashboards and monitors",
+        "Only newly submitted data changes; existing graphs stay the same"
+      ],
+      "answer": 2,
+      "explanation": "Editing the metric type changes that metric's behavior for all your dashboards and monitors, so it should be done carefully. The in-app type affects how the metric is interpreted in queries, and changing it does not cause Datadog to reject client submissions.",
+      "reference": "https://docs.datadoghq.com/metrics/summary/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-068",
+      "topic": "Metrics & Timeseries",
+      "question": "Which of these is a standard Datadog integration whose metrics can count as custom metrics?",
+      "choices": [
+        "The system core CPU check",
+        "The NGINX integration",
+        "The Agent's built-in disk check",
+        "The Java JMX integration"
+      ],
+      "answer": 3,
+      "explanation": "Certain standard integrations can potentially emit custom metrics, including Java-JMX, ActiveMQ XML, Go-Expvar, OpenMetrics, Prometheus and WMI, because the metrics they collect are user-defined. Core system checks such as CPU and disk, and the NGINX integration's standard metrics, are not custom metrics.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-069",
+      "topic": "Metrics & Timeseries",
+      "question": "Within one 10-second flush interval, an app sends the gauge values 10, 30 and then 20 to DogStatsD for the same metric and tags. What value does DogStatsD forward?",
+      "choices": [
+        "60, the sum of all values",
+        "20, the last value received",
+        "30, the highest value",
+        "10, the first value received"
+      ],
+      "answer": 1,
+      "explanation": "For a GAUGE, DogStatsD sends the latest data point received during the flush interval, so 20 is forwarded. Summing values is how COUNT aggregation works, and neither the maximum nor the first value is kept for a gauge.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/data_aggregation/",
+      "difficulty": 2
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "dc-fc-001",
+      "topic": "DogStatsD",
+      "front": "What is DogStatsD?",
+      "back": "A metrics aggregation service bundled with the Datadog Agent. It implements the StatsD protocol and adds Datadog-specific extensions: the histogram type, service checks, events and tagging.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/"
+    },
+    {
+      "id": "dc-fc-002",
+      "topic": "DogStatsD",
+      "front": "DogStatsD default transport and port",
+      "back": "UDP port 8125, enabled by default for Agent v6+. UDP is fire-and-forget: the app sends and resumes work without waiting for a response, and is not interrupted if DogStatsD is unavailable.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/#how-it-works"
+    },
+    {
+      "id": "dc-fc-003",
+      "topic": "DogStatsD",
+      "front": "DogStatsD flush interval and aggregation",
+      "back": "10 seconds. Points with the same metric name and tags are aggregated into a single value per flush (GAUGE: latest point; COUNT: sum; SET: number of unique values), which reduces API calls.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/data_aggregation/"
+    },
+    {
+      "id": "dc-fc-004",
+      "topic": "DogStatsD",
+      "front": "DogStatsD metric datagram format",
+      "back": "<METRIC_NAME>:<VALUE>|<TYPE>|@<SAMPLE_RATE>|#<TAG_KEY_1>:<TAG_VALUE_1>,<TAG_2>\nExample: page.views:1|c|@0.5|#env:prod\nName, value and type are required; sample rate and tags are optional.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/"
+    },
+    {
+      "id": "dc-fc-005",
+      "topic": "DogStatsD",
+      "front": "DogStatsD datagram type identifiers",
+      "back": "c = COUNT\ng = GAUGE\nms = TIMER\nh = HISTOGRAM\ns = SET\nd = DISTRIBUTION",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/"
+    },
+    {
+      "id": "dc-fc-006",
+      "topic": "DogStatsD",
+      "front": "Default metrics produced by a DogStatsD HISTOGRAM (or TIMER)",
+      "back": ".avg, .count, .median, .95percentile and .max.\nControlled in datadog.yaml by histogram_aggregates (default max, median, avg, count; min and sum also allowed) and histogram_percentiles (default \"0.95\").",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/#histogram"
+    },
+    {
+      "id": "dc-fc-007",
+      "topic": "DogStatsD",
+      "front": "How DogStatsD corrects sampled values (sample rate)",
+      "back": "COUNT: value multiplied by 1/<SAMPLE_RATE>.\nDISTRIBUTION: each value counted 1/<SAMPLE_RATE> times.\nGAUGE and SET: no correction.\nHISTOGRAM: only the .count statistic is corrected.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/#sample-rates"
+    },
+    {
+      "id": "dc-fc-008",
+      "topic": "DogStatsD",
+      "front": "Key DogStatsD settings in datadog.yaml and their defaults",
+      "back": "use_dogstatsd: true (DD_USE_DOGSTATSD)\ndogstatsd_port: 8125 (DD_DOGSTATSD_PORT)\ndogstatsd_non_local_traffic: false (DD_DOGSTATSD_NON_LOCAL_TRAFFIC) - set to true to accept UDP traffic from other hosts or containers.",
+      "reference": "https://github.com/DataDog/datadog-agent/blob/main/pkg/config/example/datadog-agent_linux.yaml.example"
+    },
+    {
+      "id": "dc-fc-009",
+      "topic": "DogStatsD",
+      "front": "DogStatsD over Unix Domain Socket (UDS)",
+      "back": "Enabled with dogstatsd_socket (DD_DOGSTATSD_SOCKET), e.g. /var/run/datadog/dsd.socket. Bypasses the network stack for better performance, lets the Agent detect dropped packets, and supports container origin detection. Not supported on Windows.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/unix_socket/"
+    },
+    {
+      "id": "dc-fc-010",
+      "topic": "DogStatsD",
+      "front": "DogStatsD event and service check datagram formats",
+      "back": "Event: _e{<TITLE_UTF8_LENGTH>,<TEXT_UTF8_LENGTH>}:<TITLE>|<TEXT>|...\nService check: _sc|<NAME>|<STATUS>|...\nService check status: 0 = OK, 1 = WARNING, 2 = CRITICAL, 3 = UNKNOWN.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/"
+    },
+    {
+      "id": "dc-fc-011",
+      "topic": "DogStatsD",
+      "front": "Official DogStatsD client languages, and can a plain StatsD client be used?",
+      "back": "Official clients: Python, Ruby, Go, Java, PHP and .NET. Any compliant StatsD client works with DogStatsD, but without the Datadog-specific extensions (tags, histograms, events, service checks).",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/"
+    },
+    {
+      "id": "dc-fc-012",
+      "topic": "Crawlers",
+      "front": "What is an authentication-based (crawler) integration?",
+      "back": "An integration set up in Datadog where you provide credentials, and Datadog obtains metrics from the service's API. No Agent is needed. Examples: AWS, Azure, Google Cloud, Slack, PagerDuty.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/"
+    },
+    {
+      "id": "dc-fc-013",
+      "topic": "Crawlers",
+      "front": "Cloud crawler polling frequency (AWS, Azure, GCP)",
+      "back": "AWS: every 10 minutes (RDS every 3 minutes)\nAzure: every 2 minutes\nGoogle Cloud: every 5 minutes",
+      "reference": "https://docs.datadoghq.com/integrations/guide/cloud-metric-delay/"
+    },
+    {
+      "id": "dc-fc-014",
+      "topic": "Crawlers",
+      "front": "Typical cloud metric delays and how to reduce them",
+      "back": "AWS 5-minute metrics: ~15-20 min; AWS 1-minute metrics: ~10-12 min; Azure: ~4-5 min; GCP: ~7-8 min.\nInstall the Agent for system-level metrics with virtually zero delay, or use AWS CloudWatch Metric Streams + Data Firehose (~2-3 min).",
+      "reference": "https://docs.datadoghq.com/integrations/guide/cloud-metric-delay/"
+    },
+    {
+      "id": "dc-fc-015",
+      "topic": "Crawlers",
+      "front": "Is an EC2 host billed twice if it runs the Agent and is also seen by the AWS integration?",
+      "back": "No. Datadog bills AWS hosts running the Agent and all EC2 instances picked up by the AWS integration, but you are not billed twice for an instance covered by both.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/aws/"
+    },
+    {
+      "id": "dc-fc-016",
+      "topic": "Crawlers",
+      "front": "AWS integration authentication methods",
+      "back": "IAM role delegation (AWS commercial accounts on any Datadog site; GovCloud accounts on the Datadog for Government site) or access keys (required for AWS China, and for GovCloud on commercial Datadog sites). CloudFormation is the quickest documented setup.",
+      "reference": "https://docs.datadoghq.com/integrations/amazon_web_services/"
+    },
+    {
+      "id": "dc-fc-017",
+      "topic": "Crawlers",
+      "front": "How Datadog authenticates to Google Cloud",
+      "back": "Service account impersonation. The service account gets read-only roles (Compute Viewer, Monitoring Viewer, Cloud Asset Viewer, Browser); the Cloud Monitoring, Compute Engine, Cloud Asset, Cloud Resource Manager, IAM and Cloud Billing APIs must be enabled.",
+      "reference": "https://docs.datadoghq.com/integrations/google_cloud_platform/"
+    },
+    {
+      "id": "dc-fc-018",
+      "topic": "Crawlers",
+      "front": "How to limit which EC2 instances the AWS integration monitors (and bills)",
+      "back": "Use tag filters on the AWS integration page (e.g. !datadog:no or datadog:monitored). Billable via AWS: EC2 hosts, Lambda active functions, CloudWatch custom metrics and containers.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/aws/"
+    },
+    {
+      "id": "dc-fc-019",
+      "topic": "Crawlers",
+      "front": "How the Azure integration authenticates",
+      "back": "An Azure app registration with access to the subscriptions you want to monitor; the app's credentials are configured in Datadog, which then pulls data through Azure APIs.",
+      "reference": "https://docs.datadoghq.com/integrations/azure/"
+    },
+    {
+      "id": "dc-fc-020",
+      "topic": "Agent Integrations",
+      "front": "Three main types of Datadog integrations",
+      "back": "Agent-based: installed with the Agent; a Python check method collects metrics.\nAuthentication (crawler) based: credentials in Datadog; data pulled by API.\nLibrary: uses the Datadog API to monitor apps based on their language (e.g. Node.js, Python).",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/"
+    },
+    {
+      "id": "dc-fc-021",
+      "topic": "Agent Integrations",
+      "front": "How to enable an Agent-based integration",
+      "back": "In the Agent's conf.d/<INTEGRATION_NAME>.d/ folder, rename conf.yaml.example to conf.yaml, set the required parameters, then restart the Agent. Verify with the Agent status command (Checks section).",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/#configuring-agent-integrations"
+    },
+    {
+      "id": "dc-fc-022",
+      "topic": "Agent Integrations",
+      "front": "Structure of an integration conf.yaml",
+      "back": "init_config: settings shared by the check.\ninstances: a list; each entry is one thing to monitor (add entries to monitor multiple servers with one Agent).\nOptional logs: section for log collection.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/#configuring-agent-integrations"
+    },
+    {
+      "id": "dc-fc-023",
+      "topic": "Agent Integrations",
+      "front": "Files for a custom Agent check",
+      "back": "checks.d/<name>.py (the Python check) and conf.d/<name>.yaml (its config). The names must match. Prefix with custom_ to avoid conflicts with existing integrations. Test with: datadog-agent check <name>.",
+      "reference": "https://docs.datadoghq.com/developers/custom_checks/write_agent_check/"
+    },
+    {
+      "id": "dc-fc-024",
+      "topic": "Agent Integrations",
+      "front": "Minimal custom Agent check in Python",
+      "back": "from datadog_checks.base import AgentCheck\nclass HelloCheck(AgentCheck):\n    def check(self, instance):\n        self.gauge('hello.world', 1)\nThe class inherits AgentCheck; the Agent calls check() on every run.",
+      "reference": "https://docs.datadoghq.com/developers/custom_checks/write_agent_check/"
+    },
+    {
+      "id": "dc-fc-025",
+      "topic": "Agent Integrations",
+      "front": "min_collection_interval",
+      "back": "Per-instance setting (in seconds) for how often the collector tries to run a check. Default is 15 s. Not guaranteed: a check can be queued behind other checks on the same Agent.",
+      "reference": "https://docs.datadoghq.com/developers/custom_checks/write_agent_check/#collection-interval"
+    },
+    {
+      "id": "dc-fc-026",
+      "topic": "Agent Integrations",
+      "front": "integrations-core vs integrations-extras vs Marketplace",
+      "back": "integrations-core: officially supported by Datadog, bundled in the Agent package.\nintegrations-extras: community-developed, not bundled, installed as add-ons.\nMarketplace: offerings with additional fees; their metrics are custom metrics.",
+      "reference": "https://docs.datadoghq.com/agent/guide/use-community-integrations/"
+    },
+    {
+      "id": "dc-fc-027",
+      "topic": "Agent Integrations",
+      "front": "datadog-agent integration subcommands",
+      "back": "install, remove, show, freeze. Run as dd-agent on Linux (administrator on Windows).\nCommunity install: sudo -u dd-agent datadog-agent integration install -t datadog-<NAME>==<VERSION>\nA later Agent upgrade overwrites individually upgraded official integrations.",
+      "reference": "https://docs.datadoghq.com/agent/guide/integration-management/"
+    },
+    {
+      "id": "dc-fc-028",
+      "topic": "Agent Integrations",
+      "front": "Custom Agent check or full Agent integration?",
+      "back": "Custom check: your own custom systems or applications. Full-fledged Agent integration: generally available applications, public services or open-source projects. Metrics from custom checks are custom metrics.",
+      "reference": "https://docs.datadoghq.com/developers/custom_checks/"
+    },
+    {
+      "id": "dc-fc-029",
+      "topic": "Agent Integrations",
+      "front": "Where do integration dashboards come from?",
+      "back": "Datadog creates them automatically when you install an integration; they appear in the All Integrations preset list on the Dashboard List page.",
+      "reference": "https://docs.datadoghq.com/dashboards/list/"
+    },
+    {
+      "id": "dc-fc-030",
+      "topic": "Metrics & Timeseries",
+      "front": "What is a metric in Datadog?",
+      "back": "A numerical value tracked over time, e.g. latency, error rate or user signups. A sequence of [value, timestamp] points forms a timeseries.",
+      "reference": "https://docs.datadoghq.com/metrics/#what-are-metrics"
+    },
+    {
+      "id": "dc-fc-031",
+      "topic": "Metrics & Timeseries",
+      "front": "What counts as a custom metric?",
+      "back": "Any metric not submitted from one of the 1,000+ Datadog integrations. In general: anything sent through DogStatsD or a custom Agent check, Marketplace integration metrics, and metrics from certain standard integrations (e.g. JMX, OpenMetrics, Prometheus, WMI).",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/"
+    },
+    {
+      "id": "dc-fc-032",
+      "topic": "Metrics & Timeseries",
+      "front": "What uniquely identifies one custom metric (timeseries)?",
+      "back": "A unique combination of metric name and tag values, including the host tag. Reordering tags does not create a new one.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/custom_metrics/"
+    },
+    {
+      "id": "dc-fc-033",
+      "topic": "Metrics & Timeseries",
+      "front": "Metric naming rules",
+      "back": "Must start with a letter.\nOnly ASCII alphanumerics, underscores and periods; other characters (including spaces) are converted to underscores; Unicode not supported.\nMax 200 characters (fewer than 100 preferred).\nCase sensitive.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/#naming-custom-metrics"
+    },
+    {
+      "id": "dc-fc-034",
+      "topic": "Metrics & Timeseries",
+      "front": "Metric timestamp rules",
+      "back": "Timestamps with fractions of a second are rounded to the nearest second. If points share a timestamp, the latest point overwrites the previous ones.",
+      "reference": "https://docs.datadoghq.com/metrics/"
+    },
+    {
+      "id": "dc-fc-035",
+      "topic": "Metrics & Timeseries",
+      "front": "Metric submission types vs in-app types",
+      "back": "Submission types: COUNT, RATE, GAUGE, SET, HISTOGRAM, DISTRIBUTION.\nIn-app types: COUNT, RATE, GAUGE, HISTOGRAM, DISTRIBUTION (no SET; a DogStatsD SET is stored as GAUGE).",
+      "reference": "https://docs.datadoghq.com/metrics/types/"
+    },
+    {
+      "id": "dc-fc-036",
+      "topic": "Metrics & Timeseries",
+      "front": "Notable submission-to-in-app type mappings",
+      "back": "DogStatsD COUNT (increment/decrement/count) -> RATE\nDogStatsD SET -> GAUGE\nAgent check rate() -> GAUGE\nAgent check count()/monotonic_count() -> COUNT\nAPI COUNT -> COUNT\nHISTOGRAM -> GAUGE aggregations + RATE .count",
+      "reference": "https://docs.datadoghq.com/metrics/types/#submission-types-and-datadog-in-app-types"
+    },
+    {
+      "id": "dc-fc-037",
+      "topic": "Metrics & Timeseries",
+      "front": "HISTOGRAM vs DISTRIBUTION",
+      "back": "HISTOGRAM: statistical distribution calculated Agent-side (per host) in one interval.\nDISTRIBUTION: global distribution calculated across your whole infrastructure; provides count, sum, min, max, avg, plus optional percentiles (p50, p75, p90, p95, p99).",
+      "reference": "https://docs.datadoghq.com/metrics/types/"
+    },
+    {
+      "id": "dc-fc-038",
+      "topic": "Metrics & Timeseries",
+      "front": "Metric retention period",
+      "back": "Metric tags and values are retained for 15 months.",
+      "reference": "https://docs.datadoghq.com/data_security/data_retention_periods/"
+    },
+    {
+      "id": "dc-fc-039",
+      "topic": "Metrics & Timeseries",
+      "front": "How are metric units set, and what do they change?",
+      "back": "In the Metrics Summary, select the metric and edit its metadata to choose a unit (families like BYTES, TIME, PERCENTAGE). Raw data is then converted to readable display units; the stored values do not change.",
+      "reference": "https://docs.datadoghq.com/metrics/units/"
+    },
+    {
+      "id": "dc-fc-040",
+      "topic": "Metrics & Timeseries",
+      "front": "Custom metrics generated by HISTOGRAM and DISTRIBUTION",
+      "back": "By default, 5 custom metrics per unique metric name + tag-value combination for each type. Enabling percentile aggregations on a distribution adds more.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/custom_metrics/"
+    },
+    {
+      "id": "dc-fc-041",
+      "topic": "Metrics & Timeseries",
+      "front": "Warning about editing a metric's type in Metrics Summary",
+      "back": "Editing the metric type changes that metric's behavior for ALL dashboards and monitors that use it. Metadata from a supported integration (the integration name) cannot be edited.",
+      "reference": "https://docs.datadoghq.com/metrics/summary/"
+    }
+  ]
+}

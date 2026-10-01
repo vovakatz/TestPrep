@@ -1,0 +1,673 @@
+{
+  "questions": [
+    {
+      "id": "api-q-001",
+      "topic": "API Key",
+      "question": "Which credential does the Datadog Agent require in order to submit metrics and events to Datadog?",
+      "choices": ["An API key", "An application key", "A client token", "A service account token"],
+      "answer": 0,
+      "explanation": "Datadog's docs state that an API key is required by the Datadog Agent to submit metrics and events; it is set with `api_key` in datadog.yaml or `DD_API_KEY`. Application keys are used together with an API key for programmatic API access such as reading data, and client tokens are for browser, mobile and TV apps. The Agent does not need a service account credential to send data.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#api-keys",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-002",
+      "topic": "API Key",
+      "question": "In the Agent's main configuration file, `datadog.yaml`, which setting holds the key the Agent uses to send data to Datadog?",
+      "choices": ["`app_key`", "`dd_url`", "`api_key`", "`client_token`"],
+      "answer": 2,
+      "explanation": "`api_key` (environment variable `DD_API_KEY`) is marked as required in the example datadog.yaml and is described as the key used by the Agent to submit metrics and events. `app_key` is optional and only gives access to Datadog's programmatic API, `dd_url` overrides the metrics intake host, and client tokens are not an Agent setting.",
+      "reference": "https://github.com/DataDog/datadog-agent/blob/main/pkg/config/example/datadog-agent_linux.yaml.example",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-003",
+      "topic": "API Key",
+      "question": "Which statement about Datadog API keys is accurate?",
+      "choices": [
+        "They are unique to an organization, and an org can have several active at once",
+        "Each user gets one personal API key that inherits that user's role and permissions",
+        "One API key works across every Datadog site, such as both US1 and EU1",
+        "They expire automatically 90 days after creation unless they are renewed"
+      ],
+      "answer": 0,
+      "explanation": "API keys are unique to your organization, and Datadog recommends creating multiple API keys (up to 50 by default) so each can be rotated or revoked on its own. Inheriting a user's permissions describes application keys, not API keys. Datadog sites are completely independent, and API keys are long-lived with no built-in expiration.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#using-multiple-api-keys",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-004",
+      "topic": "API Key",
+      "question": "A front-end team is adding Datadog browser log collection and RUM to a public web app. Which credential should they embed in the JavaScript?",
+      "choices": ["An organization API key", "A client token", "An application key", "An API key plus an application key"],
+      "answer": 1,
+      "explanation": "API keys cannot be used to send data from a browser, mobile or TV app because they would be exposed client-side, so end-user-facing applications such as the browser log collector and RUM use client tokens. Application keys grant access to Datadog's programmatic API and must never be exposed in browser code, alone or combined with an API key.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#client-tokens",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-005",
+      "topic": "API Key",
+      "question": "By default, what is the maximum number of API keys a Datadog organization can have?",
+      "choices": ["10", "25", "50", "100"],
+      "answer": 2,
+      "explanation": "An org must have at least one API key and can have up to 50 API keys by default; Datadog Support can raise the limit on request. Managed API keys created by a Datadog integration or service don't count toward this limit. 10, 25 and 100 are not the documented default.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#add-an-api-key-or-client-token",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-006",
+      "topic": "API Key",
+      "question": "Your org uses a single API key for Kubernetes Agents in AWS, Chef-managed on-prem Agents and Terraform scripts. Security wants to be able to revoke the Terraform credential without touching any Agents. What should you do?",
+      "choices": [
+        "Replace the Terraform API key with a client token",
+        "Create a separate API key for each deployment method",
+        "Issue each Agent its own application key instead",
+        "Rename the existing API key to mark it as Terraform-only"
+      ],
+      "answer": 1,
+      "explanation": "Datadog recommends a different API key for each deployment method (for example Kubernetes in AWS, on-prem with Chef, Terraform, local development) so one key can be rotated or revoked without affecting the others. Renaming a key doesn't change its value, client tokens are only for browser, mobile and TV clients, and the Agent submits data with an API key rather than an application key.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#using-multiple-api-keys",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-007",
+      "topic": "API Key",
+      "question": "An API key used by a single test VM was accidentally committed to a public GitHub repository. According to Datadog's guidance, what is the first step?",
+      "choices": [
+        "Delete the file from the GitHub repository",
+        "Disable the user account that created the key",
+        "Ask Datadog Support to change the key's value",
+        "Revoke the exposed key on the API Keys page"
+      ],
+      "answer": 3,
+      "explanation": "The documented response starts with revoking the affected key, then removing it from public files and commit history, creating a new key, updating services and reviewing the account for unapproved access. Deleting the file alone does not guarantee nobody already copied the key. Disabling the creator does nothing to an API key, because API keys created by a disabled account remain valid.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#what-to-do-if-an-api-or-application-key-was-exposed",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-008",
+      "topic": "API Key",
+      "question": "An exposed API key is used by hundreds of Agents across several environments, and nobody is sure where all of them run. What does Datadog advise about when to revoke it?",
+      "choices": [
+        "Revoke it at once and watch which Agents stop reporting data",
+        "Create and roll out a new key first, then revoke the exposed one",
+        "Leave it active, since API keys can only write data and never read",
+        "Revoke it at once; the Agents fall back to their application key"
+      ],
+      "answer": 1,
+      "explanation": "Revoking an active key can impact your services, so when the scope of usage is large or undetermined Datadog suggests doing the other steps (clean up the exposure, create a new key, update services, review access) before revoking the affected key. The exposed key must still be revoked, because anyone holding it can send data into your org. Agents have no application-key fallback.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#what-to-do-if-an-api-or-application-key-was-exposed",
+      "difficulty": 3
+    },
+    {
+      "id": "api-q-009",
+      "topic": "API Key",
+      "question": "Your org uses separate API keys for production Agents, staging Agents and a Terraform pipeline. An admin revokes only the staging key. What is the effect?",
+      "choices": [
+        "Only clients using the staging key have data rejected",
+        "All Agents stop, since every org API key shares one secret",
+        "The production and Terraform keys are revoked along with it",
+        "Nothing changes until the staging Agents are restarted"
+      ],
+      "answer": 0,
+      "explanation": "Each API key is revoked on its own, so only the Agents and scripts configured with the revoked key have their submissions rejected, while production and Terraform keep working. That isolation is why Datadog suggests a different API key for each deployment method, so one key can be rotated or revoked without affecting the others. Revocation takes effect on Datadog's side within a few seconds, so it doesn't wait for an Agent restart.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#using-multiple-api-keys",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-010",
+      "topic": "API Key",
+      "question": "Which Datadog managed role includes, by default, the API Keys Write permission needed to create API keys?",
+      "choices": ["Datadog Read Only Role", "Datadog Standard Role", "Datadog Admin Role"],
+      "answer": 2,
+      "explanation": "API Keys Write (`api_keys_write`, create and rename API keys) and API Keys Delete default to the Datadog Admin Role. The Standard Role gets API Keys Read (`api_keys_read`), which lists and retrieves API key values, and Read Only gets neither. Managed roles inherit from less powerful roles, so Admin also has the read permission.",
+      "reference": "https://docs.datadoghq.com/account_management/rbac/permissions/#api-and-application-keys",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-011",
+      "topic": "API Key",
+      "question": "A user who has only the Datadog Standard Role is installing an Agent and needs an API key. What can they do with the default permissions?",
+      "choices": [
+        "Copy an existing API key's value, but not create a new key",
+        "Nothing; only the Datadog Admin Role can see API key values",
+        "Both copy existing API keys and create new ones as needed",
+        "Nothing; API key values are only shown once, at creation"
+      ],
+      "answer": 0,
+      "explanation": "The Standard Role has API Keys Read (`api_keys_read`), which lets users list and retrieve the key values of all API keys in the org, while API Keys Write for creating keys defaults to the Admin Role. The show-once behavior applies to application keys (One-Time Read mode and service account keys), not to API keys.",
+      "reference": "https://docs.datadoghq.com/account_management/rbac/permissions/#api-and-application-keys",
+      "difficulty": 3
+    },
+    {
+      "id": "api-q-012",
+      "topic": "API Key",
+      "question": "The admin who created the API key used by every production Agent leaves the company, and her Datadog account is disabled. What happens to the Agents' data submission?",
+      "choices": [
+        "It continues, because API keys from a disabled account stay valid",
+        "It stops at once, because her API keys are revoked with the account",
+        "It continues for 7 days, then stops unless the key is restored",
+        "It continues only if an admin transfers the key to another user"
+      ],
+      "answer": 0,
+      "explanation": "When a user account is disabled, API keys that it created are not deleted and remain valid; only the user's application keys are revoked. No transfer is needed because API keys belong to the organization, and there is no grace period or expiry: the key stays valid until someone revokes it.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#disabling-a-user-account",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-013",
+      "topic": "API Key",
+      "question": "Datadog API and application keys are long-lived credentials. What does Datadog say about their expiration and storage?",
+      "choices": [
+        "They don't expire on their own, so store them in a secrets manager",
+        "They expire after 90 days, so rotate them through the Agent config",
+        "They expire after one year unless they are used at least monthly",
+        "They expire when unused for 30 days, so keep them in source code"
+      ],
+      "answer": 0,
+      "explanation": "Because API and application keys are long-lived and have no built-in expiration, Datadog recommends storing them in a secrets manager such as AWS Secrets Manager, HashiCorp Vault or Azure Key Vault instead of in source code or environment files. Rotation is your responsibility; there is no 90-day, yearly or inactivity-based expiry.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#add-application-keys",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-014",
+      "topic": "API Key",
+      "question": "A CI pipeline creates a new API key and uses it in the very next step. That step sometimes fails with 403 Forbidden, but a rerun a few seconds later succeeds. What explains this?",
+      "choices": [
+        "Key changes are eventually consistent and need a few seconds",
+        "New API keys must be approved by an admin before they can be used",
+        "New API keys work only after the Agent has been restarted once",
+        "The pipeline exceeded the X-RateLimit-Limit for key creation"
+      ],
+      "answer": 0,
+      "explanation": "Datadog keys follow an eventual consistency model: creation and revocation may take a few seconds to propagate, so using a brand-new key immediately can cause temporary 401 or 403 errors. Datadog recommends a short wait or retries with exponential backoff, and `/api/v1/validate` can confirm the key is usable. A rate limit would return 429, and there is no admin approval step.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#key-propagation-delay-and-eventual-consistency",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-015",
+      "topic": "Application Key",
+      "question": "When a Datadog user account is disabled, what happens to the API keys and application keys that the account created?",
+      "choices": [
+        "API keys remain valid; application keys are revoked",
+        "API keys remain valid; application keys pass to the inviting admin",
+        "Both the API keys and the application keys are revoked",
+        "API keys are revoked; application keys remain valid"
+      ],
+      "answer": 0,
+      "explanation": "Disabling a user revokes every application key that user created, while API keys created by the account are not deleted and stay valid because they belong to the organization. Datadog never transfers application keys from one user to another for security reasons; use a service account for keys that must outlive an individual.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#disabling-a-user-account",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-016",
+      "topic": "Application Key",
+      "question": "What is the purpose of an application key in Datadog?",
+      "choices": [
+        "It replaces the API key so the Agent can send metrics without one",
+        "It lets browser and mobile SDKs send RUM events and logs securely",
+        "Paired with an API key, it grants access to the Datadog API",
+        "It authenticates DogStatsD clients that send metrics to the Agent"
+      ],
+      "answer": 2,
+      "explanation": "Application keys, in conjunction with your organization's API key, give users access to Datadog's programmatic API, and by default they carry the permissions of the user who created them. The Agent always sends data with an API key, browser and mobile SDKs use client tokens, and DogStatsD traffic to the local Agent does not use application keys.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#application-keys",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-017",
+      "topic": "Application Key",
+      "question": "A user whose role can view but not edit dashboards creates an application key without any scopes. A script using that key tries to delete a dashboard. What happens?",
+      "choices": [
+        "It succeeds, because unscoped keys have full access to the org",
+        "It succeeds, because the paired API key grants write access",
+        "It is denied, since the key carries only that user's permissions",
+        "It succeeds, but only if the request is sent to a v2 endpoint"
+      ],
+      "answer": 2,
+      "explanation": "If no scopes are specified, an application key has the same scopes and permissions as the user who created it, so a user who cannot delete dashboards cannot do it through their key either. The API key does not add permissions to the call, and the API version does not change authorization.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#scope-application-keys",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-018",
+      "topic": "Application Key",
+      "question": "A reporting script only needs to read dashboards. Following Datadog's best practice, how should its application key be set up?",
+      "choices": [
+        "Create it from an Admin account so it never hits permission errors",
+        "Skip it; an API key alone is enough to read dashboard definitions",
+        "Scope it to only the needed scopes, such as `dashboards_read`",
+        "Use a client token instead, because tokens are limited to reads"
+      ],
+      "answer": 2,
+      "explanation": "Datadog recommends granting application keys the minimal privileges an application needs, and a scoped key gets only the scopes you specify and no other permissions. An unscoped Admin-owned key exposes far more than required. Reading data needs both an API key and an application key, and client tokens are only for browser, mobile and TV clients sending data.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#scopes",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-019",
+      "topic": "Application Key",
+      "question": "A Datadog Admin creates an application key scoped only to `dashboards_read` and hands it to a script. The script then tries to create a monitor. What happens?",
+      "choices": [
+        "It succeeds, because the key's owner has the Admin role",
+        "It succeeds, since scopes only restrict reads, not writes",
+        "It is denied; the key has only the scopes it was granted",
+        "It succeeds once, then the key's scopes expand automatically"
+      ],
+      "answer": 2,
+      "explanation": "Scoped application keys are granted only the scopes specified and no other additional permissions, even when the owner's role could do more. Scopes limit write operations as well as reads, and they never expand on their own. To let the script create monitors, add the needed scope (such as `monitors_write`) to the key.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#scopes",
+      "difficulty": 3
+    },
+    {
+      "id": "api-q-020",
+      "topic": "Application Key",
+      "question": "An application key was scoped to `monitors_read` and `monitors_write`. Later, the role of the user who owns the key is changed. What happens to the scopes on that key?",
+      "choices": [
+        "They are replaced by the new role's permissions",
+        "They are cleared, and the key becomes unscoped",
+        "They stay exactly as they were set",
+        "The key is revoked and must be created again"
+      ],
+      "answer": 2,
+      "explanation": "Datadog notes that if a user's role or permissions change, the authorization scopes specified for their application keys remain unchanged. A role change does not rescope, clear or revoke the key; disabling the user is what revokes their application keys. If the key needs different access, you can edit its scopes at any time.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#scopes",
+      "difficulty": 3
+    },
+    {
+      "id": "api-q-021",
+      "topic": "Application Key",
+      "question": "A nightly automation script calls the Datadog API with an engineer's personal application key. How do you keep it from breaking when that engineer leaves and their account is disabled?",
+      "choices": [
+        "Transfer the engineer's application key to their manager first",
+        "Create a service account and use an application key it owns",
+        "Switch the script to an API key only, since it never expires",
+        "Generate a client token for the script, as it has no owner"
+      ],
+      "answer": 1,
+      "explanation": "When an account is disabled its application keys are revoked, and Datadog does not transfer application keys between users for security reasons, so it recommends a service account application key for shared automation. An API key alone cannot read data through the API, and client tokens are only for browser, mobile and TV clients.",
+      "reference": "https://docs.datadoghq.com/account_management/org_settings/service_accounts/",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-022",
+      "topic": "Application Key",
+      "question": "What is a Datadog service account?",
+      "choices": [
+        "A shared UI login that several team members use for on-call work",
+        "A special API key that does not count toward the 50-key org limit",
+        "A Datadog-managed user that support engineers use to access your org",
+        "A non-interactive account that owns app keys and shared resources"
+      ],
+      "answer": 3,
+      "explanation": "Service accounts are non-interactive accounts used to own application keys and other resources that are shared across teams, so automation doesn't depend on an individual user. They are not shared human logins or a type of API key. The keys that don't count toward the 50-key limit are managed API keys created by Datadog integrations or services.",
+      "reference": "https://docs.datadoghq.com/account_management/org_settings/service_accounts/",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-023",
+      "topic": "Application Key",
+      "question": "You created an application key for a service account and closed the dialog without copying the secret. What should you do?",
+      "choices": [
+        "Reopen the service account panel to copy the secret",
+        "Ask Datadog Support to reveal the key's secret",
+        "Retrieve the secret through the Key Management API",
+        "Revoke that key and create a new application key"
+      ],
+      "answer": 3,
+      "explanation": "A service account application key can be viewed exactly once, immediately after it is created; after the dialog closes, its value cannot be retrieved. Datadog's documented fix for a lost or forgotten service account key is to revoke it and create a new one, not to look it up again in the UI or API.",
+      "reference": "https://docs.datadoghq.com/account_management/org_settings/service_accounts/#service-account-application-keys",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-024",
+      "topic": "Application Key",
+      "question": "Which permission lets a user create service accounts in Datadog?",
+      "choices": ["Org App Keys Write", "Service Account Write", "User App Keys", "API Keys Write"],
+      "answer": 1,
+      "explanation": "Creating a service account requires the Service Account Write permission, which the Datadog Admin Role includes. API Keys Write creates org API keys, Org App Keys Write manages application keys owned by any user, and User App Keys covers a user's own application keys. Disabling a service account also requires User Manage Access.",
+      "reference": "https://docs.datadoghq.com/account_management/org_settings/service_accounts/#permissions",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-025",
+      "topic": "Application Key",
+      "question": "A security engineer must find and revoke application keys owned by other users across the organization. Which permission does this require?",
+      "choices": ["`user_app_keys`", "`org_app_keys_read`", "`service_account_write`", "`org_app_keys_write`"],
+      "answer": 3,
+      "explanation": "`org_app_keys_write` (Datadog Admin Role by default) manages application keys owned by all users in the organization. `org_app_keys_read` can only view them, `user_app_keys` is limited to the user's own keys, and `service_account_write` covers creating, disabling and using service accounts rather than other users' keys.",
+      "reference": "https://docs.datadoghq.com/account_management/rbac/permissions/#api-and-application-keys",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-026",
+      "topic": "Application Key",
+      "question": "Which statement correctly contrasts Datadog API keys and application keys?",
+      "choices": [
+        "API keys belong to the org; app keys belong to the user who made them",
+        "API keys belong to a user; app keys belong to the whole organization",
+        "Both belong to the org, and neither of them carries a user's permissions",
+        "Both belong to a user and are revoked when that user is disabled"
+      ],
+      "answer": 0,
+      "explanation": "API keys are unique to your organization, while application keys are associated with the user account that created them and by default carry that user's permissions. That is why disabling a user revokes the application keys they created but leaves their API keys valid, and why Datadog recommends service accounts to own application keys for shared automation.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#application-keys",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-027",
+      "topic": "Application Key",
+      "question": "You enable the Datadog Cluster Agent's external metrics server so the Kubernetes Horizontal Pod Autoscaler can scale on Datadog metrics. Besides an API key, what must the Cluster Agent be given?",
+      "choices": ["A client token", "An application key", "A second API key", "Nothing else is needed"],
+      "answer": 1,
+      "explanation": "To serve Datadog metrics to the autoscaler, the Cluster Agent has to read metric values from Datadog, and reading data through the Datadog API requires an application key along with the API key. Datadog's setup guide lists a valid API key and application key as requirements (for example `DD_API_KEY` and `DD_APP_KEY`). A second API key adds no read access, and client tokens are only for browser, mobile and TV clients.",
+      "reference": "https://docs.datadoghq.com/containers/guide/cluster_agent_autoscaling_metrics/",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-028",
+      "topic": "Application Key",
+      "question": "An hour ago an admin revoked, by mistake, the application key used by a reporting script. What can be done?",
+      "choices": [
+        "Unrevoke the key within 7 days from the Revoked filter",
+        "Create a new application key and update the script",
+        "Ask the key owner to unrevoke it from their profile",
+        "Restore it with the Key Management API within 24 hours"
+      ],
+      "answer": 1,
+      "explanation": "Revoking an application key is permanent; the 7-day restoration window applies only to API keys. The fix is to create a new application key (ideally owned by a service account, for automation) and update the script to use it.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#remove-application-keys",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-029",
+      "topic": "API Endpoints",
+      "question": "Which description matches the Datadog API?",
+      "choices": [
+        "A GraphQL API that serves every query from a single endpoint",
+        "An HTTP REST API with resource-oriented URLs that returns JSON",
+        "A gRPC API that exchanges Protocol Buffers messages over HTTP/2",
+        "A SOAP web service that exchanges XML documents described by WSDL"
+      ],
+      "answer": 1,
+      "explanation": "Datadog describes its API as an HTTP REST API that uses resource-oriented URLs, returns JSON from all requests and uses standard HTTP response codes to indicate success or failure. It is not GraphQL, gRPC or SOAP; the cURL examples and official client libraries all call REST endpoints such as `/api/v2/series`.",
+      "reference": "https://docs.datadoghq.com/api/latest/",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-030",
+      "topic": "API Endpoints",
+      "question": "Which HTTP request header carries the API key when you call the Datadog API?",
+      "choices": ["`X-Datadog-Api-Key`", "`DD-API-KEY`", "`Authorization: Bearer <api-key>`", "`DD-APPLICATION-KEY`"],
+      "answer": 1,
+      "explanation": "You authenticate with an API key in the `DD-API-KEY` header, and endpoints that also need an application key take it in `DD-APPLICATION-KEY`. `X-Datadog-Api-Key` is not the documented header, and API keys are not sent as bearer tokens. Passing keys as `api_key` query parameters is deprecated in favor of the headers.",
+      "reference": "https://docs.datadoghq.com/api/latest/",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-031",
+      "topic": "API Endpoints",
+      "question": "A partner tool has been given only your organization's API key, with no application key. Which of these API operations can it perform?",
+      "choices": [
+        "Query timeseries with `GET /api/v1/query`",
+        "Create a monitor with `POST /api/v1/monitor`",
+        "Post an event with `POST /api/v1/events`",
+        "List active metrics with `GET /api/v1/metrics`"
+      ],
+      "answer": 2,
+      "explanation": "Endpoints that write data, such as posting events, submitting metrics or submitting service checks, require only an API key. Querying timeseries, listing active metrics and creating monitors read data or manage resources, so they also require an application key in the `DD-APPLICATION-KEY` header.",
+      "reference": "https://docs.datadoghq.com/api/latest/events/#post-an-event",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-032",
+      "topic": "API Endpoints",
+      "question": "According to Datadog's API authentication rules, which requests need an application key in addition to the API key?",
+      "choices": [
+        "Requests that write data",
+        "Requests that read data",
+        "Requests sent to the EU site",
+        "Requests with gzip-compressed bodies"
+      ],
+      "answer": 1,
+      "explanation": "Datadog states that all API requests must be authenticated: requests that write data require an API key, while requests that read data require full access and also an application key. The site you call and whether the body is compressed don't change which keys are needed.",
+      "reference": "https://docs.datadoghq.com/api/latest/authentication/",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-033",
+      "topic": "API Endpoints",
+      "question": "A nightly batch job runs on a server that has no Datadog Agent installed. It must send a custom metric straight to Datadog over HTTPS. Which should it use?",
+      "choices": ["DogStatsD", "A custom Agent check", "The Datadog API", "The Datadog Agent"],
+      "answer": 2,
+      "explanation": "Custom metrics can be submitted through a custom Agent check, DogStatsD or the HTTP API, among other ways, but of these options only the API (for example `POST /api/v2/series` with an API key) accepts metrics directly over HTTPS without an Agent. DogStatsD clients send datagrams to the DogStatsD server built into the Agent, and custom checks run inside the Agent.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/#submitting-custom-metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-034",
+      "topic": "API Endpoints",
+      "question": "Your organization's Datadog UI is at `https://app.datadoghq.eu`. Which base URL should your API calls use?",
+      "choices": ["`https://api.datadoghq.com`", "`https://api.datadoghq.eu`", "`https://eu.api.datadoghq.com`", "`https://api.eu1.datadoghq.com`"],
+      "answer": 1,
+      "explanation": "Each Datadog site has its own API host; for EU1 (`app.datadoghq.eu`, site parameter `datadoghq.eu`) the endpoints are under `https://api.datadoghq.eu`. `api.datadoghq.com` is the US1 host, and because sites are completely independent, an EU org's keys don't work there. The `eu.api` and `api.eu1` hostnames are not Datadog endpoints.",
+      "reference": "https://docs.datadoghq.com/getting_started/site/",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-035",
+      "topic": "API Endpoints",
+      "question": "Your team logs in to Datadog at `https://us3.datadoghq.com`. A script posts metrics to `https://api.datadoghq.com/api/v2/series` and gets 403 errors even though the key is valid in your org. Which URL should it use?",
+      "choices": [
+        "`https://us3.api.datadoghq.com/api/v2/series`",
+        "`https://api.datadoghq.com/us3/api/v2/series`",
+        "`https://api.us3.datadoghq.com/api/v2/series`",
+        "`https://us3.datadoghq.com/intake/api/v2/series`"
+      ],
+      "answer": 2,
+      "explanation": "API hosts follow the site: US3 (`us3.datadoghq.com`) uses `https://api.us3.datadoghq.com`, while `api.datadoghq.com` belongs to US1. Datadog sites are completely independent, so a US3 org's key is rejected with an authentication error on US1. The other hostnames and paths are not valid Datadog endpoints.",
+      "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics",
+      "difficulty": 3
+    },
+    {
+      "id": "api-q-036",
+      "topic": "API Endpoints",
+      "question": "A `POST /api/v2/series` request returns HTTP 202 with the body `{\"errors\": []}`. What does this mean?",
+      "choices": [
+        "The payload was accepted and will be processed",
+        "The request was queued because of rate limiting",
+        "The key was valid, but the points were discarded",
+        "The request must be retried with an application key"
+      ],
+      "answer": 0,
+      "explanation": "For the Submit metrics endpoint, 202 means Payload accepted, and the v2 example response is an empty `errors` list. Rate limiting returns 429 and authentication problems return 403. Metric submission needs only an API key, so an application key is never the issue.",
+      "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-037",
+      "topic": "API Endpoints",
+      "question": "A script that submits metrics to `/api/v2/series` suddenly starts receiving HTTP 403 responses. What is the most likely cause?",
+      "choices": [
+        "The JSON body is malformed or has a wrong field type",
+        "The API key in `DD-API-KEY` is invalid or missing",
+        "The payload is over the endpoint's maximum size",
+        "The script is sending too many requests per second"
+      ],
+      "answer": 1,
+      "explanation": "The Submit metrics endpoint documents 403 as an authentication error, which points to a missing, revoked or wrong-site API key. A malformed body returns 400 Bad Request, an oversized payload returns 413 Payload Too Large and excessive requests return 429 Too Many Requests.",
+      "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-038",
+      "topic": "API Endpoints",
+      "question": "An exporter batches thousands of series into one uncompressed `POST /api/v2/series` request and receives HTTP 413. What should it change?",
+      "choices": [
+        "Add an application key header to raise the size limit",
+        "Wait for the X-RateLimit-Reset period before retrying",
+        "Split the data into smaller requests under 500 KB each",
+        "Switch the timestamps from seconds to milliseconds"
+      ],
+      "answer": 2,
+      "explanation": "413 means Payload too large. The v2 endpoint accepts at most 500 kilobytes (512000 bytes) per payload, and compressed payloads must decompress to less than 5 megabytes, so the fix is smaller batches (compression also helps). An application key doesn't change limits, 429 is the rate-limit response, and timestamps must stay in seconds.",
+      "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-039",
+      "topic": "API Endpoints",
+      "question": "What is the maximum payload size for a single request to the v2 Submit metrics endpoint, `POST /api/v2/series`?",
+      "choices": ["3.2 megabytes (3200000 bytes)", "5 megabytes (5242880 bytes)", "500 kilobytes (512000 bytes)", "62 megabytes (62914560 bytes)"],
+      "answer": 2,
+      "explanation": "The v2 endpoint's maximum payload size is 500 kilobytes (512000 bytes), and compressed payloads must have a decompressed size of less than 5 megabytes (5242880 bytes). The 3.2 MB limit, with its 62 MB decompressed ceiling, belongs to the older v1 endpoint `POST /api/v1/series`.",
+      "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics",
+      "difficulty": 3
+    },
+    {
+      "id": "api-q-040",
+      "topic": "API Endpoints",
+      "question": "A job uses `POST /api/v2/series` to backfill metric points whose timestamps are three hours old. Which documented rule does this break?",
+      "choices": [
+        "Points may be no more than 10 minutes in the past",
+        "Points must be sent with millisecond timestamps",
+        "Backfilling requires an application key as well",
+        "Points may be no more than 1 hour in the past"
+      ],
+      "answer": 3,
+      "explanation": "Metric point timestamps must be POSIX time in seconds and current, meaning no more than 10 minutes in the future or 1 hour in the past. Ten minutes is the future limit, not the past one, and adding an application key does not widen the window.",
+      "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-041",
+      "topic": "API Endpoints",
+      "question": "A script polling monitor status receives HTTP 429. Which response header tells it how many seconds remain until the rate limit resets?",
+      "choices": ["`X-RateLimit-Reset`", "`X-RateLimit-Period`", "`X-RateLimit-Remaining`", "`X-RateLimit-Limit`"],
+      "answer": 0,
+      "explanation": "`X-RateLimit-Reset` is the time in seconds until the next reset. `X-RateLimit-Period` is the length of the calendar-aligned period, `X-RateLimit-Remaining` is how many requests are left in the current period, and `X-RateLimit-Limit` is how many requests are allowed per period.",
+      "reference": "https://docs.datadoghq.com/api/latest/rate-limits/",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-042",
+      "topic": "API Endpoints",
+      "question": "A team plans to send very high volumes of points through the Metrics API and asks how Datadog rate limits metric submission. What does Datadog document?",
+      "choices": [
+        "It is capped at 250,000 points per minute per organization",
+        "It is not rate limited; custom metric volume drives billing",
+        "It follows per-endpoint limits shown in the X-RateLimit headers",
+        "It is capped at 1,000 requests per hour for each API key"
+      ],
+      "answer": 1,
+      "explanation": "Datadog does not rate limit data point or metric submission; what you run into depends on your custom metrics volume under your agreement, and usage beyond your allotment is billed. 250,000 per minute per organization is the event submission limit. Other endpoints have limits reported in X-RateLimit headers.",
+      "reference": "https://docs.datadoghq.com/api/latest/rate-limits/",
+      "difficulty": 3
+    },
+    {
+      "id": "api-q-043",
+      "topic": "API Endpoints",
+      "question": "Before rolling an API key out to new Agents, you want to confirm it is valid. You don't have an application key. Which request should you make?",
+      "choices": ["`GET /api/v2/validate_keys`", "`GET /api/v1/metrics`", "`GET /api/v1/validate`", "`GET /api/v1/query`"],
+      "answer": 2,
+      "explanation": "`GET /api/v1/validate` checks whether the API key (not the application key) is valid using only `DD-API-KEY`, returning `{\"valid\": true}` or a 403. `/api/v2/validate_keys` checks an API key and application key pair, so it needs both. Listing active metrics and querying timeseries read data and also require an application key.",
+      "reference": "https://docs.datadoghq.com/api/latest/authentication/#validate-api-key",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-044",
+      "topic": "API Endpoints",
+      "question": "Which Datadog API endpoint queries timeseries data across various data sources and lets you process it with formulas and functions?",
+      "choices": ["`POST /api/v2/series`", "`POST /api/v2/query/timeseries`", "`GET /api/v2/metrics/{metric_name}/all-tags`", "`GET /api/v1/metrics`"],
+      "answer": 1,
+      "explanation": "`POST /api/v2/query/timeseries` queries timeseries data across various data sources and processes it by applying formulas and functions; current docs also recommend it over the older `GET /api/v1/query`. `POST /api/v2/series` submits metrics, `GET /api/v1/metrics` lists actively reporting metrics, and the `all-tags` endpoint lists tags for one metric.",
+      "reference": "https://docs.datadoghq.com/api/latest/metrics/#query-timeseries-data-across-multiple-products",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-045",
+      "topic": "API Endpoints",
+      "question": "This request returns HTTP 403 even though the API key is valid:\n\ncurl -X GET \"https://api.datadoghq.com/api/v1/query?from=1700000000&to=1700003600&query=avg:system.cpu.user{*}\" \\\n  -H \"Accept: application/json\" \\\n  -H \"DD-API-KEY: ${DD_API_KEY}\"\n\nWhat is the most likely fix?",
+      "choices": [
+        "Change the request method to POST",
+        "Send `from` and `to` in milliseconds",
+        "Add the `DD-APPLICATION-KEY` header",
+        "Move the API key into an `api_key` query parameter"
+      ],
+      "answer": 2,
+      "explanation": "Query timeseries points reads data, so it requires both `DD-API-KEY` and `DD-APPLICATION-KEY`; without the application key the request is refused. The v1 query endpoint is a GET with `from` and `to` in seconds since the Unix epoch, and moving the API key into a (deprecated) query parameter would not supply the missing application key.",
+      "reference": "https://docs.datadoghq.com/api/latest/metrics/#query-timeseries-points",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-046",
+      "topic": "API Endpoints",
+      "question": "Which endpoint is this metrics payload formatted for?\n\n{\"series\": [{\n  \"metric\": \"app.jobs.completed\",\n  \"type\": 1,\n  \"points\": [{\"timestamp\": 1700000000, \"value\": 5}],\n  \"resources\": [{\"name\": \"web-01\", \"type\": \"host\"}]\n}]}",
+      "choices": ["`POST /api/v1/series`", "`POST /api/v1/distribution_points`", "`POST /api/v2/query/timeseries`", "`POST /api/v2/series`"],
+      "answer": 3,
+      "explanation": "The v2 Submit metrics format uses point objects with `timestamp` and `value`, a numeric `type` (0 unspecified, 1 count, 2 rate, 3 gauge) and a `resources` list that names the host. The v1 format sends points as `[timestamp, value]` tuples with a `host` field and a string type such as `gauge`. Distribution points and the timeseries query endpoint use different payloads.",
+      "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics",
+      "difficulty": 3
+    },
+    {
+      "id": "api-q-047",
+      "topic": "API Endpoints",
+      "question": "By default, which environment variables do Datadog's official API client libraries, such as the Python and TypeScript `datadog-api-client` packages, read for authentication?",
+      "choices": ["`DD-API-KEY` and `DD-APPLICATION-KEY`", "`DD_API_KEY` and `DD_APP_KEY`", "`DD_API_KEY` and `DD_CLIENT_TOKEN`", "`DD_SITE` and `DD_HOSTNAME`"],
+      "answer": 1,
+      "explanation": "The official client libraries use the `DD_API_KEY` and `DD_APP_KEY` environment variables by default to authenticate against the Datadog API. `DD-API-KEY` and `DD-APPLICATION-KEY` are the HTTP header names, not environment variables. Client tokens are for browser and mobile SDKs, and `DD_SITE` and `DD_HOSTNAME` are not credentials.",
+      "reference": "https://github.com/DataDog/datadog-api-client-python#authentication",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-048",
+      "topic": "API Endpoints",
+      "question": "A Python script built on the official Datadog API client works for a US1 org, but it gets 403 errors when run with keys from an EU1 org. What is the fix?",
+      "choices": [
+        "Create new EU-specific keys in the US1 org",
+        "Point the client at `https://api.datadoghq.eu`",
+        "Add an `X-Datadog-Region: eu1` header to requests",
+        "Use a client token, since keys are US-only"
+      ],
+      "answer": 1,
+      "explanation": "Datadog API clients target the US site by default, and sites are fully independent, so EU keys aren't recognized by the US1 API. Configure the client for the EU site so it calls `https://api.datadoghq.eu`; in the Python client, set `configuration.server_variables[\"site\"] = \"datadoghq.eu\"` or the `DD_SITE` environment variable. There is no region header, and client tokens don't authenticate API calls.",
+      "reference": "https://docs.datadoghq.com/api/latest/authentication/",
+      "difficulty": 2
+    }
+  ],
+  "flashcards": [
+    {"id": "api-fc-001", "topic": "API Key", "front": "What is a Datadog API key used for?", "back": "An organization-level key that the Datadog Agent requires to submit metrics and events. API keys are unique to your organization and are sent in the DD-API-KEY header on API calls; requests that only write data need nothing else.", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#api-keys"},
+    {"id": "api-fc-002", "topic": "API Key", "front": "How do you give the Agent its API key?", "back": "Set `api_key` in datadog.yaml (a required setting), or set the DD_API_KEY environment variable, for example for containerized Agents.", "reference": "https://github.com/DataDog/datadog-agent/blob/main/pkg/config/example/datadog-agent_linux.yaml.example"},
+    {"id": "api-fc-003", "topic": "API Key", "front": "API key limits per organization", "back": "At least one API key is required, and up to 50 are allowed by default (Support can raise the limit). Managed API keys created by integrations don't count. Key names must be unique across the org.", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#add-an-api-key-or-client-token"},
+    {"id": "api-fc-004", "topic": "API Key", "front": "What happens to API keys when the user who created them is disabled?", "back": "Nothing: they are not deleted and stay valid. Only that user's application keys are revoked. Client tokens they created also stay active.", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#disabling-a-user-account"},
+    {"id": "api-fc-005", "topic": "API Key", "front": "Client token vs. API key", "back": "Client tokens are for end-user-facing apps (browser, Android, iOS, React Native, Flutter and Roku log collectors; RUM), because an API key would be exposed client-side. Both are unique to your organization.", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#client-tokens"},
+    {"id": "api-fc-006", "topic": "API Key", "front": "Can a revoked API key be restored?", "back": "Current behavior (documented in 2026): yes, within 7 days. Filter the API Keys tab by Revoked status and click Unrevoke (UI only, no API). The key comes back with the same name, ID and value. Removed client tokens can't be recovered.", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#unrevoke-an-api-key"},
+    {"id": "api-fc-007", "topic": "API Key", "front": "Steps after an API or application key is exposed", "back": "1. Revoke the key (if usage is large or unknown, do steps 2-5 first)\n2. Remove it from public files and commit history\n3. Create a new key\n4. Update affected services\n5. Review the account for new users, new resources and role changes", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#what-to-do-if-an-api-or-application-key-was-exposed"},
+    {"id": "api-fc-008", "topic": "API Key", "front": "API key permissions and their default roles", "back": "api_keys_read: list and retrieve key values (Standard Role)\napi_keys_write: create and rename keys (Admin Role)\napi_keys_delete: delete keys (Admin Role)", "reference": "https://docs.datadoghq.com/account_management/rbac/permissions/#api-and-application-keys"},
+    {"id": "api-fc-009", "topic": "API Key", "front": "Why use multiple API keys?", "back": "Using one key per deployment method (for example Kubernetes in AWS, Chef on-prem, Terraform, local dev) lets you rotate a key, or revoke one that was exposed or retired, without affecting the others.", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#using-multiple-api-keys"},
+    {"id": "api-fc-010", "topic": "API Key", "front": "Do Datadog API keys expire, and how quickly do key changes take effect?", "back": "They don't expire: API and application keys are long-lived with no built-in expiration, so store them in a secrets manager and rotate them yourself. Creating or revoking a key is eventually consistent and can take a few seconds to propagate.", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#key-propagation-delay-and-eventual-consistency"},
+    {"id": "api-fc-011", "topic": "Application Key", "front": "What is an application key?", "back": "A key used together with an API key (DD-APPLICATION-KEY header) for programmatic access to the Datadog API, such as reading data. It belongs to the user or service account that created it and, if unscoped, has that owner's permissions.", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#application-keys"},
+    {"id": "api-fc-012", "topic": "Application Key", "front": "Application key scopes", "back": "Optional authorization scopes limit a key to the listed scopes only, with no other permissions (least privilege). Scope names are case-sensitive. Scopes stay the same if the owner's role changes. Unscoped keys get all of the owner's permissions.", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#scopes"},
+    {"id": "api-fc-013", "topic": "Application Key", "front": "What happens to application keys when their owner is disabled?", "back": "They are revoked. Datadog does not transfer application keys between users, so use a service account for keys that must outlive a person.", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#transferring-keys"},
+    {"id": "api-fc-014", "topic": "Application Key", "front": "What is a service account?", "back": "A non-interactive account that owns application keys and other shared resources, so automation keeps working when people leave. Creating one requires Service Account Write (included in the Admin Role), and it can get any subset of your own roles.", "reference": "https://docs.datadoghq.com/account_management/org_settings/service_accounts/"},
+    {"id": "api-fc-015", "topic": "Application Key", "front": "When can you see a service account application key's secret?", "back": "Only once, right after you create it. If it is lost, revoke it and create a new key.", "reference": "https://docs.datadoghq.com/account_management/org_settings/service_accounts/#service-account-application-keys"},
+    {"id": "api-fc-016", "topic": "Application Key", "front": "One-Time Read (OTR) mode", "back": "A security setting introduced in August 2025 (current behavior): application key secrets are shown once, at creation, and can't be retrieved later through the UI or API. OTR is on permanently for new parent orgs created after August 20, 2025. Existing orgs can toggle it for 3 months, after which it becomes permanent (toggling requires org_app_keys_write and org_management).", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#one-time-read-mode"},
+    {"id": "api-fc-017", "topic": "Application Key", "front": "Application key permissions and their default roles", "back": "user_app_keys: view and manage your own keys (Standard Role)\norg_app_keys_read: view all users' keys (Standard Role)\norg_app_keys_write: manage all users' keys (Admin Role)", "reference": "https://docs.datadoghq.com/account_management/rbac/permissions/#api-and-application-keys"},
+    {"id": "api-fc-018", "topic": "Application Key", "front": "Can a revoked application key be restored?", "back": "No. Revoking an application key is permanent, so create a new key and update whatever used the old one. (Current docs add a 7-day unrevoke window for API keys only.)", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#remove-application-keys"},
+    {"id": "api-fc-019", "topic": "Application Key", "front": "Actions API access on an application key", "back": "Current behavior (added in 2025): it must be enabled, in the UI or through the API, before the key can call the App Builder, Actions Connections or Workflow Automation APIs. By default, application keys can't use these APIs.", "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#actions-api-access"},
+    {"id": "api-fc-020", "topic": "API Endpoints", "front": "Datadog API authentication headers", "back": "DD-API-KEY: the API key (every key-authenticated request)\nDD-APPLICATION-KEY: the application key (endpoints that read data or manage resources, such as queries and monitors)", "reference": "https://docs.datadoghq.com/api/latest/"},
+    {"id": "api-fc-021", "topic": "API Endpoints", "front": "Which requests need only an API key, and which need both keys?", "back": "API key only: writing data, such as POST /api/v2/series, POST /api/v1/events and POST /api/v1/check_run, plus GET /api/v1/validate.\nAPI key + application key: reading data, such as GET /api/v1/query and GET /api/v1/metrics.", "reference": "https://docs.datadoghq.com/api/latest/authentication/"},
+    {"id": "api-fc-022", "topic": "API Endpoints", "front": "API base URL for each Datadog site", "back": "US1: api.datadoghq.com\nUS3: api.us3.datadoghq.com\nUS5: api.us5.datadoghq.com\nEU1: api.datadoghq.eu\nAP1: api.ap1.datadoghq.com\nAP2: api.ap2.datadoghq.com\nUK1: api.uk1.datadoghq.com\nUS1-FED: api.ddog-gov.com\nUS2-FED: api.us2.ddog-gov.com", "reference": "https://docs.datadoghq.com/getting_started/site/"},
+    {"id": "api-fc-023", "topic": "API Endpoints", "front": "Metric submission endpoints and their payload limits", "back": "v2, POST /api/v2/series: at most 500 KB (512000 bytes), and compressed payloads must decompress to under 5 MB (5242880 bytes).\nv1, POST /api/v1/series: at most 3.2 MB (3200000 bytes), and under 62 MB decompressed.", "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics"},
+    {"id": "api-fc-024", "topic": "API Endpoints", "front": "Timestamp rules for submitted metric points", "back": "POSIX time in seconds, and current: no more than 10 minutes in the future or 1 hour in the past.", "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics"},
+    {"id": "api-fc-025", "topic": "API Endpoints", "front": "Response codes for Submit metrics", "back": "202 Payload accepted\n400 Bad Request\n403 Authentication error\n408 Request timeout\n413 Payload too large\n429 Too many requests", "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics"},
+    {"id": "api-fc-026", "topic": "API Endpoints", "front": "The X-RateLimit-* response headers", "back": "Limit: requests allowed per period\nPeriod: period length in seconds (calendar aligned)\nRemaining: requests left in the current period\nReset: seconds until the next reset\nName: name of the limit, for increase requests", "reference": "https://docs.datadoghq.com/api/latest/rate-limits/"},
+    {"id": "api-fc-027", "topic": "API Endpoints", "front": "Which Datadog APIs are rate limited?", "back": "Metric (data point) submission and log submission are not rate limited; metric volume is governed by custom metric billing. Event submission is limited to 250,000 events per minute per org. Other endpoints report their limits in X-RateLimit headers and return 429 when you exceed them.", "reference": "https://docs.datadoghq.com/api/latest/rate-limits/"},
+    {"id": "api-fc-028", "topic": "API Endpoints", "front": "How do you validate an API key?", "back": "Call GET /api/v1/validate with only the DD-API-KEY header. It returns {\"valid\": true}, or 403 if the key is invalid. To check an API key and application key pair, use GET /api/v2/validate_keys.", "reference": "https://docs.datadoghq.com/api/latest/authentication/#validate-api-key"},
+    {"id": "api-fc-029", "topic": "API Endpoints", "front": "Metric `type` values in a v2 series payload", "back": "0 = unspecified, 1 = count, 2 = rate, 3 = gauge. The v1 API uses strings instead: \"\", count, gauge, rate.", "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics"},
+    {"id": "api-fc-030", "topic": "API Endpoints", "front": "How do you query metrics through the API?", "back": "GET /api/v1/query (from and to in epoch seconds, plus query), or POST /api/v2/query/timeseries, which supports formulas and functions across data sources (current docs recommend the v2 endpoint). Both need an API key and an application key.", "reference": "https://docs.datadoghq.com/api/latest/metrics/#query-timeseries-points"},
+    {"id": "api-fc-031", "topic": "API Endpoints", "front": "Official Datadog API client libraries", "back": "datadog-api-client for Java, Python, Ruby, Go, TypeScript and Rust. Clients target the US site by default; for EU, configure the site as datadoghq.eu (the Python and Rust clients also read DD_SITE). The Python, TypeScript and Rust clients read DD_API_KEY and DD_APP_KEY by default.", "reference": "https://docs.datadoghq.com/api/latest/"},
+    {"id": "api-fc-032", "topic": "API Endpoints", "front": "Content-Encoding options for POST /api/v2/series", "back": "deflate (the default), zstd1 or gzip. The v1 /api/v1/series endpoint accepts deflate or gzip.", "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics"}
+  ]
+}

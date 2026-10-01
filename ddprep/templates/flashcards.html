@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% from "_macros.html" import mode_badge %}
+{% block title %}Flash Cards{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Flash cards</p>
+    <h1>Build a deck</h1>
+    <p class="lede-dark">Flip each card, then rate yourself honestly. Cards you mark “Still learning” come back more often in targeted decks.</p>
+  </div>
+</header>
+
+{% set default_mode = 'targeted' if answered and not preselect_topic else 'random' %}
+<form class="deck-builder card" method="post" action="{{ url_for('main.start_flashcards') }}">
+  <fieldset class="mode-picker">
+    <legend>Deck type</legend>
+    <label class="mode-option">
+      <input type="radio" name="mode" value="random" {{ 'checked' if default_mode == 'random' }}>
+      <span class="mode-option-body">
+        <span class="mode-icon mode-icon-random" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 7h4l10 10h4M3 17h4l3-3M14 10l3-3h4M18 4l3 3-3 3M18 14l3 3-3 3"/></svg></span>
+        <span><strong>Random</strong><br><span class="muted small">An even shuffle across the selection.</span></span>
+      </span>
+    </label>
+    <label class="mode-option {{ 'is-disabled' if not answered }}">
+      <input type="radio" name="mode" value="targeted" {{ 'disabled' if not answered }} {{ 'checked' if default_mode == 'targeted' }}>
+      <span class="mode-option-body">
+        <span class="mode-icon mode-icon-targeted" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg></span>
+        <span><strong>Targeted</strong><br><span class="muted small">
+          {% if answered %}Mostly cards from topics you missed in exams.{% else %}Unlocks after your first exam answers.{% endif %}
+        </span></span>
+      </span>
+    </label>
+  </fieldset>
+
+  <div class="deck-options">
+    <label class="field">
+      <span class="field-label">Cover</span>
+      <select name="scope" class="select">
+        <option value="">All domains ({{ bank_counts.flashcards }} cards)</option>
+        {% for d in domains %}
+          <optgroup label="{{ d.name }}">
+            <option value="domain:{{ d.id }}">All of {{ d.name }} ({{ d.cards }})</option>
+            {% for t in topics if t.domain_id == d.id %}
+              <option value="topic:{{ t.id }}" {{ 'selected' if preselect_topic == t.id }}>{{ t.name }} ({{ t.cards }})</option>
+            {% endfor %}
+          </optgroup>
+        {% endfor %}
+      </select>
+    </label>
+    <fieldset class="field">
+      <legend class="field-label">Cards</legend>
+      <div class="segmented segmented-radio">
+        {% for n in deck_sizes %}
+          <label class="seg"><input type="radio" name="size" value="{{ n }}" {{ 'checked' if n == default_size }}><span>{{ n }}</span></label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    <button class="btn btn-primary btn-lg" type="submit">Start studying</button>
+  </div>
+
+  {% if focus %}
+    <div class="deck-focus">
+      <span class="muted small">Your weakest exam topics:</span>
+      <ul class="focus-chips">
+        {% for t in focus %}<li><span class="num">{{ t.accuracy | pct }}</span> {{ t.topic }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+</form>
+
+<section class="card">
+  <header class="card-head"><h2>Recent decks</h2></header>
+  {% if sessions %}
+    <table class="table">
+      <thead><tr><th>Started</th><th>Type</th><th class="num">Reviewed</th><th class="num">Known</th><th></th></tr></thead>
+      <tbody>
+        {% for s in sessions %}
+          <tr>
+            <td>{{ s.started_at | when }}</td>
+            <td>{{ mode_badge(s.mode) }}</td>
+            <td class="num">{{ s.reviewed }}/{{ s.size }}</td>
+            <td class="num">{{ s.known }}</td>
+            <td class="actions"><a class="link" href="{{ url_for('main.study', session_id=s.id) }}">{{ 'Continue' if s.reviewed < s.size else 'Open' }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="empty"><p>No decks studied yet.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

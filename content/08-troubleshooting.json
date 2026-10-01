@@ -1,0 +1,1099 @@
+{
+  "questions": [
+    {
+      "id": "ts-q-001",
+      "topic": "Agent Commands",
+      "question": "To run an Agent subcommand, the syntax is `<AGENT_BINARY> <SUB_COMMAND> <OPTIONS>`. Which subcommand prints all the configurations loaded and resolved by a running Agent?",
+      "choices": [
+        "`diagnose`",
+        "`configcheck`",
+        "`check`"
+      ],
+      "answer": 1,
+      "explanation": "`configcheck` is documented as printing all configurations loaded and resolved by a running Agent, which makes it the command for verifying which check configurations (including Autodiscovery templates) were picked up. `diagnose` runs connectivity diagnostics, and `check <CHECK_NAME>` executes one check rather than listing every loaded configuration.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#other-commands",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-002",
+      "topic": "Agent Commands",
+      "question": "Datadog Support asks you to send the Agent's configuration files and logs for an open ticket. Which subcommand packages them into an archive and uploads it?",
+      "choices": [
+        "`flare`",
+        "`diagnose`",
+        "`health`",
+        "`stream-logs`"
+      ],
+      "answer": 0,
+      "explanation": "`flare` collects the Agent's configuration files and logs into an archive (removing sensitive values) and sends it to Datadog Support, optionally tied to a case ID. `diagnose` runs connectivity checks, `health` prints the Agent's current health, and `stream-logs` shows the logs being processed by log collection in real time.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-003",
+      "topic": "Agent Commands",
+      "question": "A host sits behind a strict firewall and you suspect the Agent cannot reach Datadog. Which subcommand is documented as executing connectivity diagnosis on the system?",
+      "choices": [
+        "`diagnose`",
+        "`health`",
+        "`hostname`",
+        "`configcheck`"
+      ],
+      "answer": 0,
+      "explanation": "The `diagnose` subcommand executes connectivity diagnosis on your system. `health` reports whether the Agent's internal components are healthy, `hostname` prints the hostname the Agent reports, and `configcheck` lists loaded check configurations; none of them tests network connectivity to Datadog.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#other-commands",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-004",
+      "topic": "Agent Commands",
+      "question": "You configured a new integration and restarted the Agent, but no data appears in Datadog. What is the documented first step to see whether the integration is running?",
+      "choices": [
+        "Run the `status` subcommand and look under Running Checks",
+        "Run the `health` subcommand and look under Healthy checks",
+        "Run the `version` subcommand and look under Integrations",
+        "Run the `hostname` subcommand and look under Providers"
+      ],
+      "answer": 0,
+      "explanation": "The troubleshooting guide says to run the `status` command and look for the integration under the Running Checks heading; a working check is listed there without warnings or errors, and problems show up in the Config errors or Loading errors sections. `health` only reports component health, `version` prints build information, and `hostname` prints the reported hostname.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/integrations/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-005",
+      "topic": "Agent Commands",
+      "question": "On a Linux host, which command runs a single Agent check, as the Agent user, and prints the collected metrics to the terminal?",
+      "choices": [
+        "`sudo -u dd-agent -- datadog-agent check <CHECK_NAME>`",
+        "`sudo -u dd-agent -- datadog-agent configcheck <CHECK_NAME>`",
+        "`sudo -u dd-agent -- datadog-agent status <CHECK_NAME>`",
+        "`sudo -u dd-agent -- datadog-agent run <CHECK_NAME>`"
+      ],
+      "answer": 0,
+      "explanation": "`datadog-agent check <CHECK_NAME>` runs the specified check and prints its metrics, events and service checks; running it with `sudo -u dd-agent --` uses the same user and permissions as the Agent service. `configcheck` only prints loaded configurations, `status` shows the overall status page, and `run` starts the whole Agent rather than one check.",
+      "reference": "https://docs.datadoghq.com/agent/supported_platforms/linux/#commands",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-006",
+      "topic": "Agent Commands",
+      "question": "A check reports rate metrics, but `datadog-agent check <CHECK_NAME>` shows no values for them. Which flag runs the check twice, one second apart, so rates can be computed?",
+      "choices": [
+        "`--check-rate`",
+        "`--delay 1000`",
+        "`--json`",
+        "`--include-rates`"
+      ],
+      "answer": 0,
+      "explanation": "The docs recommend adding `--check-rate` to include rate metrics; it runs the check twice with a one-second pause because a rate needs two samples. `--delay` only changes how long the command waits before grabbing metrics from a run, `--json` changes the output format, and `--include-rates` is not an Agent flag.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/agent_check_status/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-007",
+      "topic": "Agent Commands",
+      "question": "On a Windows host, which command, run from an elevated PowerShell prompt, prints the Agent status page including running checks?",
+      "choices": [
+        "`& \"$env:ProgramFiles\\Datadog\\Datadog Agent\\bin\\agent.exe\" status`",
+        "`& \"$env:ProgramFiles\\Datadog\\Datadog Agent\\bin\\agent.exe\" health`",
+        "`& \"$env:ProgramData\\Datadog\\bin\\agent.exe\" status`",
+        "`Get-Service -Name DatadogAgent | Format-List *`"
+      ],
+      "answer": 0,
+      "explanation": "On Windows the main executable is `agent.exe` in `%ProgramFiles%\\Datadog\\Datadog Agent\\bin\\`, and its `status` subcommand prints the status page. `health` exists but only reports component health, `%ProgramData%\\Datadog` holds configuration and logs rather than the binary, and `Get-Service` only shows whether the DatadogAgent service is running.",
+      "reference": "https://docs.datadoghq.com/agent/supported_platforms/windows/#agent-commands",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-008",
+      "topic": "Agent Commands",
+      "question": "An Agent running in Kubernetes needs DEBUG logging for a short investigation, and you do not want to recreate the pod. Which command changes the log level at runtime (Agent 7.19+)?",
+      "choices": [
+        "`kubectl exec <POD_NAME> agent config set log_level debug`",
+        "`kubectl exec <POD_NAME> agent configcheck set log_level debug`",
+        "`kubectl exec <POD_NAME> agent config reload log_level=debug`",
+        "`kubectl exec <POD_NAME> agent set-config log_level debug`"
+      ],
+      "answer": 0,
+      "explanation": "Since Agent 6.19/7.19, `config set <SETTING> <VALUE>` changes runtime-editable settings such as `log_level` without a restart, which is especially useful in containers where editing `datadog.yaml` means recreating the container. `configcheck` only prints check configurations, and there is no `config reload` or `set-config` subcommand.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/config/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-009",
+      "topic": "Agent Commands",
+      "question": "You raised the Agent's verbosity with `datadog-agent config set log_level debug`. What happens to this change?",
+      "choices": [
+        "It applies immediately but is lost when the Agent restarts",
+        "It is written to datadog.yaml and persists across restarts",
+        "It is queued and applied only after the next Agent restart",
+        "It is pushed to every Agent that uses the same API key"
+      ],
+      "answer": 0,
+      "explanation": "Runtime changes made with `config set` take effect right away without a restart, but the documentation notes they do not persist and are lost as soon as the Agent restarts. The command does not edit `datadog.yaml`, so a permanent change still means editing the file and restarting, and it only affects the Agent you run it against.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/config/",
+      "difficulty": 3
+    },
+    {
+      "id": "ts-q-010",
+      "topic": "Agent Commands",
+      "question": "Which command lists the Agent settings that can be changed at runtime without a restart?",
+      "choices": [
+        "`sudo datadog-agent config list-runtime`",
+        "`sudo datadog-agent config show-runtime`",
+        "`sudo datadog-agent configcheck --runtime`",
+        "`sudo datadog-agent diagnose --runtime`"
+      ],
+      "answer": 0,
+      "explanation": "`config list-runtime` lists the configuration parameters that can be changed at runtime; you can then read one with `config get <SETTING>` or change it with `config set`. `show-runtime` is not a `config` subcommand, and neither `configcheck` nor `diagnose` has a `--runtime` flag.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/config/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-011",
+      "topic": "Agent Commands",
+      "question": "A Redis container is running, but the Docker Agent never schedules the Redis check from its Autodiscovery template. Which command shows every template, including unresolved ones?",
+      "choices": [
+        "`docker exec -it <AGENT_CONTAINER_NAME> agent configcheck -v`",
+        "`docker exec -it <AGENT_CONTAINER_NAME> agent status --verbose`",
+        "`docker exec -it <AGENT_CONTAINER_NAME> agent diagnose --verbose`",
+        "`docker exec -it <AGENT_CONTAINER_NAME> agent check redisdb`"
+      ],
+      "answer": 0,
+      "explanation": "The Autodiscovery troubleshooting guide uses `agent configcheck -v`; the `-v` option shows all templates, including unresolved ones, along with resolve warnings such as \"No service found with this AD identifier\". `status --verbose` and `diagnose --verbose` add detail to the status page and connectivity diagnostics, and `check redisdb` tries to run the check once without listing unresolved templates.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/autodiscovery/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-012",
+      "topic": "Agent Commands",
+      "question": "Datadog Support opened case 1234567 and asks for a flare from a Debian host. Which command sends a flare attached to that case?",
+      "choices": [
+        "`sudo datadog-agent flare 1234567`",
+        "`sudo datadog-agent flare --case 1234567`",
+        "`sudo datadog-agent support 1234567`",
+        "`sudo datadog-agent status --flare 1234567`"
+      ],
+      "answer": 0,
+      "explanation": "The documented form is `datadog-agent flare <CASE_ID>`, with the case ID as a positional argument; you then enter the email associated with the case and confirm the upload. There is no `--case` flag or `support` subcommand, and `status` does not send flares. Without a case ID, the flare opens a new support case for your email address.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-013",
+      "topic": "Agent Commands",
+      "question": "A security team worries that a flare will leak credentials. What does the Agent do with passwords, API keys, proxy credentials and SNMP community strings when it builds a flare?",
+      "choices": [
+        "Removes them from the archive before it is uploaded",
+        "Encrypts them in the archive with the org's API key",
+        "Includes them so Support can reproduce the setup",
+        "Refuses to build the flare until they are deleted"
+      ],
+      "answer": 0,
+      "explanation": "A flare gathers the Agent's configuration files and logs but removes sensitive information such as passwords, API keys, proxy credentials and SNMP community strings. The command also asks for confirmation before uploading, so the archive can be reviewed first. The values are not encrypted or sent as-is, and you do not need to delete them yourself.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-014",
+      "topic": "Agent Commands",
+      "question": "The Agent has no connectivity to Datadog, so `datadog-agent flare` cannot upload the archive. What does the documentation recommend?",
+      "choices": [
+        "Retrieve the archive from the local `/tmp` directory and give it to Support",
+        "Run `flare --local` so the archive uploads through a backup intake endpoint",
+        "Enable debug mode so the flare is queued and retried once the network is back",
+        "Run `diagnose` with `--send` so the logs are uploaded over the DogStatsD port"
+      ],
+      "answer": 0,
+      "explanation": "The flare process first writes the archive to the local `/tmp` directory, so when connectivity is the problem you can collect that file manually and provide it to Support. `--local` only makes the CLI, rather than the Agent process, build the flare; debug mode does not queue flares; and `diagnose` has no `--send` option.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/#manual-submission",
+      "difficulty": 3
+    },
+    {
+      "id": "ts-q-015",
+      "topic": "Agent Commands",
+      "question": "Which Agent subcommand is documented as Windows only?",
+      "choices": [
+        "`stopservice`",
+        "`launch-gui`",
+        "`stream-logs`",
+        "`configcheck`"
+      ],
+      "answer": 0,
+      "explanation": "`start-service`, `stopservice` and `restart-service` control the Agent through the Windows Service Control Manager and are marked Windows only in the subcommand table. `launch-gui`, `stream-logs` and `configcheck` are not limited to Windows (the GUI, for example, is enabled by default on both Windows and macOS).",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#other-commands",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-016",
+      "topic": "Agent Commands",
+      "question": "You need version 3.6.0 of the vSphere integration on a Linux host before the next Agent release ships it. Which command installs it?",
+      "choices": [
+        "`sudo -u dd-agent -- datadog-agent integration install datadog-vsphere==3.6.0`",
+        "`sudo -u dd-agent -- datadog-agent integration upgrade datadog-vsphere==3.6.0`",
+        "`sudo -u dd-agent -- datadog-agent integration install vsphere==3.6.0`",
+        "`sudo -u dd-agent -- datadog-agent integration add datadog-vsphere:3.6.0`"
+      ],
+      "answer": 0,
+      "explanation": "The syntax is `datadog-agent integration install <INTEGRATION_PACKAGE_NAME>==<VERSION>`, where the package name is the integration name prefixed with `datadog-`, run as the `dd-agent` user on Linux. `upgrade` and `add` are not `integration` subcommands, and `vsphere` without the `datadog-` prefix is not a valid package name. Restart the Agent afterwards to use the new version.",
+      "reference": "https://docs.datadoghq.com/agent/guide/integration-management/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-017",
+      "topic": "Agent Commands",
+      "question": "Which `datadog-agent integration` subcommand lists every Python package installed in the Agent's environment, including Datadog integrations and their dependencies?",
+      "choices": [
+        "`freeze`",
+        "`show`",
+        "`list`",
+        "`inventory`"
+      ],
+      "answer": 0,
+      "explanation": "`integration freeze` lists all Python packages in the Agent's Python environment: the `datadog-` integration packages plus the dependencies they need. `integration show <PACKAGE>` prints information such as the version of one installed integration, while `list` and `inventory` are not subcommands (the supported ones are install, remove, show and freeze).",
+      "reference": "https://docs.datadoghq.com/agent/guide/integration-management/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-018",
+      "topic": "Agent Commands",
+      "question": "After running `datadog-agent integration remove datadog-vsphere`, what is left on the host?",
+      "choices": [
+        "The `vsphere.d` folder in the `conf.d` directory",
+        "The vSphere Python package, disabled until restart",
+        "Nothing; the package and its configs are deleted",
+        "A backup copy of the package in `checks.d`"
+      ],
+      "answer": 0,
+      "explanation": "Removing an integration uninstalls its Python package but does not remove the corresponding configuration folder in the `conf.d` directory, so your `conf.yaml` stays in place. The package is removed rather than disabled, and nothing is copied into `checks.d`, which is reserved for custom check code.",
+      "reference": "https://docs.datadoghq.com/agent/guide/integration-management/",
+      "difficulty": 3
+    },
+    {
+      "id": "ts-q-019",
+      "topic": "Agent Commands",
+      "question": "A JMX-based integration collects fewer metrics than your configuration matches. Which command lists attributes that match your instance configuration but are not collected because they would exceed the metric limit?",
+      "choices": [
+        "`sudo -u dd-agent datadog-agent jmx list limited`",
+        "`sudo -u dd-agent datadog-agent jmx list not-matching`",
+        "`sudo -u dd-agent datadog-agent jmx list collected`",
+        "`sudo -u dd-agent datadog-agent jmx list everything`"
+      ],
+      "answer": 0,
+      "explanation": "`jmx list limited` shows attributes that match one of your instance configurations but are not collected because collecting them would exceed the number of metrics allowed. `not-matching` lists attributes that match none of your configuration, `collected` lists what is actually collected, and `everything` lists every attribute with a type JMXFetch supports.",
+      "reference": "https://docs.datadoghq.com/integrations/faq/troubleshooting-jmx-integrations/",
+      "difficulty": 3
+    },
+    {
+      "id": "ts-q-020",
+      "topic": "Agent Commands",
+      "question": "On macOS, which command restarts the Datadog Agent service?",
+      "choices": [
+        "`sudo launchctl kickstart -k system/com.datadoghq.agent`",
+        "`sudo launchctl kickstart system/com.datadoghq.agent`",
+        "`sudo launchctl kill SIGTERM system/com.datadoghq.agent`",
+        "`sudo launchctl print system/com.datadoghq.agent`"
+      ],
+      "answer": 0,
+      "explanation": "On macOS the `launchctl` service manager controls the Agent lifecycle, and `kickstart -k` kills the running instance before starting it again, which restarts it. `kickstart` without `-k` starts the service, `kill SIGTERM` stops it, and `print` shows the service status.",
+      "reference": "https://docs.datadoghq.com/agent/supported_platforms/osx/#commands",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-021",
+      "topic": "Agent Commands",
+      "question": "What does the `stream-logs` subcommand display?",
+      "choices": [
+        "Logs being processed by a running Agent's log collection",
+        "New lines as they are written to the Agent's own `agent.log`",
+        "Metrics and events received by the DogStatsD server",
+        "Debug output from each check as it runs"
+      ],
+      "answer": 0,
+      "explanation": "`stream-logs` streams the logs being processed by a running Agent, so it only shows data when log collection is enabled and configured; output can be filtered by name, type, source or service. It does not tail the Agent's own `agent.log` (read that in the Agent log directory), show DogStatsD traffic, or print check debug output.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#other-commands",
+      "difficulty": 3
+    },
+    {
+      "id": "ts-q-022",
+      "topic": "Agent Commands",
+      "question": "The Agent runs in a Docker container named `dd-agent`. Which command displays its status page, including running checks?",
+      "choices": [
+        "`docker exec -it dd-agent agent status`",
+        "`docker ps --filter name=dd-agent`",
+        "`docker inspect --format '{{.State.Status}}' dd-agent`",
+        "`docker logs --tail 100 dd-agent`"
+      ],
+      "answer": 0,
+      "explanation": "Inside the container the Agent binary is `agent`, so `docker exec -it <CONTAINER_NAME> agent status` prints the full status page with running checks, forwarder and endpoint information. `docker ps` and `docker inspect` only report the container's state, and `docker logs` shows the container's console output rather than the status page.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-023",
+      "topic": "Agent Logs",
+      "question": "To configure the Agent to log only critical, error and warn messages, how should the local `datadog.yaml` file be modified?",
+      "choices": [
+        "Replace `# log_level: INFO` with `log_level: CRITICAL`",
+        "Replace `# log_level: INFO` with `log_level: ERROR`",
+        "Replace `# log_level: INFO` with `log_level: WARN`"
+      ],
+      "answer": 2,
+      "explanation": "Each log level includes every more severe level: `WARN` logs critical, error and warn messages, `ERROR` drops warnings, and `CRITICAL` keeps only critical messages. The line must also be uncommented (remove the `#`), and the Agent restarted for the change to apply.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/debug_mode/#agent-log-level",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-024",
+      "topic": "Agent Logs",
+      "question": "What log level does the Datadog Agent use by default?",
+      "choices": [
+        "`INFO`",
+        "`WARN`",
+        "`ERROR`",
+        "`DEBUG`"
+      ],
+      "answer": 0,
+      "explanation": "The Agent logs at `INFO` by default, which the shipped `datadog.yaml` shows as the commented-out `log_level` line. `DEBUG` is meant for short troubleshooting windows because it greatly increases log volume, while `WARN` and `ERROR` are quieter levels you would opt into explicitly.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/debug_mode/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-025",
+      "topic": "Agent Logs",
+      "question": "Where does the Agent write its own log files on a Linux host?",
+      "choices": [
+        "`/var/log/datadog/`",
+        "`/etc/datadog-agent/logs/`",
+        "`/opt/datadog-agent/logs/`",
+        "`/var/lib/datadog/logs/`"
+      ],
+      "answer": 0,
+      "explanation": "On Linux the Agent log directory is `/var/log/datadog/`, which holds files such as `agent.log`, `trace-agent.log` and `process-agent.log`. `/opt/datadog-agent/logs` is the macOS location for Agent 7.28+/6.28+, `/etc/datadog-agent/` holds configuration rather than logs, and `/var/lib/datadog/logs/` is not an Agent path.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-log-files/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-026",
+      "topic": "Agent Logs",
+      "question": "On a Windows host, where is the main Agent log file?",
+      "choices": [
+        "`C:\\ProgramData\\Datadog\\logs\\agent.log`",
+        "`C:\\Program Files\\Datadog\\Datadog Agent\\logs\\agent.log`",
+        "`C:\\ProgramData\\Datadog\\conf.d\\agent.log`",
+        "`C:\\Windows\\Temp\\Datadog\\agent.log`"
+      ],
+      "answer": 0,
+      "explanation": "Windows Agent logs live in `C:\\ProgramData\\Datadog\\logs\\`, with the main log at `agent.log`; note that `ProgramData` is a hidden folder. `C:\\Program Files\\Datadog\\Datadog Agent\\` contains the binaries (such as `bin\\agent.exe`), `conf.d` holds integration configuration, and `C:\\Windows\\Temp\\Datadog` is not an Agent path (the MSI installer writes its own log to `%TEMP%`).",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-log-files/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-027",
+      "topic": "Agent Logs",
+      "question": "A Mac runs Agent 7.50. In which directory should you look for `agent.log`?",
+      "choices": [
+        "`/opt/datadog-agent/logs`",
+        "`/var/log/datadog`",
+        "`/Library/Logs/Datadog`",
+        "`/opt/datadog-agent/etc/logs`"
+      ],
+      "answer": 0,
+      "explanation": "Starting with Agent 7.28 and 6.28, macOS Agent logs are written to `/opt/datadog-agent/logs`. Older macOS Agents used `/var/log/datadog`, which is still the Linux location. `/opt/datadog-agent/etc/` holds configuration such as `datadog.yaml`, and `/Library/Logs/Datadog` is not an Agent log path.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-log-files/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-028",
+      "topic": "Agent Logs",
+      "question": "Traces from an instrumented application are not reaching Datadog, although host metrics are. Which Agent log file is the most relevant to inspect first?",
+      "choices": [
+        "`trace-agent.log`",
+        "`process-agent.log`",
+        "`jmxfetch.log`",
+        "`system-probe.log`"
+      ],
+      "answer": 0,
+      "explanation": "APM traces are received and forwarded by the trace-agent, which writes to its own `trace-agent.log` in the Agent log directory. `process-agent.log` belongs to live process and container collection, `jmxfetch.log` to JMX-based integrations, and `system-probe.log` to the separate system-probe component.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-log-files/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-029",
+      "topic": "Agent Logs",
+      "question": "With default settings, how does the Agent rotate `agent.log`?",
+      "choices": [
+        "At 10 MB, keeping one backup named `agent.log.1`",
+        "Daily, keeping seven compressed backup files",
+        "At 100 MB, keeping five numbered backup files",
+        "It never rotates; OS logrotate must handle it"
+      ],
+      "answer": 0,
+      "explanation": "The Agent rolls its log over every 10 MB by default and keeps a single backup (`agent.log.1`), overwriting any previous backup. Size and backup count are controlled by `log_file_max_size` (default 10485760 bytes) and `log_file_max_rolls` (default 1); rotation is built in rather than delegated to logrotate.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-log-files/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-030",
+      "topic": "Agent Logs",
+      "question": "You need to keep more Agent log history on disk. Which pair of `datadog.yaml` settings controls the log file size and the number of backups kept?",
+      "choices": [
+        "`log_file_max_size` and `log_file_max_rolls`",
+        "`log_rotate_size` and `log_rotate_count`",
+        "`logs_config.max_size` and `logs_config.max_files`",
+        "`log_max_bytes` and `log_backup_count`"
+      ],
+      "answer": 0,
+      "explanation": "`log_file_max_size` sets the maximum size of one Agent log file and `log_file_max_rolls` sets how many old files to keep (0 means no limit). The `logs_config` section configures log collection from your applications, not the Agent's own logs, and the other key names do not exist in `datadog.yaml`.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-log-files/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-031",
+      "topic": "Agent Logs",
+      "question": "What is the documented procedure to enable full debug mode for an Agent installed on a host?",
+      "choices": [
+        "Set `log_level: DEBUG` in `datadog.yaml`, restart, and wait a few minutes",
+        "Set `log_level: DEBUG` in `datadog.yaml`; it applies on the next check run",
+        "Set `logs_enabled: debug` in `datadog.yaml`, then restart the Agent service",
+        "Run `datadog-agent flare --debug` to switch the Agent into debug logging"
+      ],
+      "answer": 0,
+      "explanation": "Debug mode is enabled by replacing `# log_level: INFO` with an uncommented `log_level: DEBUG`, restarting the Agent, and waiting a few minutes for logs to accumulate. Edits to `datadog.yaml` are not picked up without a restart, `logs_enabled` turns on log collection rather than Agent verbosity, and `flare` has no `--debug` flag.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/debug_mode/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-032",
+      "topic": "Agent Logs",
+      "question": "You are starting a containerized Agent and want it to log at debug level from startup. Which environment variable do you set?",
+      "choices": [
+        "`DD_LOG_LEVEL=debug`",
+        "`DD_DEBUG=true`",
+        "`DD_LOGS_ENABLED=debug`",
+        "`DD_AGENT_LOG=debug`"
+      ],
+      "answer": 0,
+      "explanation": "`DD_LOG_LEVEL` is the environment variable equivalent of `log_level`, so `DD_LOG_LEVEL=debug` enables debug mode for the container Agent. `DD_LOGS_ENABLED` turns on log collection and expects a boolean, and `DD_DEBUG` and `DD_AGENT_LOG` are not Agent settings. With Helm, the equivalent is `logLevel: DEBUG` in the values file.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/debug_mode/#containerized-agent",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-033",
+      "topic": "Agent Logs",
+      "question": "You want to silence Agent logging entirely by setting the level to `OFF` in `datadog.yaml`. What is required?",
+      "choices": [
+        "Quote the value, as in `log_level: 'OFF'`",
+        "Use lowercase, as in `log_level: off`",
+        "Use `log_level: NONE`, since `OFF` is invalid",
+        "Also set `log_to_console: false` for it to apply"
+      ],
+      "answer": 0,
+      "explanation": "The docs state that quotes are mandatory when setting the level to `'OFF'` so the value is not parsed improperly (YAML can read an unquoted off as a boolean); quotes are optional for other levels. `NONE` is not a valid level, and `log_to_console` separately controls logging to stdout.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/debug_mode/#agent-log-level",
+      "difficulty": 3
+    },
+    {
+      "id": "ts-q-034",
+      "topic": "Agent Logs",
+      "question": "In a Kubernetes Agent pod with a dedicated trace-agent container, `agent config set log_level debug` worked for the agent container. How do you get debug logs from the trace-agent container?",
+      "choices": [
+        "Set `DD_LOG_LEVEL=debug` for it and redeploy",
+        "Run the same `config set` command inside it",
+        "Run `agent flare --local` inside that container",
+        "Set `log_level: debug` in its `conf.d/apm.yaml`"
+      ],
+      "answer": 0,
+      "explanation": "The docs state that the trace-agent container's log level cannot be changed at runtime the way the agent container's can; you must set `DD_LOG_LEVEL=debug` and redeploy. A local flare only collects existing logs without changing verbosity, and no `conf.d/apm.yaml` file controls the trace-agent's log level.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/debug_mode/#containerized-agent",
+      "difficulty": 3
+    },
+    {
+      "id": "ts-q-035",
+      "topic": "Agent Logs",
+      "question": "After troubleshooting on a Linux host, the Agent logs `Permission denied` errors for files in `/var/log/datadog/`. Which command fixes the problem before you restart the Agent?",
+      "choices": [
+        "`sudo chown -R dd-agent:dd-agent /var/log/datadog/`",
+        "`sudo chown -R root:root /var/log/datadog/`",
+        "`sudo chown -R dd-agent:dd-agent /etc/datadog-agent/`",
+        "`sudo chmod -R 600 /var/log/datadog/`"
+      ],
+      "answer": 0,
+      "explanation": "The Agent's log files and the directory containing them must be owned by the Agent user `dd-agent`, so the documented fix is `sudo chown -R dd-agent:dd-agent /var/log/datadog/` followed by an Agent restart. Giving ownership to root blocks the Agent from writing, `chmod` does not change who owns the files, and changing `/etc/datadog-agent/` does not touch the log directory.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/permissions/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-036",
+      "topic": "Agent Logs",
+      "question": "A team set `log_level: DEBUG` in `datadog.yaml` and restarted the Agent, expecting their application's log files to appear in Log Explorer. Nothing arrives. What is the most likely reason?",
+      "choices": [
+        "It sets Agent verbosity only; collecting logs needs `logs_enabled: true`",
+        "Application log files are forwarded only when `log_level` is set to `TRACE`",
+        "Debug-level output is uploaded to Log Explorer only after a flare is sent",
+        "Log Explorer requires a full host reboot after any `log_level` change"
+      ],
+      "answer": 0,
+      "explanation": "`log_level` controls how verbose the Agent's own log files are. Collecting logs from applications is a separate feature that is disabled by default and must be turned on with `logs_enabled: true`, plus a log configuration for each source. No log level forwards application logs, flares go to Support rather than Log Explorer, and no host reboot is needed.",
+      "reference": "https://docs.datadoghq.com/agent/logs/",
+      "difficulty": 3
+    },
+    {
+      "id": "ts-q-037",
+      "topic": "Agent Logs",
+      "question": "On a systemd-based Linux host the Agent fails to start and `systemctl status datadog-agent` gives no detail. Which command displays all logs for the Agent service?",
+      "choices": [
+        "`sudo journalctl -u datadog-agent.service`",
+        "`sudo systemctl show-logs datadog-agent.service`",
+        "`sudo datadog-agent stream-logs`",
+        "`sudo journalctl --agent datadog`"
+      ],
+      "answer": 0,
+      "explanation": "For systemd systems the docs recommend `sudo journalctl -u datadog-agent.service` to display all logs for the Agent service (add `-r` for reverse order). `systemctl` has no `show-logs` action, `stream-logs` needs a running Agent and shows collected logs rather than service startup output, and `journalctl` has no `--agent` option.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/agent_check_status/#systemd",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-038",
+      "topic": "Agent Config Files",
+      "question": "When making configuration changes in `datadog.yaml`, which statement is true?",
+      "choices": [
+        "The Agent must be restarted to apply changes made to `datadog.yaml`",
+        "The Agent must be stopped before editing `datadog.yaml`, or runtime errors occur",
+        "Changes made to `datadog.yaml` are applied dynamically by the running Agent"
+      ],
+      "answer": 0,
+      "explanation": "The Agent reads `datadog.yaml` when it starts, which is why the troubleshooting checklist asks whether you restarted the Agent after editing a YAML configuration file. Editing the file while the Agent runs is safe; nothing changes until the restart. Only some settings can be changed live, and that is done with `datadog-agent config set`, not by editing the file.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-039",
+      "topic": "Agent Config Files",
+      "question": "After changes are made to `datadog.yaml` while the Agent is running, when does the Agent apply them?",
+      "choices": [
+        "The next time it starts",
+        "During the next check cycle",
+        "When it receives the `reload` command"
+      ],
+      "answer": 0,
+      "explanation": "Settings in `datadog.yaml` are loaded when the Agent process starts, so edits take effect the next time the Agent starts, typically after a restart. The Agent does not re-read the file on each check cycle, and there is no `reload` subcommand; the documented procedure is to restart the Agent.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#restart-the-agent",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-040",
+      "topic": "Agent Config Files",
+      "question": "For a Datadog Agent running on a host, what is the definitive way to determine its default configuration values?",
+      "choices": [
+        "Examine its original `datadog.yaml` file",
+        "Read the Agent documentation on docs.datadoghq.com",
+        "Run the command `datadog-agent configcheck`"
+      ],
+      "answer": 0,
+      "explanation": "The configuration file shipped with the Agent (also installed as the fully commented `datadog.yaml.example`) lists every available option with its default value for that exact Agent version. The public docs may describe a different version, and `configcheck` prints the loaded integration check configurations rather than the Agent's default settings.",
+      "reference": "https://docs.datadoghq.com/agent/supported_platforms/linux/#configure-the-agent",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-041",
+      "topic": "Agent Config Files",
+      "question": "Where is the Agent's main configuration file on a Linux host?",
+      "choices": [
+        "`/etc/datadog-agent/datadog.yaml`",
+        "`/opt/datadog-agent/etc/datadog.yaml`",
+        "`/etc/datadog/datadog.conf`",
+        "`/var/lib/datadog-agent/datadog.yaml`"
+      ],
+      "answer": 0,
+      "explanation": "Linux (and AIX) Agents read `/etc/datadog-agent/datadog.yaml`. `/opt/datadog-agent/etc/datadog.yaml` is the macOS location, current Agents use a YAML file named `datadog.yaml` rather than a `.conf` file, and `/var/lib/datadog-agent/` is not a configuration path.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#main-configuration-file",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-042",
+      "topic": "Agent Config Files",
+      "question": "On Windows, where is the Agent's main configuration file?",
+      "choices": [
+        "`%ProgramData%\\Datadog\\datadog.yaml`",
+        "`%ProgramFiles%\\Datadog\\Datadog Agent\\datadog.yaml`",
+        "`%ProgramData%\\Datadog\\conf.d\\datadog.yaml`",
+        "`%AppData%\\Datadog\\datadog.yaml`"
+      ],
+      "answer": 0,
+      "explanation": "The Windows Agent reads `%ProgramData%\\Datadog\\datadog.yaml` (usually `C:\\ProgramData\\Datadog\\datadog.yaml`, inside a hidden folder). `%ProgramFiles%\\Datadog\\Datadog Agent\\` contains the binaries, `conf.d` holds integration configuration rather than the main file, and the Agent does not use a per-user `%AppData%` path.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#main-configuration-file",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-043",
+      "topic": "Agent Config Files",
+      "question": "To enable the Redis check on a Linux host, what do you do with `/etc/datadog-agent/conf.d/redisdb.d/conf.yaml.example`?",
+      "choices": [
+        "Rename it to `conf.yaml`, edit it, then restart the Agent",
+        "Edit it in place, since the Agent loads `.example` files as well",
+        "Move it to `/etc/datadog-agent/checks.d/` as `redisdb.yaml`",
+        "Copy its contents into `datadog.yaml` under a `redisdb:` key"
+      ],
+      "answer": 0,
+      "explanation": "Each check directory ships a `conf.yaml.example`; renaming (or copying) it to `conf.yaml` and filling in your settings enables the check, followed by an Agent restart. The Agent does not load `.example` files, `checks.d` holds custom Python check code, and integration settings belong in the check's `conf.d/<CHECK_NAME>.d/` folder rather than in `datadog.yaml`.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#check-configuration-files",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-044",
+      "topic": "Agent Config Files",
+      "question": "What is the role of a file such as `conf.d/cpu.d/conf.yaml.default`?",
+      "choices": [
+        "It enables a core check out of the box unless another config exists",
+        "It holds defaults merged into every `conf.yaml` written for that check",
+        "It is a template that must be renamed to `conf.yaml` before the check runs",
+        "It stores the Autodiscovery template used for containerized services"
+      ],
+      "answer": 0,
+      "explanation": "Files with the `.default` suffix are loaded automatically and define the core set of always-on checks (CPU, memory, uptime and so on); they are ignored if any other configuration is found for that check. To disable a default check, remove the file; to customize it, start from `conf.yaml.example`. Autodiscovery templates live in `auto_conf.yaml`.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#check-configuration-files",
+      "difficulty": 3
+    },
+    {
+      "id": "ts-q-045",
+      "topic": "Agent Config Files",
+      "question": "In `/etc/datadog-agent/conf.d/redisdb.d/`, which file holds the Autodiscovery template for the Redis check?",
+      "choices": [
+        "`auto_conf.yaml`",
+        "`conf.yaml.default`",
+        "`conf.yaml.example`",
+        "`metrics.yaml`"
+      ],
+      "answer": 0,
+      "explanation": "Autodiscovery template files are stored in the check's configuration folder as `auto_conf.yaml`, which lets the Agent configure the check automatically for matching containers. `conf.yaml.default` enables core checks out of the box, `conf.yaml.example` is a sample to copy, and `metrics.yaml` lists the default beans collected by JMX-based checks.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#check-configuration-files",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-046",
+      "topic": "Agent Config Files",
+      "question": "You split the `http_check` configuration into `backend.yaml` and `frontend.yaml` inside `/etc/datadog-agent/conf.d/http_check.d/`. How does the Agent treat them?",
+      "choices": [
+        "It loads both valid YAML files as configuration for the check",
+        "It reads only a file named `conf.yaml` and ignores the others",
+        "It loads the first file alphabetically and skips the other one",
+        "It refuses to start the check until the files are merged"
+      ],
+      "answer": 0,
+      "explanation": "The Agent loads all valid YAML files in `conf.d/<CHECK_NAME>.d/`, so complex configurations can be broken into several files; the docs use this exact `http_check` example. The file does not have to be named `conf.yaml`. The first-alphabetical rule applies only when several files point to the same log source for log collection.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#check-configuration-files",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-047",
+      "topic": "Agent Config Files",
+      "question": "Two YAML files in an integration's `conf.d` folder both configure log collection for the same log file. What does the Agent do?",
+      "choices": [
+        "Uses the first file alphabetically to prevent duplicate logs",
+        "Tails the file twice and lets Datadog deduplicate the log events",
+        "Merges both configurations and applies the union of their tags",
+        "Uses whichever of the two files was modified most recently"
+      ],
+      "answer": 0,
+      "explanation": "To prevent duplicate logs, the Agent does not accept multiple YAML files that point to the same log source; it considers the files in alphabetical order and uses the first one. It does not send duplicates for backend deduplication, merge the configurations, or pick the most recently modified file.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#check-configuration-files",
+      "difficulty": 3
+    },
+    {
+      "id": "ts-q-048",
+      "topic": "Agent Config Files",
+      "question": "While troubleshooting, you want to stop a check from running without deleting its configuration. What does the documentation suggest?",
+      "choices": [
+        "Rename `conf.yaml` so it no longer ends in `.yaml` or `.yml`",
+        "Add a `# disabled` comment as the first line of `conf.yaml`",
+        "Set `log_level: OFF` at the top of the check's `conf.yaml`",
+        "Set `min_collection_interval: 0` under the check's instances"
+      ],
+      "answer": 0,
+      "explanation": "The docs suggest renaming `conf.d/<CHECK_NAME>.d/conf.yaml` to something without a `.yaml` or `.yml` extension, such as `conf.yaml.disable`, which keeps the file but stops the Agent from loading it. A comment has no effect, `log_level` is an Agent-wide setting in `datadog.yaml` rather than a check option, and `min_collection_interval` changes how often a check runs rather than disabling it.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/agent_check_status/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-049",
+      "topic": "Agent Config Files",
+      "question": "A containerized Agent has `DD_SITE` set as an environment variable and a mounted `datadog.yaml` that sets a different `site`. Which value does the Agent use?",
+      "choices": [
+        "The environment variable, which takes precedence",
+        "The `datadog.yaml` value, which overrides env vars",
+        "Whichever of the two values was set most recently",
+        "Neither; the Agent exits because the values conflict"
+      ],
+      "answer": 0,
+      "explanation": "When a property is defined both in `datadog.yaml` and as an environment variable, the environment variable takes precedence. The file does not override it, the Agent does not compare modification times, and the conflict does not prevent the Agent from starting.",
+      "reference": "https://docs.datadoghq.com/agent/guide/environment-variables/#property-definition-priority",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-050",
+      "topic": "Agent Config Files",
+      "question": "How is a `datadog.yaml` option such as `hostname` expressed as an environment variable?",
+      "choices": [
+        "`DD_HOSTNAME`",
+        "`DD_HOST_NAME`",
+        "`DATADOG_HOSTNAME`",
+        "`DD.HOSTNAME`"
+      ],
+      "answer": 0,
+      "explanation": "Environment variable names are the option name in uppercase with the `DD_` prefix, so `hostname` becomes `DD_HOSTNAME`. The variable must match the option name exactly, so `DD_HOST_NAME` refers to a different (nonexistent) key, and a `DATADOG_` prefix or dotted names do not follow the documented convention.",
+      "reference": "https://docs.datadoghq.com/agent/guide/environment-variables/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-051",
+      "topic": "Agent Config Files",
+      "question": "Which environment variable sets the nested `datadog.yaml` option `cmd_port: 5005` placed under `cluster_agent:`?",
+      "choices": [
+        "`DD_CLUSTER_AGENT_CMD_PORT=5005`",
+        "`DD_CLUSTER_AGENT.CMD_PORT=5005`",
+        "`DD_CMD_PORT=5005`",
+        "`DD_CLUSTER-AGENT_CMD-PORT=5005`"
+      ],
+      "answer": 0,
+      "explanation": "Nested options with predefined keys are flattened by joining the keys with underscores after the `DD_` prefix, so `cluster_agent.cmd_port` becomes `DD_CLUSTER_AGENT_CMD_PORT`. Dots and hyphens are not used in these names, and `DD_CMD_PORT` sets the main Agent's own top-level `cmd_port` instead.",
+      "reference": "https://docs.datadoghq.com/agent/guide/environment-variables/",
+      "difficulty": 3
+    },
+    {
+      "id": "ts-q-052",
+      "topic": "Agent Config Files",
+      "question": "An Agent on a new host is running, but no data shows up in your organization, which is on the EU site. Which `datadog.yaml` change fixes this?",
+      "choices": [
+        "`site: datadoghq.eu`",
+        "`region: eu1`",
+        "`dd_site: eu`",
+        "`endpoint: app.datadoghq.eu`"
+      ],
+      "answer": 0,
+      "explanation": "By default the Agent sends data to the US1 site (`datadoghq.com`); if your organization is on another site you must set the `site` parameter (or `DD_SITE`), for example `site: datadoghq.eu`, and restart the Agent. `region`, `dd_site` and `endpoint` are not the documented keys for choosing a Datadog site.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/site/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-053",
+      "topic": "Agent Config Files",
+      "question": "An integration does not appear under Running Checks in the `status` output after you edited its `conf.yaml`, which may have an indentation mistake. What is the documented approach?",
+      "choices": [
+        "Validate the file with a YAML parser, fix it, restart, and rerun `status`",
+        "Wait for the next check cycle, when the Agent re-reads `conf.d` automatically",
+        "Run `datadog-agent config set` to force the Agent to reload the check file",
+        "Rename the file to `conf.yaml.default` so the Agent falls back to defaults"
+      ],
+      "answer": 0,
+      "explanation": "The integration troubleshooting guide says to confirm the file is in the right location with the right name, check it with a YAML parser, and restart the Agent and rerun `status` each time you change the file. The Agent does not reload `conf.d` on each check cycle, `config set` only changes runtime Agent settings, and `.default` files are reserved for core checks.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/integrations/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-054",
+      "topic": "Agent Config Files",
+      "question": "Which pair of files correctly sets up a custom Agent check named `my_check`?",
+      "choices": [
+        "`checks.d/my_check.py` with `conf.d/my_check.yaml`",
+        "`conf.d/my_check.py` with `checks.d/my_check.yaml`",
+        "`checks.d/my_check.py` with `conf.d/custom.yaml`",
+        "`checks.d/check.py` with `conf.d/my_check.d/conf.yaml`"
+      ],
+      "answer": 0,
+      "explanation": "Custom check code goes in the `checks.d` directory and its configuration in `conf.d`, and the names must match: `my_check.py` needs `my_check.yaml`. Swapping the directories or giving the two files different names prevents the Agent from pairing the configuration with the check code.",
+      "reference": "https://docs.datadoghq.com/extend/custom_checks/write_agent_check/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-055",
+      "topic": "Agent Config Files",
+      "question": "You suspect the Agent is reading a different `datadog.yaml` than the one you edited. Which output shows the configuration file path the running Agent uses?",
+      "choices": [
+        "The Paths section of `datadog-agent status`",
+        "The first provider in `datadog-agent configcheck`",
+        "The output of `datadog-agent hostname`",
+        "The build details in `datadog-agent version`"
+      ],
+      "answer": 0,
+      "explanation": "The status page's Paths section lists the Config File in use along with the `conf.d` and `checks.d` directories. `configcheck` lists the check configurations the Agent resolved, `hostname` prints only the reported hostname, and `version` prints build information.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-status-page/#paths",
+      "difficulty": 2
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "ts-fc-001",
+      "topic": "Agent Commands",
+      "front": "Agent subcommand syntax",
+      "back": "`<AGENT_BINARY> <SUB_COMMAND> <OPTIONS>`\nList subcommands: `<AGENT_BINARY> --help`\nHelp for one: e.g. `<AGENT_BINARY> check --help`",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#other-commands"
+    },
+    {
+      "id": "ts-fc-002",
+      "topic": "Agent Commands",
+      "front": "Agent binary name per platform",
+      "back": "Linux host: `datadog-agent` (use `sudo`; run checks as `sudo -u dd-agent --`)\nmacOS host: `datadog-agent` (e.g. `sudo datadog-agent status`)\nDocker / Kubernetes container: `agent`\nWindows: `%ProgramFiles%\\Datadog\\Datadog Agent\\bin\\agent.exe` from an elevated prompt",
+      "reference": "https://docs.datadoghq.com/agent/supported_platforms/windows/#agent-commands"
+    },
+    {
+      "id": "ts-fc-003",
+      "topic": "Agent Commands",
+      "front": "`status` subcommand: what does it show?",
+      "back": "The Agent status page: version, log level, paths (Config File, conf.d, checks.d), hostnames, Collector running checks plus config/loading errors, forwarder transactions, endpoints and API key status, Logs Agent, aggregator and DogStatsD stats.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-status-page/"
+    },
+    {
+      "id": "ts-fc-004",
+      "topic": "Agent Commands",
+      "front": "`configcheck`",
+      "back": "Prints all configurations loaded and resolved by a running Agent. Add `-v` to also see unresolved Autodiscovery templates and resolve warnings.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/autodiscovery/"
+    },
+    {
+      "id": "ts-fc-005",
+      "topic": "Agent Commands",
+      "front": "`config` subcommand (runtime configuration)",
+      "back": "Agent 6.19+/7.19+: `config` prints the runtime config; `config list-runtime` lists editable settings; `config get <SETTING>` reads one; `config set <SETTING> <VALUE>` changes it (e.g. `log_level debug`). Changes are lost on restart.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/config/"
+    },
+    {
+      "id": "ts-fc-006",
+      "topic": "Agent Commands",
+      "front": "`check <CHECK_NAME>`",
+      "back": "Runs the specified check and prints its metrics, events and service checks.\nLinux: `sudo -u dd-agent -- datadog-agent check <CHECK_NAME>`\n`--check-rate` runs it twice (1 s apart) to include rates; `--check-times N` sets the number of runs.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/agent_check_status/"
+    },
+    {
+      "id": "ts-fc-007",
+      "topic": "Agent Commands",
+      "front": "`diagnose`",
+      "back": "Executes connectivity diagnosis on your system. Recent versions run diagnose suites that validate the Agent installation, configuration and environment (`--list` shows the suites, `--verbose` includes passed checks).",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#other-commands"
+    },
+    {
+      "id": "ts-fc-008",
+      "topic": "Agent Commands",
+      "front": "`flare [<CASE_ID>]`",
+      "back": "Collects the Agent's config files and logs into an archive (sensitive values removed), asks for confirmation, then uploads it to Datadog Support. With a case ID it attaches to that case; without one, your email creates a new case.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/"
+    },
+    {
+      "id": "ts-fc-009",
+      "topic": "Agent Commands",
+      "front": "`health`, `hostname`, `version`",
+      "back": "`health`: prints the current Agent health.\n`hostname`: prints the hostname used by the Agent.\n`version`: prints version info.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#other-commands"
+    },
+    {
+      "id": "ts-fc-010",
+      "topic": "Agent Commands",
+      "front": "`stream-logs`",
+      "back": "Streams the logs being processed by a running Agent's log collection (filterable by name, type, source, service). It does not show the Agent's own `agent.log`.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#other-commands"
+    },
+    {
+      "id": "ts-fc-011",
+      "topic": "Agent Commands",
+      "front": "Managing integrations from the CLI: subcommands and package names",
+      "back": "`install <PKG>==<VERSION>`, `remove <PKG>`, `show <PKG>`, `freeze`.\nPackage names are prefixed with `datadog-` (e.g. `datadog-vsphere`). Run as `dd-agent` on Linux or as administrator on Windows; restart the Agent after installing.",
+      "reference": "https://docs.datadoghq.com/agent/guide/integration-management/"
+    },
+    {
+      "id": "ts-fc-012",
+      "topic": "Agent Commands",
+      "front": "Windows-only Agent subcommands",
+      "back": "`start-service`, `stopservice`, `restart-service`: start, stop or restart the Agent within the Windows Service Control Manager.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#other-commands"
+    },
+    {
+      "id": "ts-fc-013",
+      "topic": "Agent Commands",
+      "front": "Linux service commands (systemd)",
+      "back": "`sudo systemctl start|stop|restart|status datadog-agent`\nUpstart systems (CentOS/RHEL 6, SUSE 11): drop `systemctl`, e.g. `sudo start datadog-agent`.\nStatus page: `sudo datadog-agent status`",
+      "reference": "https://docs.datadoghq.com/agent/supported_platforms/linux/#commands"
+    },
+    {
+      "id": "ts-fc-014",
+      "topic": "Agent Commands",
+      "front": "macOS service commands (launchctl)",
+      "back": "Start: `sudo launchctl kickstart system/com.datadoghq.agent`\nStop: `sudo launchctl kill SIGTERM system/com.datadoghq.agent`\nRestart: `sudo launchctl kickstart -k system/com.datadoghq.agent`\nStatus: `sudo launchctl print system/com.datadoghq.agent`",
+      "reference": "https://docs.datadoghq.com/agent/supported_platforms/osx/#commands"
+    },
+    {
+      "id": "ts-fc-015",
+      "topic": "Agent Commands",
+      "front": "`jmx list` troubleshooting commands",
+      "back": "`jmx list matching`, `limited`, `collected`, `not-matching`, `everything`, e.g.\n`sudo -u dd-agent datadog-agent jmx list collected --checks tomcat`",
+      "reference": "https://docs.datadoghq.com/integrations/faq/troubleshooting-jmx-integrations/"
+    },
+    {
+      "id": "ts-fc-016",
+      "topic": "Agent Commands",
+      "front": "`launch-gui`",
+      "back": "Starts the Datadog Agent GUI (Agent Manager) in a browser. The GUI port defaults to 5002 on Windows and macOS and is disabled on Linux (`GUI_port: -1`).",
+      "reference": "https://github.com/DataDog/datadog-agent/blob/main/pkg/config/example/datadog-agent_linux.yaml.example"
+    },
+    {
+      "id": "ts-fc-017",
+      "topic": "Agent Logs",
+      "front": "Agent log directory per OS",
+      "back": "Linux: `/var/log/datadog/`\nmacOS (Agent 7.28+/6.28+): `/opt/datadog-agent/logs`\nmacOS (older): `/var/log/datadog`\nWindows: `C:\\ProgramData\\Datadog\\logs`",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-log-files/"
+    },
+    {
+      "id": "ts-fc-018",
+      "topic": "Agent Logs",
+      "front": "Agent log files by component",
+      "back": "`agent.log`, `process-agent.log`, `trace-agent.log`, `system-probe.log`, `jmxfetch.log` (Agent 7.24+/6.24+), `dogstatsd.log` (Agent 7.46+)",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-log-files/"
+    },
+    {
+      "id": "ts-fc-019",
+      "topic": "Agent Logs",
+      "front": "`log_level` values and how they nest",
+      "back": "`OFF`, `CRITICAL`, `ERROR`, `WARN`, `INFO` (default), `DEBUG`, `TRACE`. Each level includes all more severe ones, e.g. `WARN` = critical + error + warn. `'OFF'` must be quoted in the YAML file.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/debug_mode/#agent-log-level"
+    },
+    {
+      "id": "ts-fc-020",
+      "topic": "Agent Logs",
+      "front": "Enable Agent debug mode on a host",
+      "back": "1. Edit `datadog.yaml`\n2. Replace `# log_level: INFO` with `log_level: DEBUG`\n3. Restart the Agent\n4. Wait a few minutes for logs\nSwitch back to `INFO` when done.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/debug_mode/"
+    },
+    {
+      "id": "ts-fc-021",
+      "topic": "Agent Logs",
+      "front": "Enable debug logging for a containerized Agent",
+      "back": "Start it with `DD_LOG_LEVEL=debug`, or at runtime (7.19+): `agent config set log_level debug`. A dedicated trace-agent container needs `DD_LOG_LEVEL=debug` and a redeploy. Helm: `logLevel: DEBUG`.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/debug_mode/#containerized-agent"
+    },
+    {
+      "id": "ts-fc-022",
+      "topic": "Agent Logs",
+      "front": "Agent log rotation defaults",
+      "back": "Rolls over every 10 MB and keeps one backup (`agent.log.1`, overwritten on the next rollover). Tune with `log_file_max_size` (default 10485760 bytes) and `log_file_max_rolls` (default 1).",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-log-files/"
+    },
+    {
+      "id": "ts-fc-023",
+      "topic": "Agent Logs",
+      "front": "Agent logs vs log collection",
+      "back": "`log_level` and `log_file` control the Agent's own logs. Collecting application logs is separate: set `logs_enabled: true` (default `false`) in `datadog.yaml` and add a log configuration for each source.",
+      "reference": "https://docs.datadoghq.com/agent/logs/"
+    },
+    {
+      "id": "ts-fc-024",
+      "topic": "Agent Logs",
+      "front": "Agent installation log locations",
+      "back": "Linux: `$(pwd)/ddagent-install.log`\nmacOS: `/tmp/dd_agent.log`\nWindows: `%TEMP%\\MSI*.LOG`",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-log-files/"
+    },
+    {
+      "id": "ts-fc-025",
+      "topic": "Agent Logs",
+      "front": "View Agent service logs on systemd",
+      "back": "`sudo journalctl -u datadog-agent.service` (add `-r` for reverse order). Check the service with `sudo systemctl status datadog-agent`.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/agent_check_status/#systemd"
+    },
+    {
+      "id": "ts-fc-026",
+      "topic": "Agent Logs",
+      "front": "What goes into a flare, and where is it written first?",
+      "back": "All Agent configuration files and logs (plus tracer debug logs if APM is enabled), with passwords, API keys, proxy credentials and SNMP community strings removed. The archive is written to local `/tmp` first, so it can be sent manually if the upload fails.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/#manual-submission"
+    },
+    {
+      "id": "ts-fc-027",
+      "topic": "Agent Config Files",
+      "front": "`datadog.yaml` location per OS",
+      "back": "Linux / AIX: `/etc/datadog-agent/datadog.yaml`\nmacOS: `/opt/datadog-agent/etc/datadog.yaml`\nWindows: `%ProgramData%\\Datadog\\datadog.yaml` (hidden `C:\\ProgramData` folder)",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#main-configuration-file"
+    },
+    {
+      "id": "ts-fc-028",
+      "topic": "Agent Config Files",
+      "front": "`conf.d` directory per OS",
+      "back": "Linux: `/etc/datadog-agent/conf.d/`\nmacOS: `/opt/datadog-agent/etc/conf.d/`\nWindows: `%ProgramData%\\Datadog\\conf.d`\nZero-length files in it are ignored.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#agent-configuration-directory"
+    },
+    {
+      "id": "ts-fc-029",
+      "topic": "Agent Config Files",
+      "front": "Files in a `conf.d/<INTEGRATION>.d/` folder",
+      "back": "`conf.yaml`: active config\n`conf.yaml.example`: sample, rename to `conf.yaml` to enable\n`conf.yaml.default`: core check enabled by default, ignored if another config exists\n`auto_conf.yaml`: Autodiscovery template\n`metrics.yaml`: default beans for JMX checks",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#check-configuration-files"
+    },
+    {
+      "id": "ts-fc-030",
+      "topic": "Agent Config Files",
+      "front": "`datadog.yaml.example` / config template",
+      "back": "A fully commented reference listing every option and its default, installed next to `datadog.yaml` (e.g. `/etc/datadog-agent/datadog.yaml.example`). The source is under `pkg/config/example/` in the datadog-agent repo; the old `config_template.yaml` now points there.",
+      "reference": "https://github.com/DataDog/datadog-agent/tree/main/pkg/config/example"
+    },
+    {
+      "id": "ts-fc-031",
+      "topic": "Agent Config Files",
+      "front": "How do `datadog.yaml` changes take effect?",
+      "back": "Only after the Agent is restarted; the file is not reloaded live. A few settings (such as `log_level`) can be changed at runtime with `datadog-agent config set`, but those changes are not saved.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/"
+    },
+    {
+      "id": "ts-fc-032",
+      "topic": "Agent Config Files",
+      "front": "Agent environment variable rules",
+      "back": "Uppercase with `DD_` prefix (`hostname` -> `DD_HOSTNAME`); nested predefined keys joined with `_`; lists space-separated. Env vars take precedence over `datadog.yaml`. On systemd hosts (7.45+), put them in `/etc/datadog-agent/environment`.",
+      "reference": "https://docs.datadoghq.com/agent/guide/environment-variables/"
+    },
+    {
+      "id": "ts-fc-033",
+      "topic": "Agent Config Files",
+      "front": "Key `datadog.yaml` settings",
+      "back": "`api_key` (required), `site` (default `datadoghq.com`), `hostname` (overrides auto-detection), `tags` (host tags), `env`, `log_level` (default `info`), `logs_enabled` (default `false`), `proxy`",
+      "reference": "https://github.com/DataDog/datadog-agent/blob/main/pkg/config/example/datadog-agent_linux.yaml.example"
+    },
+    {
+      "id": "ts-fc-034",
+      "topic": "Agent Config Files",
+      "front": "Host tags in `datadog.yaml`",
+      "back": "Set a YAML list under `tags:` (e.g. `- team:infra`), or use `DD_TAGS` with space-separated values. The tags are attached to every metric, event, log, trace and service check the Agent emits.",
+      "reference": "https://github.com/DataDog/datadog-agent/blob/main/pkg/config/example/datadog-agent_linux.yaml.example"
+    },
+    {
+      "id": "ts-fc-035",
+      "topic": "Agent Config Files",
+      "front": "`checks.d` directory",
+      "back": "Holds custom Python check code (default `/etc/datadog-agent/checks.d`). The matching config goes in `conf.d` with the same name: `checks.d/my_check.py` + `conf.d/my_check.yaml`.",
+      "reference": "https://docs.datadoghq.com/extend/custom_checks/write_agent_check/"
+    },
+    {
+      "id": "ts-fc-036",
+      "topic": "Agent Config Files",
+      "front": "Integration missing from Running Checks: checklist",
+      "back": "Confirm the config file location and name, validate the YAML with a parser, restart the Agent, rerun `status`, then check the Agent logs for errors.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/integrations/"
+    },
+    {
+      "id": "ts-fc-037",
+      "topic": "Agent Config Files",
+      "front": "Multiple YAML files for one check",
+      "back": "All valid YAML files in `conf.d/<CHECK_NAME>.d/` are loaded, so configs can be split. Exception: if several files point to the same log source, only the first file alphabetically is used.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#check-configuration-files"
+    },
+    {
+      "id": "ts-fc-038",
+      "topic": "Agent Config Files",
+      "front": "Disable a check temporarily / disable a default check",
+      "back": "Rename `conf.yaml` so it no longer has a `.yaml`/`.yml` extension (e.g. `conf.yaml.disable`). To disable a core default check, remove its `conf.yaml.default` file.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/agent_check_status/"
+    },
+    {
+      "id": "ts-fc-039",
+      "topic": "Agent Config Files",
+      "front": "What `integration install` does to config files",
+      "back": "Copies the integration's `conf.yaml.example`, `conf.yaml.default` and `auto_conf.yaml` into `conf.d`, overwriting existing ones. `integration remove` leaves the `conf.d` folder in place.",
+      "reference": "https://docs.datadoghq.com/agent/guide/integration-management/"
+    }
+  ]
+}

@@ -1,0 +1,1068 @@
+{
+  "questions": [
+    {
+      "id": "ess-q-001",
+      "topic": "Config File Modification",
+      "question": "You are editing an integration's conf.yaml. Which characters may you use to indent nested keys in YAML?",
+      "choices": [
+        "Spaces only, never tab characters",
+        "Tabs only, never space characters",
+        "Tabs or spaces, if a file uses only one kind",
+        "Any whitespace; YAML ignores indentation"
+      ],
+      "answer": 0,
+      "explanation": "The YAML specification states that tab characters must not be used in indentation because different systems treat tabs differently, so nesting is expressed with spaces. Using tabs consistently throughout a file does not make them legal, and indentation is significant in YAML because it decides which keys belong to which parent.",
+      "reference": "https://yaml.org/spec/1.2.2/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-002",
+      "topic": "Config File Modification",
+      "question": "Both of these datadog.yaml fragments set host tags:\n\ntags: [\"env:prod\", \"team:web\"]\n\ntags:\n  - \"env:prod\"\n  - \"team:web\"\n\nHow does the Agent interpret them?",
+      "choices": [
+        "Only the dashed form is a valid YAML list",
+        "The bracketed form is one tag with a comma",
+        "Both define the same list containing two tags",
+        "The dashed form creates a map with two keys"
+      ],
+      "answer": 2,
+      "explanation": "YAML sequences can be written in flow style (square brackets, comma-separated) or block style (one '- ' entry per line), and Datadog's tagging docs call the two forms functionally equivalent. The bracketed form is a real list rather than a single string, and dashes mark list entries, not mapping keys.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/assigning_tags/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-003",
+      "topic": "Config File Modification",
+      "question": "A fresh datadog.yaml contains:\n\n## @param logs_enabled - boolean - optional - default: false\n## @env DD_LOGS_ENABLED - boolean - optional - default: false\n#\n# logs_enabled: false\n\nWhich edit turns on log collection?",
+      "choices": [
+        "Change default: false to default: true in the ## @param line",
+        "Delete the two ## lines so the Agent falls back to true",
+        "Add logs_enabled: true indented two spaces under the # line",
+        "Replace the last line with logs_enabled: true at column 0"
+      ],
+      "answer": 3,
+      "explanation": "Lines beginning with # are YAML comments, so the ## @param and ## @env lines are documentation only and editing or deleting them changes nothing. You enable the feature by uncommenting the setting and setting it to true as an unindented top-level key; the documented default is false. Indenting the key would misalign it with the other top-level keys.",
+      "reference": "https://docs.datadoghq.com/getting_started/agent/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-004",
+      "topic": "Config File Modification",
+      "question": "The datadog.yaml example contains these lines (documentation comments omitted):\n\n# process_config:\n#   process_collection:\n#     enabled: false\n\nAn engineer edits only the last line so it now reads:\n\n    enabled: true\n\nWhat is the result?",
+      "choices": [
+        "Process collection is enabled because comments imply the parents",
+        "The parent keys are still comments, so the setting is not nested",
+        "The Agent enables every feature whose enabled key is true",
+        "Container collection is enabled instead of process collection"
+      ],
+      "answer": 1,
+      "explanation": "Commented lines do not exist as far as the YAML parser is concerned, so enabled: true is not inside process_config and process_collection; it becomes a stray key or causes a parse error. The example file says to uncomment the parameter and the one below it; uncommenting every level while keeping the indentation puts the value at process_config.process_collection.enabled.",
+      "reference": "https://github.com/DataDog/datadog-agent/blob/main/pkg/config/example/datadog-agent_linux.yaml.example",
+      "difficulty": 3
+    },
+    {
+      "id": "ess-q-005",
+      "topic": "Config File Modification",
+      "question": "A tool accepts only standard JSON. Which element would make the file invalid?",
+      "choices": [
+        "A comment line beginning with //",
+        "An array of objects nested in an object",
+        "The value null used for an empty field",
+        "A number written without quotes"
+      ],
+      "answer": 0,
+      "explanation": "The JSON grammar defines objects, arrays, strings, numbers, true, false and null and has no comment syntax, so // or # comment lines make a document invalid. Nesting arrays and objects is allowed, null is a valid value, and numbers are written without quotes.",
+      "reference": "https://www.json.org/json-en.html",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-006",
+      "topic": "Config File Modification",
+      "question": "An API payload contains:\n\n{\"enabled\": \"true\", \"port\": 8126}\n\nWhich JSON types do the two values have?",
+      "choices": [
+        "enabled is a boolean and port is a number",
+        "Both values are strings",
+        "enabled is a boolean and port is a string",
+        "enabled is a string and port is a number"
+      ],
+      "answer": 3,
+      "explanation": "In JSON, anything wrapped in double quotes is a string, so \"true\" is a four-character string rather than the boolean, which would be written true without quotes. 8126 has no quotes, so it is a number. A tool that expects a boolean may reject or misread the quoted value.",
+      "reference": "https://www.json.org/json-en.html",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-007",
+      "topic": "Config File Modification",
+      "question": "Which of these is a valid JSON document?",
+      "choices": [
+        "{\"env\": \"prod\", \"port\": 8080,}",
+        "{'env': 'prod', 'port': 8080}",
+        "{\"env\": \"prod\", \"port\": 8080}",
+        "{env: \"prod\", port: 8080}"
+      ],
+      "answer": 2,
+      "explanation": "JSON names and string values must be wrapped in double quotes, and the grammar has no trailing comma after the last name/value pair. Single-quoted strings and unquoted keys are accepted by JavaScript and some lenient parsers, but they are not valid JSON.",
+      "reference": "https://www.json.org/json-en.html",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-008",
+      "topic": "Config File Modification",
+      "question": "Datadog's custom check guide uses this conf.d/custom_checkvalue.yaml:\n\ninit_config:\ninstances:\n  [{}]\n\nWhat does instances contain?",
+      "choices": [
+        "No instances, so the check never runs",
+        "One instance with no instance-level settings",
+        "An empty string, which the Agent ignores",
+        "A syntax error, because [ ] is not valid YAML"
+      ],
+      "answer": 1,
+      "explanation": "[{}] is YAML flow syntax for a list (square brackets) holding one empty mapping (curly braces), so the Agent schedules exactly one instance of the check with no instance-level options. Flow collections are valid YAML, and an empty list would be written [] instead. init_config: with nothing after it is simply an empty (null) value.",
+      "reference": "https://docs.datadoghq.com/extend/custom_checks/write_agent_check/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-009",
+      "topic": "Config File Modification",
+      "question": "An engineer adds this line to datadog.yaml:\n\nsite:datadoghq.eu\n\nWhy does it not set the Agent's site?",
+      "choices": [
+        "A mapping needs a space after the colon",
+        "The value must be wrapped in double quotes",
+        "Keys must be written in uppercase",
+        "The line must start with a dash"
+      ],
+      "answer": 0,
+      "explanation": "YAML separates a key from its value with a colon followed by whitespace (key: value). Without the space, site:datadoghq.eu is read as one plain string instead of the key site, so the setting is not applied, and in a full file it can break parsing. Quoting the value is optional, datadog.yaml keys are lowercase, and a dash would turn the line into a list entry.",
+      "reference": "https://yaml.org/spec/1.2.2/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-010",
+      "topic": "Config File Modification",
+      "question": "In YAML, which block scalar indicator keeps every line break of a multi-line string exactly as written?",
+      "choices": [
+        "> (folded)",
+        "| (literal)",
+        "- (sequence entry)",
+        "& (anchor)"
+      ],
+      "answer": 1,
+      "explanation": "The literal style, introduced with |, preserves line breaks exactly. The folded style (>) turns single line breaks into spaces, while - starts a sequence entry and & defines an anchor; neither of those creates a multi-line string.",
+      "reference": "https://yaml.org/spec/1.2.2/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-011",
+      "topic": "Config File Modification",
+      "question": "A custom check reads a version string from its instance:\n\ninstances:\n  - app_version: 1.10\n\nThe check receives 1.1 instead of 1.10. What fixes it?",
+      "choices": [
+        "Indent app_version with a tab",
+        "Add a trailing zero: app_version: 1.100",
+        "Quote the value: app_version: \"1.10\"",
+        "Move app_version under init_config"
+      ],
+      "answer": 2,
+      "explanation": "An unquoted 1.10 matches YAML's number format, so it is loaded as the float 1.1 and the trailing zero is lost; quoting it forces a string. Tabs are not allowed for indentation, adding digits still produces a number, and moving the key to init_config does not change how the value is typed.",
+      "reference": "https://yaml.org/spec/1.2.2/",
+      "difficulty": 3
+    },
+    {
+      "id": "ess-q-012",
+      "topic": "Config File Modification",
+      "question": "Someone pastes this single line into an integration's conf.yaml:\n\n{\"init_config\": {}, \"instances\": [{\"host\": \"localhost\", \"port\": 6379}]}\n\nWhat will a YAML 1.2 parser do with it?",
+      "choices": [
+        "Reject it, since YAML does not allow curly braces",
+        "Treat the entire line as one long string value",
+        "Parse it as a mapping, since JSON is valid YAML 1.2",
+        "Reject it, since YAML keys must never be quoted"
+      ],
+      "answer": 2,
+      "explanation": "YAML 1.2 was designed as a superset of JSON, so a JSON object is valid YAML flow syntax and yields the same init_config and instances structure. YAML itself uses {} for flow mappings and [] for flow sequences, and quoted keys are allowed. Block style is still preferred because it is easier to read and comment.",
+      "reference": "https://yaml.org/spec/1.2.2/",
+      "difficulty": 3
+    },
+    {
+      "id": "ess-q-013",
+      "topic": "Config File Modification",
+      "question": "This logs section of a conf.yaml fails to load:\n\nlogs:\n  - type: file\n    path: /var/log/app.log\n     service: app\n    source: python\n\nWhat is the error?",
+      "choices": [
+        "service is not aligned with its sibling keys",
+        "Values with slashes, like the path, must be quoted",
+        "Every key in the entry needs its own dash",
+        "The key must be log, not logs, in conf.yaml"
+      ],
+      "answer": 0,
+      "explanation": "Keys in the same mapping must start in the same column. Because service is one space deeper than path, the parser treats it as a continuation of the path value and fails with a mapping error. Unquoted paths with slashes are fine, a dash starts a new list entry rather than marking each key, and logs is the documented key name.",
+      "reference": "https://yaml.org/spec/1.2.2/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-014",
+      "topic": "Config File Modification",
+      "question": "In an integration's conf.yaml.example, why do most parameters appear with a leading #?",
+      "choices": [
+        "The # marks parameters that are deprecated",
+        "Optional parameters are commented out by default",
+        "The # marks values the Agent fills in at startup",
+        "Required parameters are commented out by default"
+      ],
+      "answer": 1,
+      "explanation": "Datadog's configuration file conventions state that all optional parameters are commented by default, while required parameters are not commented. You enable an option by removing the # and setting a value. The Agent does not fill in commented values, and # has no special deprecation meaning.",
+      "reference": "https://docs.datadoghq.com/extend/integrations/check_references/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-015",
+      "topic": "Scripting Basics",
+      "question": "Every Datadog Agent check class must implement one entry-point method. Which one?",
+      "choices": [
+        "run(self, config)",
+        "check(self, instance)",
+        "collect(self)",
+        "main(instance, init_config)"
+      ],
+      "answer": 1,
+      "explanation": "Agent checks subclass AgentCheck and must implement check(self, instance); the Agent calls it on each run and passes the configuration of one entry from the instances list. The other names are not the documented entry point, and a check does not receive the whole YAML file or only init_config.",
+      "reference": "https://docs.datadoghq.com/extend/integrations/agent_integration/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-016",
+      "topic": "Scripting Basics",
+      "question": "A custom check file contains:\n\nfrom datadog_checks.base import AgentCheck\n\nclass DiskCheck(AgentCheck):\n    def check(self, instance):\n    self.gauge('custom.disk.free', 42)\n\nWhat happens when the Agent loads it?",
+      "choices": [
+        "The gauge is sent once, when the class is defined",
+        "The check runs but reports custom.disk.free as 0",
+        "Python raises an IndentationError and the check fails to load",
+        "Python ignores the indentation and runs it normally"
+      ],
+      "answer": 2,
+      "explanation": "In Python, indentation defines blocks, and the body of a function must be indented deeper than its def line. Here self.gauge(...) sits at the same level as def check, so the function has no body and Python raises an IndentationError, which stops the check from loading. Python never ignores indentation, and no metric is sent.",
+      "reference": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-017",
+      "topic": "Scripting Basics",
+      "question": "A custom check's instance is configured as:\n\ninstances:\n  - url: http://localhost:8080\n\nIts check method starts with:\n\nurl = instance.get('url')\ntimeout = instance['timeout']\n\nWhat happens on the second line?",
+      "choices": [
+        "A KeyError is raised; timeout is missing",
+        "timeout is set to None, just like with get()",
+        "timeout is set to the default of 15 seconds",
+        "timeout is set to the url value instead"
+      ],
+      "answer": 0,
+      "explanation": "The instance is a Python dict. Indexing with instance['timeout'] raises KeyError when the key is missing, whereas instance.get('timeout') would return None, or a default you pass such as instance.get('timeout', 5). Nothing fills in 15 seconds; that is the default check collection interval, not a dictionary value.",
+      "reference": "https://docs.python.org/3/library/stdtypes.html#mapping-types-dict",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-018",
+      "topic": "Scripting Basics",
+      "question": "This line appears in Datadog's custom check example:\n\nself.gauge('hello.world', 1, tags=['TAG_KEY:TAG_VALUE'] + self.instance.get('tags', []))\n\nIf the instance has no tags key, which tags does the gauge get?",
+      "choices": [
+        "No tags, because get() returns None",
+        "Just the one tag, 'TAG_KEY:TAG_VALUE'",
+        "The call fails with a KeyError",
+        "'TAG_KEY:TAG_VALUE' plus an empty tag"
+      ],
+      "answer": 1,
+      "explanation": "get('tags', []) returns the default empty list when the key is missing, and adding an empty list to a list leaves it unchanged, so only TAG_KEY:TAG_VALUE is sent. get() with a default never raises KeyError, and concatenating [] adds no elements rather than an empty tag.",
+      "reference": "https://docs.datadoghq.com/extend/custom_checks/write_agent_check/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-019",
+      "topic": "Scripting Basics",
+      "question": "Inside an AgentCheck, which method reports whether a service is up by sending a status such as self.OK, self.WARNING or self.CRITICAL?",
+      "choices": [
+        "self.gauge()",
+        "self.event()",
+        "self.service_check()",
+        "self.monotonic_count()"
+      ],
+      "answer": 2,
+      "explanation": "service_check(name, status, ...) submits a service check with a status constant such as OK, WARNING or CRITICAL, as in Datadog's example integration. gauge() and monotonic_count() submit metric values, and event() submits an event rather than an up/down status.",
+      "reference": "https://docs.datadoghq.com/extend/integrations/agent_integration/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-020",
+      "topic": "Scripting Basics",
+      "question": "A Python service is normally started with python app.py. How do you add ddtrace automatic instrumentation without changing its code?",
+      "choices": [
+        "python app.py --ddtrace",
+        "DD_TRACE_ENABLED=true python app.py",
+        "pip install ddtrace, then python app.py",
+        "ddtrace-run python app.py"
+      ],
+      "answer": 3,
+      "explanation": "After installing ddtrace with pip, Datadog's docs instrument a Python app by prefixing its entry-point command with ddtrace-run. Installing the package alone patches nothing, --ddtrace is just an argument passed to the app, and DD_TRACE_ENABLED (default true) only controls whether trace data is sent once a tracer is loaded.",
+      "reference": "https://docs.datadoghq.com/tracing/trace_collection/dd_libraries/python/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-021",
+      "topic": "Scripting Basics",
+      "question": "The checkout service's code does not import ddtrace. Which command starts it so its traces carry env:staging, service:checkout and version:2.1?",
+      "choices": [
+        "DD_ENV=staging DD_SERVICE=checkout DD_VERSION=2.1 ddtrace-run python app.py",
+        "DD_ENV=staging DD_SERVICE=checkout DD_VERSION=2.1 python app.py",
+        "DD_TRACE_ENV=staging DD_TRACE_SERVICE=checkout DD_TRACE_VERSION=2.1 ddtrace-run python app.py",
+        "ddtrace-run python app.py --env staging --service checkout --version 2.1"
+      ],
+      "answer": 0,
+      "explanation": "ddtrace reads the unified service tagging variables DD_ENV, DD_SERVICE and DD_VERSION, and ddtrace-run loads the tracer for code that does not import it. Without ddtrace-run (or import ddtrace.auto) nothing is instrumented, the DD_TRACE_-prefixed names are not the documented variables, and flags after app.py go to the application, not the tracer.",
+      "reference": "https://ddtrace.readthedocs.io/en/stable/configuration.html",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-022",
+      "topic": "Scripting Basics",
+      "question": "A Django app runs under ddtrace-run. The team wants to keep all other tracing but stop the Django integration from being patched. Which setting does this?",
+      "choices": [
+        "DD_TRACE_ENABLED=false",
+        "DD_DJANGO_DISTRIBUTED_TRACING=false",
+        "DD_TRACE_DJANGO_ENABLED=false",
+        "DD_TRACE_DEBUG=false"
+      ],
+      "answer": 2,
+      "explanation": "DD_TRACE_<INTEGRATION>_ENABLED toggles whether one integration is patched, and the ddtrace docs use DD_TRACE_DJANGO_ENABLED=false as the example. DD_TRACE_ENABLED=false stops sending all trace data, DD_DJANGO_DISTRIBUTED_TRACING only controls distributed tracing for that integration, and DD_TRACE_DEBUG controls tracer debug logging.",
+      "reference": "https://ddtrace.readthedocs.io/en/stable/configuration.html",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-023",
+      "topic": "Scripting Basics",
+      "question": "A developer sets the service name in code through ddtrace's config API and exports DD_ENV=prod. Running ddtrace-run --info shows env prod but not the new service name. Why?",
+      "choices": [
+        "--info prints only the ddtrace version and install path",
+        "ddtrace ignores any service name that is set in code",
+        "--info shows env var settings, not changes made in code",
+        "DD_ENV takes precedence and hides all other settings"
+      ],
+      "answer": 2,
+      "explanation": "ddtrace-run --info prints a tracer health check and configuration, but the docs note it does not reflect configuration changes made at the code level, only environment variable configuration. The code-level service name still applies when the app runs; the Service Config view in Datadog shows the runtime configuration.",
+      "reference": "https://ddtrace.readthedocs.io/en/stable/advanced_usage.html",
+      "difficulty": 3
+    },
+    {
+      "id": "ess-q-024",
+      "topic": "Scripting Basics",
+      "question": "On a host with the default datadog.yaml, an admin runs:\n\ngrep -q \"logs_enabled: true\" /etc/datadog-agent/datadog.yaml\necho $?\n\nNo line matches. What is printed?",
+      "choices": [
+        "0, because grep itself ran without crashing",
+        "The number of matching lines, which is 0",
+        "1, the non-zero status grep uses when nothing matches",
+        "Nothing, because -q suppresses all output"
+      ],
+      "answer": 2,
+      "explanation": "$? expands to the exit status of the most recently executed command, and grep exits 0 when a line is selected and 1 when none is. -q only silences grep's own output, so echo still prints the status. Exit statuses signal success or failure; they are not match counts.",
+      "reference": "https://www.gnu.org/software/grep/manual/grep.html#Exit-Status",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-025",
+      "topic": "Scripting Basics",
+      "question": "A deploy script runs:\n\n./validate_config.sh && sudo systemctl restart datadog-agent\n\nvalidate_config.sh exits with status 1. What happens?",
+      "choices": [
+        "The restart is skipped and the list returns 1",
+        "The restart runs, then the list returns 1",
+        "The restart runs because && ignores failures",
+        "The shell retries the validation script"
+      ],
+      "answer": 0,
+      "explanation": "In an AND list (cmd1 && cmd2), cmd2 runs only if cmd1 returns an exit status of zero. Because the validation returned 1, the restart never runs and the list's status is 1. To run a command only when the first one fails you would use ||, and the shell never retries commands on its own.",
+      "reference": "https://www.gnu.org/software/bash/manual/bash.html#Lists",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-026",
+      "topic": "Scripting Basics",
+      "question": "In a fresh shell where DD_SITE was never set, an admin installs the Agent with:\n\nDD_API_KEY=abc123 DD_SITE=\"datadoghq.eu\" bash -c \"$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)\"\n\nAfterwards they run echo $DD_SITE in the same shell. What is printed?",
+      "choices": [
+        "datadoghq.eu",
+        "An empty line",
+        "datadoghq.com",
+        "An error: DD_SITE is read-only"
+      ],
+      "answer": 1,
+      "explanation": "Assignments placed before a command become part of that command's environment only while it runs; they are not set or exported in the calling shell. The install script sees DD_SITE, but the interactive shell does not, so echo prints an empty line. To keep the value for later commands you would run export DD_SITE=datadoghq.eu.",
+      "reference": "https://www.gnu.org/software/bash/manual/bash.html#Environment",
+      "difficulty": 3
+    },
+    {
+      "id": "ess-q-027",
+      "topic": "Scripting Basics",
+      "question": "In the Agent install one-liner\n\nDD_API_KEY=<KEY> DD_SITE=\"datadoghq.com\" bash -c \"$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)\"\n\nwhat does the \"$(curl -L ...)\" part do?",
+      "choices": [
+        "Saves the script to disk under a name taken from the URL",
+        "Tests that the URL is reachable and passes 0 or 1 to bash",
+        "Downloads the script and passes its text to bash -c to execute",
+        "Posts DD_API_KEY to the URL to register the host first"
+      ],
+      "answer": 2,
+      "explanation": "$(command) is command substitution: curl's output (the script body) replaces the expression, and bash -c reads and executes that string as commands. curl writes to standard output here instead of saving a file, substitution passes output rather than an exit status, and the API key reaches the script as an environment variable, not through curl.",
+      "reference": "https://www.gnu.org/software/bash/manual/bash.html#Command-Substitution",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-028",
+      "topic": "Metadata",
+      "question": "What is the main purpose of tags in Datadog?",
+      "choices": [
+        "Encrypt telemetry before the Agent sends it",
+        "Add dimensions for filtering and grouping data",
+        "Set the retention period for each metric in Datadog",
+        "Pick which Datadog site receives the data"
+      ],
+      "answer": 1,
+      "explanation": "Datadog describes tags as a way of adding dimensions to telemetry so it can be filtered, aggregated and compared, for example viewing CPU across every host that runs one service. Tags do not encrypt data, control retention, or select the Datadog site.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-029",
+      "topic": "Metadata",
+      "question": "A tag can be written as prod or as env:prod. Why does Datadog recommend the env:prod form?",
+      "choices": [
+        "It supports richer queries, like grouping by key",
+        "Value-only tags are dropped when data is ingested",
+        "Only key:value tags count toward the 200-character limit",
+        "Value-only tags are converted into host names"
+      ],
+      "answer": 0,
+      "explanation": "Both formats are accepted, but Datadog recommends <key>:<value> because it is semantically clearer and allows richer querying, such as grouping by the key. Value-only tags are not dropped or turned into host names, and the 200-character limit applies to the whole tag string in either format.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-030",
+      "topic": "Metadata",
+      "question": "An EC2 instance has the AWS tag costcenter:42, and the AWS integration is set up. Logs shipped by the Agent on that instance arrive with costcenter:42 even though no log configuration mentions it. Why?",
+      "choices": [
+        "The log pipeline parsed the tag out of each log message",
+        "The Agent adds every AWS tag in the account to all logs",
+        "Data from a host inherits that host's host-level tags at ingestion",
+        "Logs always receive every tag defined in the organization"
+      ],
+      "answer": 2,
+      "explanation": "During ingestion, metrics, logs and traces go through host-tag inheritance: because the data is associated with a hostname, it inherits that host's host-level tags, which can come from the cloud provider or the Agent. For logs, the reserved host attribute is what lets Datadog find the matching host. The tag is not parsed from the message, and only that host's tags are applied.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-031",
+      "topic": "Metadata",
+      "question": "A host is tagged service:my-host, and a pod running on it is tagged service:my-service. What happens to the pod's telemetry, and what does Datadog recommend?",
+      "choices": [
+        "The pod value overrides the host value; no change is needed",
+        "The host value overrides the pod value; remove the pod tag",
+        "It gets both; use a distinct host key like infra_service",
+        "Datadog rejects data carrying two service tags"
+      ],
+      "answer": 2,
+      "explanation": "Because tags are inherited from multiple sources, the pod's data inherits both service:my-host and service:my-service. Datadog recommends unique, specific key names, such as infra_service for the host-level tag, to avoid duplicate keys. Neither value overrides the other, and the data is not rejected.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/",
+      "difficulty": 3
+    },
+    {
+      "id": "ess-q-032",
+      "topic": "Metadata",
+      "question": "Which reserved log attribute does Datadog use to correlate a log with the trace that produced it?",
+      "choices": [
+        "service",
+        "trace_id",
+        "message",
+        "sourcecategory"
+      ],
+      "answer": 1,
+      "explanation": "The reserved trace_id attribute holds the trace ID and is used to link a log to its trace. service names the application and lets you pivot between logs and APM, message holds the log body, and sourcecategory is an optional log configuration field rather than a reserved attribute.",
+      "reference": "https://docs.datadoghq.com/logs/log_configuration/attributes_naming_convention/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-033",
+      "topic": "Metadata",
+      "question": "An application's logs arrive with service:web-store, but its APM traces report service:webstore. What does this mismatch mainly affect?",
+      "choices": [
+        "Pivoting between the service's logs and its APM traces",
+        "Whether the logs get parsed by the right pipeline",
+        "Whether log timestamps are shown in UTC",
+        "How long the logs are retained in their index"
+      ],
+      "answer": 0,
+      "explanation": "The reserved service attribute is used to switch from Logs to APM, so Datadog asks you to use the same value in both products; unified service tagging applies the same idea across all telemetry. Integration parsers are matched on source, and timestamps and retention are not tied to the service name.",
+      "reference": "https://docs.datadoghq.com/logs/log_configuration/attributes_naming_convention/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-034",
+      "topic": "Metadata",
+      "question": "You add a log facet manually from the Log Explorer facet list. How do you reference the tag team versus the JSON attribute http.status_code?",
+      "choices": [
+        "@team for the tag and http.status_code for the attribute",
+        "team for the tag and @http.status_code for the attribute",
+        "#team for the tag and $http.status_code for the attribute",
+        "tag:team and attr:http.status_code, with explicit prefixes"
+      ],
+      "answer": 1,
+      "explanation": "When defining a facet, Datadog says to use the tag key name for tags and the attribute path with an @ prefix for attributes. Search follows the same convention: @ marks an attribute search, while tags are queried by key directly. The #, $, tag: and attr: prefixes are not used.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/facets/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-035",
+      "topic": "Metadata",
+      "question": "The Agent tails this JSON log line:\n\n{\"message\": \"payment declined\", \"status\": \"error\", \"amount\": 42}\n\nHow does Datadog treat these fields by default?",
+      "choices": [
+        "All three fields are converted into tags on the log event",
+        "Body from message, level from status, amount as attribute",
+        "message is dropped, status is a tag, amount a metric",
+        "amount becomes the log body and the rest are dropped"
+      ],
+      "answer": 1,
+      "explanation": "Datadog ingests the reserved message attribute as the log body used for full-text search and the reserved status attribute as the log's level. Other JSON keys such as amount are kept as attributes that you can search with @amount or turn into a facet or measure. JSON fields are not automatically turned into tags or metrics.",
+      "reference": "https://docs.datadoghq.com/logs/log_configuration/attributes_naming_convention/",
+      "difficulty": 3
+    },
+    {
+      "id": "ess-q-036",
+      "topic": "Metadata",
+      "question": "Where in Datadog do you look up a host's operating system, cloud provider, tags and the Agent integrations enabled on it?",
+      "choices": [
+        "The Metrics Summary page",
+        "The Infrastructure (Host) List",
+        "The Log Explorer facet panel",
+        "The Monitor Status page"
+      ],
+      "answer": 1,
+      "explanation": "The Host List (Infrastructure > Hosts, also called the Infrastructure List) is a live inventory of hosts: its Configurations column shows cloud provider, OS and Agent status, the Integrations column lists enabled Agent integrations, and the host panel shows tags, metrics and Agent configuration. Metrics Summary describes metrics, the Log Explorer searches logs, and monitor pages show alert state.",
+      "reference": "https://docs.datadoghq.com/infrastructure/list/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-037",
+      "topic": "Metadata",
+      "question": "Which reserved tag key does Datadog list for assigning ownership of resources?",
+      "choices": [
+        "team",
+        "env",
+        "service",
+        "device"
+      ],
+      "answer": 0,
+      "explanation": "Datadog's table of reserved tag keys lists team for assigning ownership to any resource. service scopes application data across metrics, traces and logs, device segregates data by device or disk, and env scopes data by environment.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-038",
+      "topic": "Metadata",
+      "question": "Different teams log the client IP as clientIP, client_ip_address and remote_address. What does Datadog recommend so everyone can search one field?",
+      "choices": [
+        "Create one facet per variant and search all three",
+        "Convert each variant into a host tag on ingestion",
+        "Rename the fields in every application's source code",
+        "Alias the variants to one standard attribute such as network.client.ip"
+      ],
+      "answer": 3,
+      "explanation": "Datadog's naming convention uses standard attributes (such as network.client.ip) as its backbone, and aliasing maps non-standard source attributes onto a standard one without changing each team's technical stack. Separate facets keep the data fragmented, host tags are the wrong kind of metadata, and rewriting every application is what aliasing avoids.",
+      "reference": "https://docs.datadoghq.com/logs/log_configuration/attributes_naming_convention/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-039",
+      "topic": "Datadog Observability",
+      "question": "Which three telemetry types are commonly called the three pillars of observability?",
+      "choices": [
+        "Dashboards, monitors and notebooks",
+        "Metrics, logs and traces",
+        "Hosts, containers and functions",
+        "Events, alerts and incidents"
+      ],
+      "answer": 1,
+      "explanation": "Metrics (numeric measurements over time), logs (chronological records of events) and traces (the path of a request through a system) are the three pillars. Dashboards, monitors and notebooks are ways to view or act on that data, hosts and containers are what you monitor, and alerts and incidents are outcomes.",
+      "reference": "https://www.datadoghq.com/knowledge-center/observability/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-040",
+      "topic": "Datadog Observability",
+      "question": "A checkout request is slow and passes through five microservices. Which telemetry type best shows how much time each service call added?",
+      "choices": [
+        "Host metrics",
+        "Log messages",
+        "Distributed traces",
+        "Synthetic test results"
+      ],
+      "answer": 2,
+      "explanation": "A distributed trace records one request's flow from the frontend through each backend component, with a timed span for each operation, so it shows where latency builds up. Host metrics show resource usage, logs record discrete events, and Synthetic tests time simulated requests end to end rather than each service in the real request.",
+      "reference": "https://www.datadoghq.com/knowledge-center/observability/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-041",
+      "topic": "Datadog Observability",
+      "question": "A capacity planner wants a 30-day trend of memory usage across a cluster to forecast when to add nodes. Which telemetry type fits best?",
+      "choices": [
+        "Metrics",
+        "Logs",
+        "Traces",
+        "Session replays"
+      ],
+      "answer": 0,
+      "explanation": "Metrics are quantitative measurements of performance and resource utilization over time, which makes them the basis for trend analysis and forecasting. Logs and traces describe individual events and requests, and session replays show individual user sessions in RUM.",
+      "reference": "https://www.datadoghq.com/knowledge-center/observability/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-042",
+      "topic": "Datadog Observability",
+      "question": "Which statement best contrasts monitoring with observability?",
+      "choices": [
+        "Monitoring covers only metrics; observability covers only logs",
+        "Monitoring asks if it works; observability asks why it behaves so",
+        "Monitoring is for cloud hosts; observability is for on-prem hosts",
+        "Monitoring needs an Agent; observability works without collecting data"
+      ],
+      "answer": 1,
+      "explanation": "Monitoring answers 'Is the system working?' with predefined checks and dashboards, while observability uses rich, queryable telemetry to answer 'Why is the system behaving this way?', including for problems nobody anticipated. The difference is not about a single data type or hosting model, and observability still depends on collecting telemetry.",
+      "reference": "https://www.datadoghq.com/knowledge-center/observability/",
+      "difficulty": 3
+    },
+    {
+      "id": "ess-q-043",
+      "topic": "Datadog Observability",
+      "question": "Which Datadog product simulates requests and user journeys from locations around the world, so you can test an app or API even when no real users are active?",
+      "choices": [
+        "Real User Monitoring",
+        "Synthetic Monitoring",
+        "APM",
+        "Cloud Network Monitoring"
+      ],
+      "answer": 1,
+      "explanation": "Synthetic Monitoring runs API, multistep API, browser and mobile tests from managed or private locations, on a schedule, on demand or from CI/CD pipelines. RUM measures what real users experience, APM traces requests handled by your code, and Cloud Network Monitoring analyzes network flows.",
+      "reference": "https://docs.datadoghq.com/getting_started/synthetics/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-044",
+      "topic": "Datadog Observability",
+      "question": "A team wants to see traffic volume and dependencies between services, containers and availability zones, built from connection data at the IP, port and PID level. Which product fits?",
+      "choices": [
+        "Application Performance Monitoring (APM)",
+        "Synthetic Monitoring (Synthetics)",
+        "Cloud Network Monitoring (formerly NPM)",
+        "Real User Monitoring (RUM)"
+      ],
+      "answer": 2,
+      "explanation": "Cloud Network Monitoring (formerly Network Performance Monitoring) aggregates IP-, port- and PID-level connection data into dependencies between endpoints and shows them on a network page and network map. APM traces application requests, Synthetic Monitoring runs simulated tests, and RUM measures real users' browser and mobile sessions.",
+      "reference": "https://docs.datadoghq.com/network_monitoring/cloud_network_monitoring/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-045",
+      "topic": "Datadog Observability",
+      "question": "Which Datadog security product is powered by Log Management and detects real-time threats such as an IP address that matches a threat-intelligence list?",
+      "choices": [
+        "Cloud SIEM",
+        "Code Security",
+        "Sensitive Data Scanner",
+        "Synthetic Monitoring"
+      ],
+      "answer": 0,
+      "explanation": "Cloud SIEM (Security Information and Event Management) analyzes ingested logs to detect threats such as targeted attacks or communication with IPs on threat-intel lists. Code Security scans code and open source libraries for vulnerabilities, Sensitive Data Scanner finds sensitive data such as PII, and Synthetic Monitoring tests availability and performance.",
+      "reference": "https://docs.datadoghq.com/security/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-046",
+      "topic": "Datadog Observability",
+      "question": "Your team logs in to Datadog at https://ap1.datadoghq.com. Which value belongs in the Agent's site setting?",
+      "choices": [
+        "datadoghq.com",
+        "app.ap1.datadoghq.com",
+        "ap1.datadoghq.com",
+        "datadoghq.jp"
+      ],
+      "answer": 2,
+      "explanation": "Datadog's site table maps the AP1 site URL https://ap1.datadoghq.com to the site parameter ap1.datadoghq.com, located in Japan. datadoghq.com is US1, which the Agent uses when site is not set, and the other values are not site parameters.",
+      "reference": "https://docs.datadoghq.com/getting_started/site/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-047",
+      "topic": "Datadog Observability",
+      "question": "A company has one Datadog organization on US1 and another on EU1. Can a US1 dashboard display data stored in the EU1 organization?",
+      "choices": [
+        "Yes, once both organizations are linked as multi-org",
+        "No, each site is independent and data cannot be shared",
+        "Yes, if the dashboard's time zone is set to CET",
+        "Yes, but only for metrics and not for logs"
+      ],
+      "answer": 1,
+      "explanation": "Datadog's sites documentation states that each site is completely independent and you cannot share data across sites. To see the same data in both, you would have to send it to both destinations (see the Dual Shipping guide). Organization linking, time zones and data type do not change this.",
+      "reference": "https://docs.datadoghq.com/getting_started/site/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-048",
+      "topic": "Datadog Observability",
+      "question": "A German company requires that its monitoring data be stored in the EU. Which Datadog site should it use?",
+      "choices": [
+        "US1 (datadoghq.com)",
+        "EU1 (datadoghq.eu)",
+        "US5 (us5.datadoghq.com)",
+        "AP1 (ap1.datadoghq.com)"
+      ],
+      "answer": 1,
+      "explanation": "Datadog sites let you store data in specific locations; EU1 (site parameter datadoghq.eu, app at https://app.datadoghq.eu) is located in Germany. US1 and US5 are located in the US, and AP1 is located in Japan.",
+      "reference": "https://docs.datadoghq.com/getting_started/site/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-049",
+      "topic": "Datadog Observability",
+      "question": "A US government agency needs Datadog's FedRAMP High certified site. Which site does it use?",
+      "choices": [
+        "US1-FED (ddog-gov.com)",
+        "US3 (us3.datadoghq.com)",
+        "US5 (us5.datadoghq.com)",
+        "US1 (datadoghq.com)"
+      ],
+      "answer": 0,
+      "explanation": "The Datadog for Government site US1-FED (site parameter ddog-gov.com, app at https://app.ddog-gov.com) is Datadog's FedRAMP High certified site, meant for US government agencies and partners. US1, US3 and US5 are commercial sites located in the US.",
+      "reference": "https://docs.datadoghq.com/getting_started/site/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-050",
+      "topic": "Datadog Observability",
+      "question": "An organization's Datadog account is on US3. An admin installs the Agent, sets only api_key in datadog.yaml, and leaves # site: \"datadoghq.com\" commented out. No data appears in the US3 account. What is the most likely cause?",
+      "choices": [
+        "The Agent needs an application key to send data",
+        "The Agent sends to the default US1 site, not US3",
+        "US3 accepts data only through the API, not the Agent",
+        "The site line must stay commented out for US3"
+      ],
+      "answer": 1,
+      "explanation": "The datadog.yaml example documents site as optional with a default of datadoghq.com (US1). With it commented out, the Agent reports to US1, and because sites are independent the US3 organization never sees the data; setting site: us3.datadoghq.com fixes it. The Agent needs an API key and the correct site, not an application key, and US3 accepts Agent data like any other site.",
+      "reference": "https://github.com/DataDog/datadog-agent/blob/main/pkg/config/example/datadog-agent_linux.yaml.example",
+      "difficulty": 3
+    },
+    {
+      "id": "ess-q-051",
+      "topic": "Datadog Observability",
+      "question": "Why does the Datadog documentation include a site selector dropdown?",
+      "choices": [
+        "It translates the docs into the site's local language",
+        "Features, endpoints and settings can vary by Datadog site",
+        "It moves your organization's data to the chosen site",
+        "It picks the nearest docs mirror for faster loading"
+      ],
+      "answer": 1,
+      "explanation": "Different Datadog sites may support different functionality depending on each instance's security requirements, so the docs show site-specific details, such as endpoints and government-site differences, for the selected site. Language is chosen separately, and the selector never moves data because sites are independent.",
+      "reference": "https://docs.datadoghq.com/getting_started/site/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-052",
+      "topic": "Datadog Observability",
+      "question": "Datadog is delivered as SaaS. Which statement describes how data from an Agent reaches the platform?",
+      "choices": [
+        "Datadog connects in to each host to pull its data",
+        "You host Datadog's backend database on your own servers",
+        "The Agent initiates outbound encrypted connections",
+        "The Agent serves dashboards locally on each host"
+      ],
+      "answer": 2,
+      "explanation": "Datadog runs the platform for you; the Agent collects data locally and sends it to Datadog. The network docs state that traffic is always initiated by the Agent, no sessions are ever initiated from Datadog back to the Agent, and all Agent traffic is sent over SSL. You do not host the backend, and dashboards are served by the Datadog web app.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-053",
+      "topic": "Datadog Observability",
+      "question": "Which pairing of a Datadog building block and its purpose is correct?",
+      "choices": [
+        "Monitor: alerts the team when critical changes occur",
+        "Dashboard: collects metrics from the host's processes",
+        "Integration: defines the alert thresholds for metrics",
+        "Agent: renders graphs for users in the web browser"
+      ],
+      "answer": 0,
+      "explanation": "Datadog's Getting Started describes monitors as alerts and notifications that tell your team when critical changes occur. The Agent is software on your hosts that sends metrics and events to Datadog, integrations layer Datadog over technologies you already use (alert thresholds are set in monitors), and dashboards visualize data rather than collect it.",
+      "reference": "https://docs.datadoghq.com/getting_started/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-054",
+      "topic": "Datadog Observability",
+      "question": "What does Datadog's Logging without Limits approach let a team do?",
+      "choices": [
+        "Store every log in an index forever at no extra cost",
+        "Ingest and process all logs, then pick what to index",
+        "Send logs to Datadog without installing any collector",
+        "Skip parsing, since logs are indexed as raw text only"
+      ],
+      "answer": 1,
+      "explanation": "Logging without Limits decouples log ingestion from indexing, so you can collect, process, archive and monitor all logs while choosing which ones to index, for example with exclusion filters. It does not make indexing unlimited or free, it still relies on log collection, and pipelines still parse logs.",
+      "reference": "https://docs.datadoghq.com/logs/guide/getting-started-lwl/",
+      "difficulty": 2
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "ess-fc-001",
+      "topic": "Config File Modification",
+      "front": "YAML core syntax rules",
+      "back": "key: value pairs (a space after the colon)\nIndent nested maps with spaces, never tabs\nList items start with '- '\n# starts a comment\nSibling keys must share the same indentation",
+      "reference": "https://yaml.org/spec/1.2.2/"
+    },
+    {
+      "id": "ess-fc-002",
+      "topic": "Config File Modification",
+      "front": "Two equivalent ways to write a YAML list",
+      "back": "Block style:\ntags:\n  - env:prod\n  - team:web\nFlow style:\ntags: [\"env:prod\", \"team:web\"]\nDatadog treats both as the same list.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/assigning_tags/"
+    },
+    {
+      "id": "ess-fc-003",
+      "topic": "Config File Modification",
+      "front": "YAML multi-line strings: | vs >",
+      "back": "| (literal) keeps every line break exactly as written.\n> (folded) joins lines with spaces (blank lines still become line breaks).",
+      "reference": "https://yaml.org/spec/1.2.2/"
+    },
+    {
+      "id": "ess-fc-004",
+      "topic": "Config File Modification",
+      "front": "When should you quote a YAML value?",
+      "back": "When it contains ': ' or ' #', starts with a special character such as *, &, !, [ or {, or looks like a number or boolean that must stay a string (for example \"1.10\" or \"true\").",
+      "reference": "https://yaml.org/spec/1.2.2/"
+    },
+    {
+      "id": "ess-fc-005",
+      "topic": "Config File Modification",
+      "front": "Does # always start a comment in YAML?",
+      "back": "No. # starts a comment only when it is separated from other tokens by whitespace, so in url: http://host/page#top the #top stays part of the value.",
+      "reference": "https://yaml.org/spec/1.2.2/"
+    },
+    {
+      "id": "ess-fc-006",
+      "topic": "Config File Modification",
+      "front": "JSON syntax rules",
+      "back": "Objects {\"key\": value}, arrays [a, b]\nKeys and strings use double quotes\nValues: string, number, true, false, null, object, array\nNo comments, no trailing commas",
+      "reference": "https://www.json.org/json-en.html"
+    },
+    {
+      "id": "ess-fc-007",
+      "topic": "Config File Modification",
+      "front": "YAML vs JSON",
+      "back": "YAML 1.2 is a superset of JSON, so valid JSON is valid YAML. YAML uses indentation, allows # comments and unquoted strings; JSON uses braces and brackets, requires double quotes and has no comments.",
+      "reference": "https://yaml.org/spec/1.2.2/"
+    },
+    {
+      "id": "ess-fc-008",
+      "topic": "Config File Modification",
+      "front": "How are Datadog's example config files (datadog.yaml, conf.yaml.example) laid out?",
+      "back": "Required parameters are uncommented; optional parameters are commented out with #, with ## @param lines documenting them. To change one, remove the # (and uncomment any parent keys, keeping indentation), set the value, then restart the Agent.",
+      "reference": "https://docs.datadoghq.com/extend/integrations/check_references/"
+    },
+    {
+      "id": "ess-fc-009",
+      "topic": "Config File Modification",
+      "front": "Structure of an integration's conf.yaml",
+      "back": "init_config: settings applied globally to every instance\ninstances: a list; each '- ' entry is one instance the check runs against\nlogs: (optional) log collection entries",
+      "reference": "https://docs.datadoghq.com/extend/integrations/check_references/"
+    },
+    {
+      "id": "ess-fc-010",
+      "topic": "Scripting Basics",
+      "front": "Reading a check: what do class X(AgentCheck), def check(self, instance) and self.gauge(name, value) mean?",
+      "back": "class X(AgentCheck): X inherits from Datadog's AgentCheck base class.\ndef check(self, instance): the method the Agent calls, with one instances entry as a dict.\nself.gauge(name, value, tags=[...]): submits a gauge metric with optional tags.",
+      "reference": "https://docs.datadoghq.com/extend/custom_checks/write_agent_check/"
+    },
+    {
+      "id": "ess-fc-011",
+      "topic": "Scripting Basics",
+      "front": "AgentCheck submission methods",
+      "back": "Metrics: self.gauge, self.count, self.monotonic_count, self.rate, self.histogram\nStatus: self.service_check with OK, WARNING, CRITICAL or UNKNOWN\nEvents: self.event",
+      "reference": "https://datadoghq.dev/integrations-core/base/api/"
+    },
+    {
+      "id": "ess-fc-012",
+      "topic": "Scripting Basics",
+      "front": "Python basics for reading check code",
+      "back": "Indentation defines blocks (a ':' ends def/class/if/for lines); bad indentation raises IndentationError.\nd['key'] raises KeyError if the key is missing; d.get('key', default) returns the default (None if omitted).\nlist + list concatenates.",
+      "reference": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions"
+    },
+    {
+      "id": "ess-fc-013",
+      "topic": "Scripting Basics",
+      "front": "ddtrace-run vs import ddtrace.auto",
+      "back": "ddtrace-run python app.py instruments supported libraries without code changes. import ddtrace.auto as the very first import does it from inside the code (not when already under ddtrace-run). ddtrace-run --info shows the environment-variable configuration.",
+      "reference": "https://ddtrace.readthedocs.io/en/stable/basic_usage.html"
+    },
+    {
+      "id": "ess-fc-014",
+      "topic": "Scripting Basics",
+      "front": "Key ddtrace environment variables",
+      "back": "DD_SERVICE, DD_ENV, DD_VERSION: unified service tags\nDD_TRACE_ENABLED: send traces (default true)\nDD_TRACE_<INTEGRATION>_ENABLED: patch one integration\nDD_TRACE_DEBUG: tracer debug logs\nDD_AGENT_HOST / DD_TRACE_AGENT_URL: where traces go (default http://localhost:8126)",
+      "reference": "https://ddtrace.readthedocs.io/en/stable/configuration.html"
+    },
+    {
+      "id": "ess-fc-015",
+      "topic": "Scripting Basics",
+      "front": "Shell exit status and $?",
+      "back": "0 = success, non-zero = failure. $? holds the status of the most recent command. 127 = command not found; 126 = found but not executable.",
+      "reference": "https://www.gnu.org/software/bash/manual/bash.html#Exit-Status"
+    },
+    {
+      "id": "ess-fc-016",
+      "topic": "Scripting Basics",
+      "front": "Shell operators: |, &&, ||, ;",
+      "back": "a | b: a's output feeds b's input (status of the last command unless pipefail)\na && b: run b only if a succeeded\na || b: run b only if a failed\na ; b: run both in sequence",
+      "reference": "https://www.gnu.org/software/bash/manual/bash.html#Lists"
+    },
+    {
+      "id": "ess-fc-017",
+      "topic": "Scripting Basics",
+      "front": "Anatomy of the Agent install one-liner",
+      "back": "DD_API_KEY=<KEY> DD_SITE=\"<SITE>\" bash -c \"$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)\"\nPrefix assignments set env vars for that command only; $(curl -L ...) downloads the script; bash -c runs the downloaded text.",
+      "reference": "https://github.com/DataDog/agent-linux-install-script"
+    },
+    {
+      "id": "ess-fc-018",
+      "topic": "Scripting Basics",
+      "front": "What does #!/usr/bin/env bash at the top of a script do?",
+      "back": "It is the shebang line: it tells the OS to run the script with the first bash found in $PATH. #!/bin/bash hard-codes the interpreter path instead.",
+      "reference": "https://www.gnu.org/software/bash/manual/bash.html"
+    },
+    {
+      "id": "ess-fc-019",
+      "topic": "Metadata",
+      "front": "What is a tag in Datadog?",
+      "back": "A label that adds a dimension to telemetry so it can be filtered, aggregated and compared. Format <key>:<value> (recommended, e.g. env:prod) or <value>.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/"
+    },
+    {
+      "id": "ess-fc-020",
+      "topic": "Metadata",
+      "front": "Reserved tag keys and what they enable",
+      "back": "host: correlate metrics, traces, processes, logs\ndevice: split data by device or disk\nsource: span filtering, log pipelines\nservice, env, version: scope app data (unified service tagging)\nteam: ownership",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/"
+    },
+    {
+      "id": "ess-fc-021",
+      "topic": "Metadata",
+      "front": "Host-tag inheritance",
+      "back": "Metrics, logs, traces and integrations associated with a hostname inherit that host's host-level tags (from the cloud provider or the Agent) at ingestion. Use distinct key names to avoid duplicate keys from different sources.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/"
+    },
+    {
+      "id": "ess-fc-022",
+      "topic": "Metadata",
+      "front": "Reserved log attributes",
+      "back": "host, source, status, service, trace_id, message (searchable without @).\nmessage = log body; status = level; service links to APM; trace_id links to the trace; source matches an integration to install its parsers and facets.",
+      "reference": "https://docs.datadoghq.com/logs/log_configuration/attributes_naming_convention/"
+    },
+    {
+      "id": "ess-fc-023",
+      "topic": "Metadata",
+      "front": "Log attributes vs tags",
+      "back": "Attributes: key/value fields from the log content (usually JSON), searched with @ (e.g. @http.status_code); case-sensitive and not normalized.\nTags: key:value labels from the host, Agent or integration config, searched by key (e.g. env:prod).",
+      "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/"
+    },
+    {
+      "id": "ess-fc-024",
+      "topic": "Metadata",
+      "front": "Standard attributes and aliasing",
+      "back": "Standard attributes (e.g. network.client.ip, http.status_code) define a naming convention. Aliasing maps non-standard attributes onto a standard one so all teams use the same facet; changes apply to newly ingested logs.",
+      "reference": "https://docs.datadoghq.com/logs/log_configuration/attributes_naming_convention/"
+    },
+    {
+      "id": "ess-fc-025",
+      "topic": "Metadata",
+      "front": "What host information does the Infrastructure (Host) List show?",
+      "back": "A live inventory of hosts: hostnames and aliases, status, tags, OS, cloud provider, Agent status and configuration, detected software, enabled integrations, and metrics.",
+      "reference": "https://docs.datadoghq.com/infrastructure/list/"
+    },
+    {
+      "id": "ess-fc-026",
+      "topic": "Datadog Observability",
+      "front": "Three pillars of observability",
+      "back": "Metrics: numeric measurements over time (trends, forecasting)\nLogs: timestamped records of discrete events\nTraces: a request's path across services, with timed spans",
+      "reference": "https://www.datadoghq.com/knowledge-center/observability/"
+    },
+    {
+      "id": "ess-fc-027",
+      "topic": "Datadog Observability",
+      "front": "Monitoring vs observability",
+      "back": "Monitoring: 'Is it working?' Predefined checks, thresholds and dashboards.\nObservability: 'Why is it behaving this way?' Explore rich, correlated telemetry to investigate unexpected issues.",
+      "reference": "https://www.datadoghq.com/knowledge-center/observability/"
+    },
+    {
+      "id": "ess-fc-028",
+      "topic": "Datadog Observability",
+      "front": "Which app URL do you log in to for each Datadog site?",
+      "back": "US1: https://app.datadoghq.com\nUS3: https://us3.datadoghq.com\nUS5: https://us5.datadoghq.com\nEU1: https://app.datadoghq.eu\nAP1: https://ap1.datadoghq.com\nAP2: https://ap2.datadoghq.com\nUK1: https://uk1.datadoghq.com\nUS1-FED: https://app.ddog-gov.com\nUS2-FED: https://us2.ddog-gov.com",
+      "reference": "https://docs.datadoghq.com/getting_started/site/"
+    },
+    {
+      "id": "ess-fc-029",
+      "topic": "Datadog Observability",
+      "front": "Why does your Datadog site matter?",
+      "back": "Each site is completely independent (no data sharing across sites) and keeps data in a given location or meets regulations. The Agent's site / DD_SITE (default datadoghq.com), API endpoints and the docs site selector must match your organization's site.",
+      "reference": "https://docs.datadoghq.com/getting_started/site/"
+    },
+    {
+      "id": "ess-fc-030",
+      "topic": "Datadog Observability",
+      "front": "What is US1-FED?",
+      "back": "The Datadog for Government site: FedRAMP High certified, at https://app.ddog-gov.com (site parameter ddog-gov.com), for US government agencies and partners.",
+      "reference": "https://docs.datadoghq.com/getting_started/site/"
+    },
+    {
+      "id": "ess-fc-031",
+      "topic": "Datadog Observability",
+      "front": "Core Datadog products in one line each",
+      "back": "Infrastructure: hosts, containers, processes\nAPM: application traces and performance\nLog Management: collect, process, search logs\nRUM: real users' web/mobile experience\nSynthetic Monitoring: simulated tests\nCloud Network Monitoring (formerly NPM): network flows\nSecurity: Cloud SIEM, Cloud Security, App and API Protection",
+      "reference": "https://docs.datadoghq.com/getting_started/"
+    },
+    {
+      "id": "ess-fc-032",
+      "topic": "Datadog Observability",
+      "front": "RUM vs Synthetic Monitoring",
+      "back": "RUM measures real users' sessions (performance, errors, usage) in web and mobile apps. Synthetic Monitoring runs scripted API, browser and mobile tests from managed or private locations, even with no real traffic.",
+      "reference": "https://docs.datadoghq.com/getting_started/synthetics/"
+    },
+    {
+      "id": "ess-fc-033",
+      "topic": "Datadog Observability",
+      "front": "Getting Started building blocks: Agent, integrations, dashboards, monitors",
+      "back": "Agent: software on hosts that sends metrics and events\nIntegrations: connect the technologies you already use\nDashboards: visualize and share data\nMonitors: alert when critical changes occur",
+      "reference": "https://docs.datadoghq.com/getting_started/"
+    },
+    {
+      "id": "ess-fc-034",
+      "topic": "Datadog Observability",
+      "front": "Integration types described in Introduction to Integrations",
+      "back": "Agent-based (installed with the Agent, Python check method), authentication/crawler-based (credentials set up in Datadog, e.g. AWS, Slack), and library integrations (language libraries using the Datadog API).",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/"
+    },
+    {
+      "id": "ess-fc-035",
+      "topic": "Datadog Observability",
+      "front": "What does Datadog being SaaS mean for your team?",
+      "back": "Datadog hosts and runs the platform (storage, UI, alerting) at your Datadog site; you only install the Agent and set up integrations, which send data out to Datadog. Agent connections are always outbound, over SSL.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/"
+    },
+    {
+      "id": "ess-fc-036",
+      "topic": "Datadog Observability",
+      "front": "Required settings in datadog.yaml",
+      "back": "api_key: associates the Agent's data with your organization\nsite: your Datadog site (default datadoghq.com), e.g. datadoghq.eu for EU1",
+      "reference": "https://docs.datadoghq.com/getting_started/agent/"
+    }
+  ]
+}

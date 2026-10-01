@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% from "_macros.html" import mode_badge %}
+{% block title %}Studying flash cards{% endblock %}
+{% block content %}
+<div class="study" id="study" data-review-url="{{ url_for('main.api_review', session_id=fc_session.id) }}">
+  <div class="study-bar">
+    <div>{{ mode_badge(fc_session.mode) }} <span class="muted small">deck · {{ cards | length }} cards</span></div>
+    <div class="study-progress" aria-hidden="true"><div class="study-progress-fill" id="study-fill"></div></div>
+    <div class="study-count"><span id="card-pos">1</span> <span class="muted">/ {{ cards | length }}</span></div>
+  </div>
+
+  <div class="study-stage" id="stage">
+    <div class="flip" id="flip" tabindex="0" role="button" aria-label="Flash card. Press space to flip.">
+      <div class="flip-inner">
+        <div class="flip-face flip-front">
+          <span class="card-topic" id="front-topic"></span>
+          <p class="card-text" id="front-text"></p>
+          <span class="flip-hint muted small">Click or press <kbd>Space</kbd> to reveal</span>
+        </div>
+        <div class="flip-face flip-back">
+          <span class="card-topic" id="back-topic"></span>
+          <p class="card-text card-answer" id="back-text"></p>
+          <a class="link small" id="back-ref" href="#" target="_blank" rel="noopener">Read the docs ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="rate" id="rate">
+      <button class="btn btn-ghost" type="button" id="prev-card">←</button>
+      <button class="btn btn-rate btn-learning" type="button" id="rate-learning" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/></svg>Still learning <kbd>1</kbd>
+      </button>
+      <button class="btn btn-rate btn-known" type="button" id="rate-known" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Got it <kbd>2</kbd>
+      </button>
+      <button class="btn btn-ghost" type="button" id="next-card">→</button>
+    </div>
+    <p class="muted small center">Flip the card, then rate it. <kbd>←</kbd><kbd>→</kbd> move between cards.</p>
+  </div>
+
+  <div class="study-done card" id="done" hidden>
+    <div class="done-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <h1>Deck complete</h1>
+    <p class="lede-dark"><strong id="done-known">0</strong> known · <strong id="done-learning">0</strong> still learning</p>
+    <div class="done-actions">
+      <form method="post" action="{{ url_for('main.retry_flashcards', session_id=fc_session.id) }}" id="retry-form">
+        <button class="btn btn-primary" type="submit" id="retry-btn">Review the cards I'm still learning</button>
+      </form>
+      <form method="post" action="{{ url_for('main.start_flashcards') }}">
+        <input type="hidden" name="mode" value="{{ fc_session.mode }}">
+        <input type="hidden" name="scope" value="{{ fc_session.scope }}">
+        <button class="btn btn-secondary" type="submit">New {{ fc_session.mode }} deck</button>
+      </form>
+      <button class="btn btn-ghost" type="button" id="restart-view">Look through this deck again</button>
+    </div>
+  </div>
+</div>
+<script type="application/json" id="cards-data">{{ cards | tojson }}</script>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/flashcards.js') }}"></script>{% endblock %}

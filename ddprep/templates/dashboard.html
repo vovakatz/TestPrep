@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% from "_macros.html" import band_chip, band_for, meter, mode_badge %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Datadog Fundamentals certification</p>
+    <h1>{{ "Welcome back" if summary.answered else "Welcome" }}, {{ current_user.name }}.</h1>
+    <p class="lede">Take 50-question practice exams built from the official exam guide, then sharpen weak spots with flash cards that learn from your mistakes.</p>
+    <div class="hero-actions">
+      <form method="post" action="{{ url_for('main.start_exam') }}">
+        <input type="hidden" name="mode" value="random">
+        <button class="btn btn-light btn-lg" type="submit">Start a random exam</button>
+      </form>
+      <a class="btn btn-outline-light btn-lg" href="{{ url_for('main.flashcard_hub') }}">Study flash cards</a>
+    </div>
+  </div>
+  <div class="hero-figure" aria-label="Average exam score">
+    <span class="hero-number">{% if summary.avg_score is not none %}{{ summary.avg_score | round | int }}<small>%</small>{% else %}—{% endif %}</span>
+    <span class="hero-caption">average score across {{ summary.completed }} completed exam{{ '' if summary.completed == 1 else 's' }}</span>
+  </div>
+</section>
+
+{% if in_progress %}
+<a class="resume-banner" href="{{ url_for('main.take_exam', exam_id=in_progress.id) }}">
+  <span class="resume-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+  <span><strong>Resume your {{ in_progress.mode }} exam</strong><br>
+    <span class="muted">{{ in_progress.answered }} of {{ in_progress.total }} answered · started {{ in_progress.started_at | when }}</span></span>
+  <span class="resume-go">Continue →</span>
+</a>
+{% endif %}
+
+<section class="stat-row">
+  <div class="stat"><span class="stat-label">Exams completed</span><span class="stat-value">{{ summary.completed }}</span></div>
+  <div class="stat"><span class="stat-label">Best score</span><span class="stat-value">{{ (summary.best | round | int ~ '%') if summary.best is not none else '—' }}</span></div>
+  <div class="stat"><span class="stat-label">Last score</span><span class="stat-value">{{ (summary.last_score | round | int ~ '%') if summary.last_score is not none else '—' }}</span></div>
+  <div class="stat"><span class="stat-label">Questions answered</span><span class="stat-value">{{ summary.answered }}</span></div>
+  <div class="stat"><span class="stat-label">Cards reviewed</span><span class="stat-value">{{ summary.reviews }}</span></div>
+</section>
+
+<section class="grid-2">
+  <article class="feature-card">
+    <div class="feature-icon feature-icon-exam" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M9 4h6M9 4a2 2 0 0 0-2 2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-1a2 2 0 0 0-2-2M9 4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M8 12l2 2 4-4M8 17h8"/></svg>
+    </div>
+    <h2>Practice exams</h2>
+    <p>50 multiple-choice questions drawn from a bank of {{ bank_counts.questions }}. Instant feedback and an explanation after every answer.</p>
+    <div class="feature-actions">
+      <form method="post" action="{{ url_for('main.start_exam') }}">
+        <input type="hidden" name="mode" value="random">
+        <button class="btn btn-primary" type="submit">Random exam</button>
+      </form>
+      <form method="post" action="{{ url_for('main.start_exam') }}">
+        <input type="hidden" name="mode" value="targeted">
+        <button class="btn btn-secondary" type="submit" {{ 'disabled' if not summary.answered }}
+                title="{{ 'Answer some questions first' if not summary.answered else 'Weighted toward your weak topics' }}">Targeted exam</button>
+      </form>
+    </div>
+    {% if not summary.answered %}<p class="hint">Targeted exams unlock after you answer your first questions.</p>{% endif %}
+  </article>
+  <article class="feature-card">
+    <div class="feature-icon feature-icon-cards" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="14" height="14" rx="2"/><path d="M7 6V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2"/></svg>
+    </div>
+    <h2>Flash cards</h2>
+    <p>{{ bank_counts.flashcards }} cards covering every exam domain. Flip, rate yourself, and revisit what you're still learning.</p>
+    <div class="feature-actions">
+      <form method="post" action="{{ url_for('main.start_flashcards') }}">
+        <input type="hidden" name="mode" value="random">
+        <button class="btn btn-primary" type="submit">Random deck</button>
+      </form>
+      <form method="post" action="{{ url_for('main.start_flashcards') }}">
+        <input type="hidden" name="mode" value="targeted">
+        <button class="btn btn-secondary" type="submit" {{ 'disabled' if not summary.answered }}
+                title="{{ 'Take an exam first' if not summary.answered else 'Focused on topics you missed' }}">Targeted deck</button>
+      </form>
+    </div>
+    {% if not summary.answered %}<p class="hint">Targeted decks use your exam results to pick cards.</p>{% endif %}
+  </article>
+</section>
+
+<section class="grid-2 grid-wide-left">
+  <article class="card">
+    <header class="card-head">
+      <h2>Readiness by domain</h2>
+      <a class="link" href="{{ url_for('main.progress') }}">Topic detail →</a>
+    </header>
+    <ul class="domain-list">
+      {% for d in domains %}
+        {% set band = band_for(d.accuracy or 0, d.attempts) %}
+        <li>
+          <div class="domain-row">
+            <span class="domain-name">{{ d.name }}</span>
+            <span class="domain-meta">
+              {% if d.attempts %}<span class="num">{{ d.accuracy | pct }}</span><span class="muted"> · {{ d.correct }}/{{ d.attempts }}</span>{% endif %}
+              {{ band_chip(band) }}
+            </span>
+          </div>
+          {{ meter(d.accuracy, d.name) }}
+        </li>
+      {% endfor %}
+    </ul>
+  </article>
+  <article class="card">
+    <header class="card-head"><h2>Focus areas</h2></header>
+    {% if focus %}
+      <ol class="focus-list">
+        {% for t in focus %}
+          <li>
+            <div>
+              <strong>{{ t.topic }}</strong>
+              <span class="muted small">{{ t.domain }}</span>
+            </div>
+            <div class="focus-right">
+              <span class="num">{{ t.accuracy | pct }}</span>
+              <a class="btn btn-ghost btn-sm" href="{{ url_for('main.flashcard_hub', topic=t.topic_id) }}">Study</a>
+            </div>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <div class="empty">
+        <p>Your weakest topics will show up here after your first exam.</p>
+      </div>
+    {% endif %}
+  </article>
+</section>
+
+<section class="card">
+  <header class="card-head">
+    <h2>Recent exams</h2>
+    <a class="link" href="{{ url_for('main.exam_hub') }}">All exams →</a>
+  </header>
+  {% if recent %}
+    <table class="table">
+      <thead><tr><th>Date</th><th>Type</th><th class="num">Score</th><th class="num">Correct</th><th></th></tr></thead>
+      <tbody>
+        {% for e in recent %}
+          <tr>
+            <td>{{ e.started_at | when }}</td>
+            <td>{{ mode_badge(e.mode) }}</td>
+            <td class="num">{% if e.completed_at %}<strong>{{ e.score | round | int }}%</strong>{% else %}<span class="muted">In progress</span>{% endif %}</td>
+            <td class="num">{% if e.completed_at %}{{ e.correct }}/{{ e.total }}{% else %}{{ e.answered }}/{{ e.total }} answered{% endif %}</td>
+            <td class="actions">
+              {% if e.completed_at %}<a class="link" href="{{ url_for('main.exam_results', exam_id=e.id) }}">Review</a>
+              {% else %}<a class="link" href="{{ url_for('main.take_exam', exam_id=e.id) }}">Resume</a>{% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="empty"><p>No exams yet. Start one above; it takes about an hour at exam pace.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

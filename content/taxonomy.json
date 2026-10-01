@@ -1,0 +1,76 @@
+{
+  "domains": [
+    {
+      "name": "Essential Concepts",
+      "slug": "essential",
+      "description": "Computer, Linux, data-format, networking and observability fundamentals.",
+      "topics": [
+        {"name": "Hardware Concepts", "description": "CPU, RAM, disks/storage, I/O, load, virtualization and containers."},
+        {"name": "Linux Basics", "description": "Shell commands, file system layout, permissions, processes, services, package managers."},
+        {"name": "Config File Modification", "description": "Reading and editing YAML and JSON; indentation, comments, lists, maps."},
+        {"name": "Scripting Basics", "description": "Reading Python and shell scripts; variables, pipes, exit codes, environment variables."},
+        {"name": "Metadata", "description": "Tags, attributes, host metadata and how metadata describes telemetry."},
+        {"name": "Networking", "description": "IP addresses, CIDR, DNS, ports, HTTP/HTTPS, TCP vs UDP, proxies, firewalls."},
+        {"name": "Datadog Observability", "description": "Observability pillars, Datadog products, sites and core concepts from Getting Started."}
+      ]
+    },
+    {
+      "name": "Infrastructure Development",
+      "slug": "infrastructure",
+      "description": "Installing and running the Datadog Agent, keys and hostnames.",
+      "topics": [
+        {"name": "Agent Installation", "description": "Installing the Agent on Linux, Windows, macOS, Docker, Kubernetes and with config management tools."},
+        {"name": "API Key", "description": "Purpose, scope and lifecycle of Datadog API keys."},
+        {"name": "Application Key", "description": "Purpose, scope, ownership and lifecycle of application keys."},
+        {"name": "Running the Agent", "description": "Starting, stopping, restarting the Agent per platform; Agent architecture and processes."},
+        {"name": "Agent Hostname", "description": "How the Agent resolves hostnames, cloud hostnames, aliases and the infrastructure list."}
+      ]
+    },
+    {
+      "name": "Networking & Agent Configuration",
+      "slug": "network-config",
+      "description": "Ports, IP ranges, proxies and Autodiscovery.",
+      "topics": [
+        {"name": "Datadog Ports", "description": "Inbound/outbound ports used by the Agent, DogStatsD, APM and logs."},
+        {"name": "Datadog IP Addresses", "description": "Datadog IP ranges, the ip-ranges endpoint, sites and firewall allow-listing."},
+        {"name": "Auto-discovery", "description": "Autodiscovery templates, template variables, labels/annotations, auto_conf.yaml, containers."}
+      ]
+    },
+    {
+      "name": "Data Collection",
+      "slug": "data-collection",
+      "description": "DogStatsD, integrations, the API, tagging and metrics.",
+      "topics": [
+        {"name": "DogStatsD", "description": "DogStatsD protocol, UDP/UDS, metric types, client libraries, events and service checks."},
+        {"name": "Crawlers", "description": "Authentication (crawler) based integrations such as AWS, Azure, GCP, Slack."},
+        {"name": "Agent Integrations", "description": "Agent-based integrations, conf.d, custom Agent checks, integration types."},
+        {"name": "API Endpoints", "description": "Datadog REST API, endpoints, authentication headers, sites, the Metrics API."},
+        {"name": "Tagging Best Practices", "description": "Tag syntax, reserved tags, unified service tagging, tag assignment methods."},
+        {"name": "Metrics & Timeseries", "description": "Metric types, custom metrics, timestamps, resolution, retention, submission."}
+      ]
+    },
+    {
+      "name": "Troubleshooting Datadog",
+      "slug": "troubleshooting",
+      "description": "Agent commands, Agent logs and configuration files.",
+      "topics": [
+        {"name": "Agent Commands", "description": "status, check, configcheck, flare, diagnose, hostname, config and other subcommands."},
+        {"name": "Agent Logs", "description": "Agent log file locations, log levels, debug mode, flares."},
+        {"name": "Agent Config Files", "description": "datadog.yaml, conf.d layout, conf.yaml.example, auto_conf.yaml, file locations per OS."}
+      ]
+    },
+    {
+      "name": "Data Visualization & Utilization",
+      "slug": "visualization",
+      "description": "Host Map, dashboards, querying metrics, tags, search and monitors.",
+      "topics": [
+        {"name": "Host Map", "description": "Host Map and Infrastructure List: grouping, filtering, fill and size."},
+        {"name": "Dashboards", "description": "Dashboards, widgets, template variables, out-of-the-box dashboards."},
+        {"name": "Using Metrics", "description": "Metric queries, space and time aggregation, rollup, functions, Metrics Explorer and Summary."},
+        {"name": "Using Tags", "description": "Filtering and grouping with tags in queries, dashboards and monitors."},
+        {"name": "Log & Event Search", "description": "Search syntax, facets, attributes and filtering in Log Explorer and Event Explorer."},
+        {"name": "Monitors and Alerts", "description": "Monitor types, thresholds, multi-alert, notifications, template variables, downtimes."}
+      ]
+    }
+  ]
+}

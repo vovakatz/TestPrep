@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% from "_macros.html" import mode_badge %}
+{% block title %}Practice Exams{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Practice exams</p>
+    <h1>Choose your exam</h1>
+    <p class="lede-dark">Each exam has {{ exam_size }} single-answer questions. Submit each answer to see whether it was right and why. Unanswered questions count as incorrect, as on the real exam.</p>
+  </div>
+</header>
+
+<section class="grid-2">
+  <form class="mode-card" method="post" action="{{ url_for('main.start_exam') }}">
+    <input type="hidden" name="mode" value="random">
+    <div class="mode-icon mode-icon-random" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M3 7h4l10 10h4M3 17h4l3-3M14 10l3-3h4M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>
+    </div>
+    <h2>Random exam</h2>
+    <p>{{ exam_size }} questions drawn uniformly at random from the full bank of {{ bank_counts.questions }} questions, covering all six domains. Use it to see where you stand.</p>
+    <ul class="ticks">
+      <li>Every question equally likely</li>
+      <li>Answer order shuffled each time</li>
+      <li>Good baseline before a targeted exam</li>
+    </ul>
+    <button class="btn btn-primary btn-lg btn-block" type="submit">Start random exam</button>
+  </form>
+
+  <form class="mode-card mode-card-accent" method="post" action="{{ url_for('main.start_exam') }}">
+    <input type="hidden" name="mode" value="targeted">
+    <div class="mode-icon mode-icon-targeted" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>
+    </div>
+    <h2>Targeted exam</h2>
+    <p>Weighted toward the topics and questions you've struggled with. Questions you missed are 3× as likely to come back; ones you've answered correctly several times are rarer.</p>
+    {% if focus %}
+      <p class="small muted">This exam will lean on:</p>
+      <ul class="focus-chips">
+        {% for t in focus %}<li><span class="num">{{ t.accuracy | pct }}</span> {{ t.topic }}</li>{% endfor %}
+      </ul>
+    {% else %}
+      <p class="hint">No exam history yet. Answer a few questions first so there's something to target.</p>
+    {% endif %}
+    <button class="btn btn-primary btn-lg btn-block" type="submit" {{ 'disabled' if not answered }}>Start targeted exam</button>
+  </form>
+</section>
+
+<section class="card">
+  <header class="card-head"><h2>Exam history</h2><span class="muted">{{ history | length }} exam{{ '' if history | length == 1 else 's' }}</span></header>
+  {% if history %}
+    <table class="table">
+      <thead>
+        <tr><th>Started</th><th>Type</th><th class="num">Score</th><th class="num">Correct</th><th class="num">Time</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for e in history %}
+          <tr>
+            <td>{{ e.started_at | when }}</td>
+            <td>{{ mode_badge(e.mode) }}</td>
+            <td class="num">{% if e.completed_at %}<strong>{{ e.score | round | int }}%</strong>{% else %}<span class="muted">In progress</span>{% endif %}</td>
+            <td class="num">{% if e.completed_at %}{{ e.correct }}/{{ e.total }}{% else %}{{ e.answered }}/{{ e.total }} answered{% endif %}</td>
+            <td class="num">{{ e | duration }}</td>
+            <td class="actions">
+              {% if e.completed_at %}
+                <a class="link" href="{{ url_for('main.exam_results', exam_id=e.id) }}">Review</a>
+              {% else %}
+                <a class="link" href="{{ url_for('main.take_exam', exam_id=e.id) }}">Resume</a>
+              {% endif %}
+              <form method="post" action="{{ url_for('main.delete_exam', exam_id=e.id) }}" class="inline"
+                    onsubmit="return confirm('Delete this exam and its recorded answers?');">
+                <button class="link link-danger" type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="empty"><p>You haven't taken an exam yet.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

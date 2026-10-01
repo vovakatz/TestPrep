@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% from "_macros.html" import mode_badge, meter %}
+{% block title %}Exam results{% endblock %}
+{% block content %}
+{% set wrong = exam.total - exam.correct - unanswered %}
+<section class="result-hero">
+  <div class="result-main">
+    <p class="eyebrow">{{ mode_badge(exam.mode) }} <span>exam · {{ exam.completed_at | when }}</span></p>
+    <div class="result-score">
+      <span class="hero-number">{{ exam.score | round | int }}<small>%</small></span>
+      <div class="result-sub">
+        <strong>{{ exam.correct }} of {{ exam.total }} correct</strong>
+        {% if previous_score is not none %}
+          {% set delta = exam.score - previous_score %}
+          <span class="delta {{ 'delta-up' if delta > 0 else ('delta-down' if delta < 0 else '') }}">
+            {% if delta > 0 %}▲ +{{ delta | round | int }}{% elif delta < 0 %}▼ {{ delta | round | int }}{% else %}±0{% endif %} pts vs previous exam
+          </span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="result-meter">{{ meter(exam.score / 100, 'Score') }}</div>
+    <ul class="result-facts">
+      <li><span class="dot dot-correct"></span>{{ exam.correct }} correct</li>
+      <li><span class="dot dot-wrong"></span>{{ wrong }} incorrect</li>
+      {% if unanswered %}<li><span class="dot dot-open"></span>{{ unanswered }} unanswered (scored incorrect)</li>{% endif %}
+      <li class="muted">Time: {{ exam | duration }}</li>
+    </ul>
+  </div>
+  <div class="result-actions">
+    <form method="post" action="{{ url_for('main.start_exam') }}">
+      <input type="hidden" name="mode" value="targeted">
+      <button class="btn btn-light btn-block" type="submit">Targeted exam on weak areas</button>
+    </form>
+    <form method="post" action="{{ url_for('main.start_flashcards') }}">
+      <input type="hidden" name="mode" value="targeted">
+      <button class="btn btn-outline-light btn-block" type="submit">Flash cards for weak topics</button>
+    </form>
+    <form method="post" action="{{ url_for('main.start_exam') }}">
+      <input type="hidden" name="mode" value="random">
+      <button class="btn btn-outline-light btn-block" type="submit">New random exam</button>
+    </form>
+  </div>
+</section>
+
+<section class="card">
+  <header class="card-head"><h2>Score by domain</h2><span class="muted small">Weakest first</span></header>
+  <div class="breakdown">
+    {% for d in breakdown %}
+      <details class="breakdown-domain" {{ 'open' if loop.first }}>
+        <summary>
+          <span class="bd-name">{{ d.name }}</span>
+          <span class="bd-bar">{{ meter(d.correct / d.total, d.name) }}</span>
+          <span class="bd-num num">{{ (d.correct / d.total) | pct }}</span>
+          <span class="bd-count muted num">{{ d.correct }}/{{ d.total }}</span>
+        </summary>
+        <ul class="bd-topics">
+          {% for t in d.topics %}
+            <li>
+              <span class="bd-name">{{ t.name }}</span>
+              <span class="bd-bar">{{ meter(t.correct / t.total, t.name) }}</span>
+              <span class="bd-num num">{{ (t.correct / t.total) | pct }}</span>
+              <span class="bd-count muted num">{{ t.correct }}/{{ t.total }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      </details>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="card" id="review">
+  <header class="card-head">
+    <h2>Review answers</h2>
+    <div class="segmented" role="tablist" aria-label="Filter questions">
+      <button type="button" class="seg is-active" data-filter="all">All <span class="num">{{ items | length }}</span></button>
+      <button type="button" class="seg" data-filter="wrong">Incorrect <span class="num">{{ wrong + unanswered }}</span></button>
+      <button type="button" class="seg" data-filter="right">Correct <span class="num">{{ exam.correct }}</span></button>
+    </div>
+  </header>
+  <ol class="review-list">
+    {% for q in items %}
+      {% set state = 'right' if q.is_correct else 'wrong' %}
+      <li class="review-item review-{{ state }}" data-state="{{ state }}">
+        <div class="review-head">
+          <span class="review-num">{{ q.position }}</span>
+          <span class="review-topic muted small">{{ q.domain }} · {{ q.topic }}</span>
+          <span class="review-status">
+            {% if not q.answered %}<span class="chip chip-new">Unanswered</span>
+            {% elif q.is_correct %}<span class="chip chip-strong"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>Correct</span>
+            {% else %}<span class="chip chip-weak"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg>Incorrect</span>{% endif %}
+          </span>
+        </div>
+        <div class="review-question">{{ q.question | question_rich }}</div>
+        <ul class="review-choices">
+          {% for c in q.choices %}
+            {% set is_answer = c.id == q.correct_choice %}
+            {% set is_pick = c.id == q.selected %}
+            <li class="{{ 'rc-correct' if is_answer }} {{ 'rc-wrong' if is_pick and not is_answer }}">
+              <span class="rc-letter">{{ 'ABCD'[loop.index0] }}</span>
+              <span class="rc-text">{{ c.text | rich }}</span>
+              {% if is_pick %}<span class="rc-tag">Your answer</span>{% endif %}
+              {% if is_answer and not is_pick %}<span class="rc-tag rc-tag-answer">Correct answer</span>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        <div class="review-explain">
+          <p>{{ q.explanation | rich }}</p>
+          {% if q.reference %}<a class="link small" href="{{ q.reference }}" target="_blank" rel="noopener">Read the docs ↗</a>{% endif %}
+        </div>
+      </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  (function () {
+    const segs = document.querySelectorAll(".segmented .seg");
+    const items = document.querySelectorAll(".review-item");
+    segs.forEach((s) =>
+      s.addEventListener("click", () => {
+        segs.forEach((x) => x.classList.toggle("is-active", x === s));
+        const f = s.dataset.filter;
+        items.forEach((i) => (i.hidden = f !== "all" && i.dataset.state !== f));
+      })
+    );
+  })();
+</script>
+{% endblock %}

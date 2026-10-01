@@ -1,0 +1,995 @@
+{
+  "questions": [
+    {
+      "id": "net-q-001",
+      "topic": "Networking",
+      "question": "Which of the following IPv4 addresses falls within a private address range defined by RFC 1918?",
+      "choices": [
+        "172.32.5.10",
+        "172.20.5.10",
+        "192.169.5.10",
+        "100.64.5.10"
+      ],
+      "answer": 1,
+      "explanation": "RFC 1918 reserves 10.0.0.0/8, 172.16.0.0/12 (172.16.0.0-172.31.255.255) and 192.168.0.0/16 for private networks, so 172.20.5.10 is private. 172.32.5.10 is just past the 172.16.0.0/12 block and 192.169.5.10 is outside 192.168.0.0/16. 100.64.0.0/10 is carrier-grade NAT shared address space (RFC 6598), not an RFC 1918 range.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc1918",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-002",
+      "topic": "Networking",
+      "question": "How many usable host addresses does a /24 IPv4 subnet such as 10.10.1.0/24 provide?",
+      "choices": [
+        "254",
+        "256",
+        "255",
+        "252"
+      ],
+      "answer": 0,
+      "explanation": "A /24 leaves 8 host bits, giving 2^8 = 256 total addresses. The first (network) and last (broadcast) addresses are reserved, leaving 254 usable hosts. 256 is the size of the whole block, not the usable count.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc4632",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-003",
+      "topic": "Networking",
+      "question": "A firewall rule allows traffic from 192.168.16.0/20. Which source address is covered by this rule?",
+      "choices": [
+        "192.168.32.1",
+        "192.168.15.254",
+        "192.168.48.10",
+        "192.168.31.200"
+      ],
+      "answer": 3,
+      "explanation": "A /20 has 12 host bits, so the block spans 4,096 addresses: 192.168.16.0 through 192.168.31.255, which includes 192.168.31.200. 192.168.15.254 falls just below the block, while 192.168.32.1 and 192.168.48.10 belong to later /20 blocks.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc4632",
+      "difficulty": 3
+    },
+    {
+      "id": "net-q-004",
+      "topic": "Networking",
+      "question": "Which IPv6 address is the loopback equivalent of the IPv4 address 127.0.0.1?",
+      "choices": [
+        "::",
+        "fe80::1",
+        "::1",
+        "ff02::1"
+      ],
+      "answer": 2,
+      "explanation": "::1 is the IPv6 loopback address, the counterpart of 127.0.0.1 (localhost). '::' is the unspecified address, fe80::/10 is the link-local range, and ff02::1 is the all-nodes multicast group.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc4291#section-2.5.3",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-005",
+      "topic": "Networking",
+      "question": "Which of these is a correctly written IPv6 address?",
+      "choices": [
+        "2001:db8::85a3::7334",
+        "2001:db8::8a2e:370:7334",
+        "2001:db8:0:g1::1",
+        "fe80:0:0:0:0:0:0:0:1"
+      ],
+      "answer": 1,
+      "explanation": "IPv6 addresses are eight groups of hexadecimal digits, and '::' may replace a single run of zero groups, so 2001:db8::8a2e:370:7334 is valid. Using '::' twice is ambiguous and not allowed, 'g' is not a hexadecimal digit, and fe80:0:0:0:0:0:0:0:1 has nine groups instead of eight.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc4291#section-2.2",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-006",
+      "topic": "Networking",
+      "question": "Datadog documents that its Agent destination domains are CNAME records pointing to a set of static IP addresses. What does a DNS CNAME record do?",
+      "choices": [
+        "Makes one hostname an alias of another hostname",
+        "Maps a hostname directly to an IPv4 address",
+        "Maps an IP address back to a hostname",
+        "Lists the mail servers that accept email for a domain"
+      ],
+      "answer": 0,
+      "explanation": "A CNAME (canonical name) record makes one name an alias of another name, which is then resolved to addresses. An A record maps a name directly to an IPv4 address (AAAA for IPv6), a PTR record performs reverse lookups from IP to name, and MX records list mail servers.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc1034#section-3.6.2",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-007",
+      "topic": "Networking",
+      "question": "A host uses a DNS resolver on another network. After a new firewall rule blocks all outbound traffic on port 53, what is the most likely effect on the Datadog Agent?",
+      "choices": [
+        "TLS certificate validation starts failing on its port 443 connections",
+        "DogStatsD stops accepting metrics from local applications on port 8125",
+        "The NTP check fails, because NTP queries also use port 53",
+        "It can no longer resolve Datadog intake hostnames, so submissions fail"
+      ],
+      "answer": 3,
+      "explanation": "Port 53 is DNS. Without name resolution the Agent cannot turn destinations such as <VERSION>-app.agent.<site> into IP addresses, so outbound submissions fail. TLS validation only happens after a connection is made, DogStatsD listens locally on UDP 8125 regardless of DNS, and NTP uses UDP 123, not 53.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#destinations",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-008",
+      "topic": "Networking",
+      "question": "What is the correct order of packets in a TCP three-way handshake?",
+      "choices": [
+        "SYN, ACK, SYN-ACK",
+        "SYN-ACK, SYN, ACK",
+        "SYN, SYN-ACK, ACK",
+        "SYN, SYN-ACK, FIN"
+      ],
+      "answer": 2,
+      "explanation": "The client sends SYN, the server replies with SYN-ACK, and the client confirms with ACK, after which the connection is established. FIN is used to close a connection, not open one, and the other orderings do not match the protocol.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc9293#section-3.5",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-009",
+      "topic": "Networking",
+      "question": "Which statement best describes UDP compared with TCP?",
+      "choices": [
+        "It is connection-oriented and retransmits any lost segments",
+        "It is connectionless and does not acknowledge or retransmit data",
+        "It is connectionless but guarantees in-order delivery of datagrams",
+        "It is connection-oriented but skips checksums to reduce overhead"
+      ],
+      "answer": 1,
+      "explanation": "UDP sends independent datagrams without a handshake, acknowledgments, retransmission or ordering, which keeps overhead low but gives no delivery guarantee. Connection setup, retransmission and ordered delivery are TCP features, and UDP does carry a checksum.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc768",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-010",
+      "topic": "Networking",
+      "question": "A server's firewall allows inbound TCP traffic only on ports 22 and 443. Which pair of services can clients reach?",
+      "choices": [
+        "SSH and HTTPS",
+        "Telnet and HTTPS",
+        "SSH and HTTP",
+        "RDP and HTTPS"
+      ],
+      "answer": 0,
+      "explanation": "TCP 22 is SSH and TCP 443 is HTTPS. Telnet uses port 23, plain HTTP uses port 80, and RDP uses port 3389, so none of those would pass this rule.",
+      "reference": "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-011",
+      "topic": "Networking",
+      "question": "When the Agent opens a TCP connection to a Datadog intake on port 443, which port does the connection use on the Agent host's side?",
+      "choices": [
+        "Port 443, because both ends of the connection must match",
+        "Port 8126, the Agent's local APM receiver port",
+        "Port 5001, the Agent's local IPC API port",
+        "A temporary ephemeral port chosen by the operating system"
+      ],
+      "answer": 3,
+      "explanation": "A TCP client uses a short-lived ephemeral source port picked by the OS (IANA's dynamic range is 49152-65535; Linux defaults to 32768-60999), while 443 is only the destination port. The two ends do not need matching ports, and 8126 and 5001 are local listening ports for other Agent functions.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc6335#section-6",
+      "difficulty": 3
+    },
+    {
+      "id": "net-q-012",
+      "topic": "Networking",
+      "question": "A service's listening socket is bound to 0.0.0.0:8126 instead of 127.0.0.1:8126. What does this change?",
+      "choices": [
+        "It accepts connections only from processes on the same host",
+        "It stops accepting connections until an address is assigned",
+        "It accepts connections on all of the host's IPv4 interfaces",
+        "It accepts connections only through the default gateway"
+      ],
+      "answer": 2,
+      "explanation": "Binding to 0.0.0.0 (INADDR_ANY) listens on every IPv4 interface, so other hosts or containers can connect if the firewall allows it. Binding to 127.0.0.1 restricts the socket to local processes. This is why the Agent needs settings such as apm_non_local_traffic before it accepts traces from other hosts.",
+      "reference": "https://man7.org/linux/man-pages/man7/ip.7.html",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-013",
+      "topic": "Networking",
+      "question": "A script sends new metric data points to https://api.datadoghq.com/api/v2/series. Which HTTP method does this request use?",
+      "choices": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "answer": 1,
+      "explanation": "Submitting metrics is a POST to /api/v2/series with the series payload in the request body. GET retrieves resources, PUT replaces a resource at a known URL, and DELETE removes one.",
+      "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-014",
+      "topic": "Networking",
+      "question": "A monitoring script should treat a response as a server-side failure that may succeed if retried later. Which HTTP status code class indicates this?",
+      "choices": [
+        "5xx",
+        "4xx",
+        "3xx",
+        "2xx"
+      ],
+      "answer": 0,
+      "explanation": "5xx codes (500 Internal Server Error, 502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout) mean the server failed to handle the request, so a later retry can succeed. 4xx codes are client errors that generally require the client to change something, such as its credentials or payload (429 Too Many Requests, which asks the client to slow down, is a common exception); 3xx codes are redirects and 2xx codes are successes.",
+      "reference": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-015",
+      "topic": "Networking",
+      "question": "In standard HTTP semantics, what distinguishes 401 Unauthorized from 403 Forbidden?",
+      "choices": [
+        "401 means access is refused; 403 means not authenticated",
+        "401 is a server error; 403 is a client error",
+        "401 comes from proxies; 403 comes from origin servers",
+        "401 means not authenticated; 403 means access is refused"
+      ],
+      "answer": 3,
+      "explanation": "401 semantically means 'unauthenticated': the client must supply valid credentials. 403 means the server refuses access even though it may know who the client is. Both are 4xx client errors, and the proxy-specific code is 407 Proxy Authentication Required. Datadog's API returns 403 for a missing or invalid API key.",
+      "reference": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-016",
+      "topic": "Networking",
+      "question": "Why do organizations commonly route Datadog Agent traffic through a forward proxy?",
+      "choices": [
+        "It encrypts Agent traffic that would otherwise be sent in clear text",
+        "It resolves Datadog hostnames to IP addresses on the Agent's behalf",
+        "Hosts without direct internet access can send data out through it",
+        "It lets Datadog open connections back into the private network"
+      ],
+      "answer": 2,
+      "explanation": "Datadog describes a proxy as typically used to send traffic from a host that is not directly connected to the public internet, which gives the network one controlled egress point. Agent traffic is already TLS-encrypted, name resolution is DNS's job, and Datadog never initiates connections to the Agent.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/proxy/",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-017",
+      "topic": "Networking",
+      "question": "Agent traffic passes through a corporate proxy, and the proxy returns HTTP 502 Bad Gateway. What does this status indicate?",
+      "choices": [
+        "The proxy requires the Agent to authenticate before forwarding",
+        "The proxy got an invalid response from the upstream server",
+        "Datadog rejected the API key that the Agent presented",
+        "The request body exceeded the server's maximum size"
+      ],
+      "answer": 1,
+      "explanation": "502 Bad Gateway means a server acting as a gateway or proxy received an invalid response from the upstream server it contacted. A proxy asking for credentials returns 407, a rejected Datadog API key returns 403, and an oversized body returns 413.",
+      "reference": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/502",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-018",
+      "topic": "Networking",
+      "question": "After a proxy is configured for the Agent, agent.log shows HTTP 407 Proxy Authentication Required. What is the best fix?",
+      "choices": [
+        "Add the proxy user and password to the proxy URL",
+        "Regenerate the Datadog API key and restart the Agent",
+        "Add every Datadog domain to the no_proxy list",
+        "Set skip_ssl_validation to true in datadog.yaml"
+      ],
+      "answer": 0,
+      "explanation": "407 comes from the proxy itself and means it wants credentials. The Agent accepts them in the proxy URL, in the form http://<USER>:<PASSWORD>@<PROXY_HOST>:<PROXY_PORT>. A new Datadog API key does not satisfy the proxy, no_proxy would bypass a proxy the host may depend on, and disabling TLS validation supplies no credentials.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/proxy/#configuration-file",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-019",
+      "topic": "Networking",
+      "question": "Datadog states that all Agent traffic is sent over SSL/TLS. What does this primarily provide?",
+      "choices": [
+        "Encryption of Agent data stored on the host's local disk",
+        "Guaranteed delivery of packets that are sent over UDP",
+        "Exemption from API rate limits on authenticated calls",
+        "Encryption and integrity of data while it is in transit"
+      ],
+      "answer": 3,
+      "explanation": "TLS encrypts the connection and detects tampering, and certificate validation lets the Agent verify it is talking to the genuine Datadog endpoint. It does not encrypt files at rest, add reliability to UDP, or change API rate limiting.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#overview",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-020",
+      "topic": "Networking",
+      "question": "Which datadog.yaml setting defines the proxy the Agent uses for HTTPS traffic, which carries most Datadog data?",
+      "choices": [
+        "A top-level https_proxy key",
+        "The proxy_url key under the forwarder section",
+        "The https key nested under the proxy section",
+        "The tls_proxy key under the logs_config section"
+      ],
+      "answer": 2,
+      "explanation": "Agent proxies are configured in the proxy section of datadog.yaml with http, https and no_proxy keys (for example proxy: https: http://proxy.example.com:3128), followed by an Agent restart. Datadog notes that most of its traffic uses HTTPS. The other keys listed are not Agent proxy settings.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/proxy/#configuration-file",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-021",
+      "topic": "Networking",
+      "question": "datadog.yaml sets the proxy https value to http://proxy-a:3128, but the Agent container also has DD_PROXY_HTTPS=http://proxy-b:3128. Which proxy does the Agent use for HTTPS traffic?",
+      "choices": [
+        "proxy-a, because datadog.yaml takes priority over environment variables",
+        "proxy-b, because environment variables override the config file",
+        "Both, alternating requests between the two proxies",
+        "Neither, because the Agent refuses to start with conflicting settings"
+      ],
+      "answer": 1,
+      "explanation": "Datadog's proxy documentation states that environment variables override configuration file settings, so DD_PROXY_HTTPS wins. The Agent does not load-balance across proxies, and conflicting values do not stop it from starting.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/proxy/#configure-the-datadog-agent",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-022",
+      "topic": "Networking",
+      "question": "With no_proxy_nonexact_match: true, which no_proxy entry makes the Agent bypass the proxy for app.agent.datadoghq.com but NOT for datadoghq.com itself?",
+      "choices": [
+        ".datadoghq.com",
+        "datadoghq.com",
+        "datadoghq",
+        "agent.datadoghq"
+      ],
+      "answer": 0,
+      "explanation": "Under the non-exact rules, a domain with a leading dot matches subdomains only, so .datadoghq.com matches app.agent.datadoghq.com but not datadoghq.com. Without the dot, datadoghq.com matches the domain itself and all subdomains. 'datadoghq' and 'agent.datadoghq' only match names ending in those labels, so neither host is matched.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/proxy/#no_proxy-accepted-values",
+      "difficulty": 3
+    },
+    {
+      "id": "net-q-023",
+      "topic": "Networking",
+      "question": "Hosts in a private subnet (10.0.1.0/24) reach the internet through a NAT gateway. Which source IP address does the Datadog intake see for their Agent traffic?",
+      "choices": [
+        "Each host's private 10.0.1.x address",
+        "The loopback address 127.0.0.1",
+        "The Datadog intake's own IP address",
+        "The NAT gateway's public IP address"
+      ],
+      "answer": 3,
+      "explanation": "Source NAT rewrites the private source address of outbound packets to the NAT device's public address and translates replies back. RFC 1918 addresses are not routable on the internet, so Datadog never sees 10.0.1.x, and loopback traffic never leaves the host.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc3022",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-024",
+      "topic": "Networking",
+      "question": "From a Linux host, you want to confirm that an outbound TCP connection to trace.agent.datadoghq.com on port 443 can be established. Which command tests this most directly?",
+      "choices": [
+        "ping -c 3 trace.agent.datadoghq.com",
+        "dig trace.agent.datadoghq.com",
+        "nc -vz trace.agent.datadoghq.com 443",
+        "traceroute trace.agent.datadoghq.com"
+      ],
+      "answer": 2,
+      "explanation": "nc -vz attempts a TCP connection to the given port and reports whether it succeeds, without sending data. ping uses ICMP and has no concept of ports, dig only checks DNS resolution, and a default traceroute maps the network path rather than testing TCP 443.",
+      "reference": "https://linux.die.net/man/1/nc",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-025",
+      "topic": "Networking",
+      "question": "Connections from a host to an external HTTPS endpoint time out, and you want to find the router hop along the path where packets stop getting through. Which command is designed for this?",
+      "choices": [
+        "dig api.example.com",
+        "traceroute api.example.com",
+        "ss -tan state syn-sent",
+        "nslookup -debug api.example.com"
+      ],
+      "answer": 1,
+      "explanation": "traceroute sends probes with increasing TTL values so each router on the path identifies itself, revealing where packets stop; with -T -p 443 it can probe using TCP on the HTTPS port. dig and nslookup only test DNS resolution, and ss lists local sockets, such as connections stuck in SYN-SENT, without showing the path.",
+      "reference": "https://man7.org/linux/man-pages/man8/traceroute.8.html",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-026",
+      "topic": "Networking",
+      "question": "ping api.internal.example.com gets replies, but curl https://api.internal.example.com times out. What is the most likely explanation?",
+      "choices": [
+        "ICMP is allowed, but TCP port 443 is blocked along the path",
+        "The hostname cannot be resolved by the host's DNS resolver",
+        "The remote host is down, because ping also tests port 443",
+        "The server is rejecting the request with an HTTP 403 error"
+      ],
+      "answer": 0,
+      "explanation": "ping uses ICMP echo, which has no ports, so a reply only proves the host is reachable at the IP layer; a timeout on HTTPS points to TCP 443 being dropped by a firewall or requiring a proxy. DNS clearly worked because ping resolved the name, and a 403 would be a quick HTTP response rather than a timeout.",
+      "reference": "https://man7.org/linux/man-pages/man8/ping.8.html",
+      "difficulty": 3
+    },
+    {
+      "id": "net-q-027",
+      "topic": "Datadog Ports",
+      "question": "A firewall should allow a single outbound TCP port so the Agent can send metrics, APM traces and live process data to Datadog. Which port?",
+      "choices": [
+        "8126",
+        "8125",
+        "10516",
+        "443"
+      ],
+      "answer": 3,
+      "explanation": "The Network Traffic page lists outbound TCP 443 for most Agent data, including metrics, APM, containers, live processes, Cloud Network Monitoring and Universal Service Monitoring. 8126 and 8125 are local listening ports for traces and DogStatsD, and 10516 is only the deprecated TCP logs port for US1.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#outbound",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-028",
+      "topic": "Datadog Ports",
+      "question": "The Agent's NTP check reports errors on a host whose firewall only permits outbound TCP 443. Which additional outbound rule does Datadog document for NTP?",
+      "choices": [
+        "TCP 123",
+        "UDP 53",
+        "UDP 123",
+        "TCP 8443"
+      ],
+      "answer": 2,
+      "explanation": "Datadog lists outbound UDP 123 for Network Time Protocol, and the NTP integration says outgoing UDP traffic on port 123 must be allowed so the Agent can check its clock offset. NTP does not use TCP 123, port 53 is DNS, and TCP 8443 is listed for Custom Agent Autoscaling.",
+      "reference": "https://docs.datadoghq.com/integrations/ntp/",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-029",
+      "topic": "Datadog Ports",
+      "question": "A Synthetics private location worker runs in a network that blocks all egress by default. Which access does it need to pull test configurations and push results?",
+      "choices": [
+        "Inbound TCP 443 from Datadog's synthetics IP ranges",
+        "Outbound TCP 443 to the Synthetics intake endpoint",
+        "Outbound UDP 8125 to the local Datadog Agent",
+        "Outbound TCP 8126 to trace.agent.<site>"
+      ],
+      "answer": 1,
+      "explanation": "Private location workers need outbound port 443 to the Synthetics intake endpoint (intake.synthetics.<site> for worker v1.5.0 and later) to pull test configurations and push results. Datadog does not connect in to the worker, and the worker does not rely on the Agent's DogStatsD or APM ports.",
+      "reference": "https://docs.datadoghq.com/synthetics/private_locations/",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-030",
+      "topic": "Datadog Ports",
+      "question": "An application container on another Docker host must send traces to a containerized Agent. Which combination is required on the Agent container?",
+      "choices": [
+        "Publish 8126/tcp and set DD_APM_NON_LOCAL_TRAFFIC=true",
+        "Publish 8125/udp and set DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true",
+        "Publish 5001/tcp and set DD_CMD_PORT=5001",
+        "Publish 443/tcp and set DD_SITE to the Datadog site"
+      ],
+      "answer": 0,
+      "explanation": "The APM receiver listens on TCP 8126, the port must be published (for example -p 8126:8126/tcp), and the Agent only listens to non-local traffic when DD_APM_NON_LOCAL_TRAFFIC is true. The 8125/udp option applies to DogStatsD metrics, 5001 is the internal IPC API, and 443 is used for outbound traffic only.",
+      "reference": "https://docs.datadoghq.com/containers/docker/apm/",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-031",
+      "topic": "Datadog Ports",
+      "question": "All Agent traffic on a host goes through an HTTP proxy, and the firewall blocks every other outbound path. Metrics arrive, but the NTP check fails. Why?",
+      "choices": [
+        "The NTP servers must be added to the Agent's no_proxy list",
+        "NTP offsets are sent through DogStatsD on UDP 8125 instead",
+        "The proxy removes the API key from the NTP check's requests",
+        "NTP requests do not use the proxy settings and need UDP 123"
+      ],
+      "answer": 3,
+      "explanation": "The NTP integration notes that NTP requests do not support proxy settings, so the Agent must reach its NTP servers (the cloud provider's, or 0-3.datadog.pool.ntp.org) directly over outbound UDP 123. Adding no_proxy entries only means 'connect directly', which this firewall blocks; NTP is not sent through DogStatsD and carries no API key.",
+      "reference": "https://docs.datadoghq.com/integrations/ntp/",
+      "difficulty": 3
+    },
+    {
+      "id": "net-q-032",
+      "topic": "Datadog Ports",
+      "question": "Another service on a host already listens on TCP 5001, which conflicts with the Agent's IPC API. Which datadog.yaml parameter changes the Agent's port?",
+      "choices": [
+        "expvar_port",
+        "GUI_port",
+        "cmd_port",
+        "receiver_port"
+      ],
+      "answer": 2,
+      "explanation": "The IPC API listens on cmd_port (default 5001, env DD_CMD_PORT). expvar_port controls the go_expvar server on 5000, GUI_port controls the browser GUI (5002 on Windows and macOS), and receiver_port sets the APM trace receiver (8126).",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#configure-ports",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-033",
+      "topic": "Datadog Ports",
+      "question": "On a Linux host, an engineer cannot reach the Agent browser GUI at localhost:5002, although it works on their macOS laptop. What explains this?",
+      "choices": [
+        "The GUI listens on UDP 5002 on Linux instead of TCP",
+        "GUI_port defaults to -1 on Linux, disabling the GUI",
+        "On Linux the GUI shares port 5001 with the IPC API",
+        "The GUI is only reachable from Datadog's ip-ranges"
+      ],
+      "answer": 1,
+      "explanation": "The datadog.yaml reference documents GUI_port defaults of 5002 on Windows and macOS and -1 on Linux, and -1 turns the GUI off completely. The GUI is a local TCP service; it does not switch to UDP, share the IPC API port, or accept connections from Datadog.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#configure-ports",
+      "difficulty": 3
+    },
+    {
+      "id": "net-q-034",
+      "topic": "Datadog Ports",
+      "question": "Which local TCP port does the Network Traffic documentation list for the go_expvar server of the APM (trace) Agent?",
+      "choices": [
+        "5012",
+        "5000",
+        "6062",
+        "8126"
+      ],
+      "answer": 0,
+      "explanation": "Datadog lists TCP 5012 for the go_expvar server (APM) and TCP 5000 for the go_expvar integration server. 6062 is the Process Agent debug port, and 8126 is the APM receiver that accepts traces, not the expvar endpoint.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#inbound",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-035",
+      "topic": "Datadog Ports",
+      "question": "What are TCP ports 6062 and 6162 used for on a host running the Datadog Agent?",
+      "choices": [
+        "Outbound Live Process data sent to process.<site>",
+        "Fallback listeners for DogStatsD and the APM receiver",
+        "Remote Configuration polling and flare uploads",
+        "Process Agent debug and runtime configuration"
+      ],
+      "answer": 3,
+      "explanation": "Both are local inbound ports: 6062 serves Process Agent debug endpoints and 6162 serves Process Agent runtime configuration settings. Live Process data leaves the host on TCP 443, DogStatsD and APM use 8125/UDP and 8126/TCP, and Remote Configuration and flares also go out over 443.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#inbound",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-036",
+      "topic": "Datadog Ports",
+      "question": "Datadog warns that the Agent's inbound ports (such as 8125, 8126 and 5001) should be restricted. Who should be able to reach them?",
+      "choices": [
+        "Datadog's published ip-ranges, so it can poll the Agent",
+        "Any host, since these ports only accept TLS traffic",
+        "Only local applications or trusted network sources",
+        "Only the Datadog web app, which serves the Agent GUI"
+      ],
+      "answer": 2,
+      "explanation": "The inbound ports are for Agent services communicating locally, and Datadog says the Agent should only be accessible to your applications or trusted sources; untrusted access could let attackers write traces and metrics to your account or learn about your configuration. Datadog never connects in to the Agent, and these listeners are not a TLS-only public service.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#open-ports",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-037",
+      "topic": "Datadog Ports",
+      "question": "Which statement correctly describes how network sessions between the Agent and Datadog are established?",
+      "choices": [
+        "Datadog polls the Agent on port 5001 to collect queued data",
+        "The Agent starts all sessions; Datadog never connects back",
+        "Datadog connects to port 8126 to push Remote Configuration",
+        "Each side opens its own session to send data in its direction"
+      ],
+      "answer": 1,
+      "explanation": "Datadog states that traffic is always initiated by the Agent and no sessions are ever initiated from Datadog back to the Agent, so only outbound rules are needed. Remote Configuration is fetched by the Agent from config.<site>, and ports 5001 and 8126 are local listeners that Datadog never contacts.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#overview",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-038",
+      "topic": "Datadog Ports",
+      "question": "Agent v7.50 has logs_enabled: true on a US1 host whose firewall only allows outbound TCP 443. What happens to log collection by default?",
+      "choices": [
+        "Logs are sent over compressed HTTPS on port 443",
+        "Logs fail because the Agent requires TCP 10516",
+        "Logs are sent to DogStatsD over UDP 8125 instead",
+        "Logs are buffered on disk until TCP 10514 opens"
+      ],
+      "answer": 0,
+      "explanation": "Since Agent v6.19/v7.19 the default logs transport is compressed HTTPS on port 443 (agent-http-intake.logs.<site>). The Agent only falls back to TCP if its startup HTTPS connectivity test fails; 10516 and 10514 are the legacy US1 TCP ports (with and without TLS), and DogStatsD does not carry logs.",
+      "reference": "https://docs.datadoghq.com/agent/logs/log_transport/",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-039",
+      "topic": "Datadog Ports",
+      "question": "An older configuration sets logs_config.force_use_tcp: true on an Agent reporting to US1 (datadoghq.com). Which outbound port does the deprecated TLS-encrypted TCP transport need?",
+      "choices": [
+        "10514",
+        "443",
+        "6514",
+        "10516"
+      ],
+      "answer": 3,
+      "explanation": "For US1, the Agent's TLS-encrypted TCP logs endpoint is agent-intake.logs.datadoghq.com on port 10516; 10514 is the same endpoint without TLS. 443 is the Agent's TCP logs port on the EU site (and the default HTTPS logs port), and 6514 is the generic syslog-over-TLS port, not a Datadog intake. Datadog now marks TCP log collection as not supported and recommends HTTPS.",
+      "reference": "https://docs.datadoghq.com/logs/log_collection/#logging-endpoints",
+      "difficulty": 3
+    },
+    {
+      "id": "net-q-040",
+      "topic": "Datadog Ports",
+      "question": "You change dogstatsd_port to 8135 in datadog.yaml because another service uses 8125. What else must you do?",
+      "choices": [
+        "Open outbound UDP 8135 to Datadog's ip-ranges",
+        "Change receiver_port to 8136 to avoid a clash",
+        "Configure DogStatsD clients to send to UDP 8135",
+        "Nothing, because clients discover the new port"
+      ],
+      "answer": 2,
+      "explanation": "The dogstatsd_port setting notes 'Make sure your client is sending to the same UDP port', and Datadog says SDK configuration must change whenever the DogStatsD or APM port changes. DogStatsD is a local listener, so nothing is opened toward Datadog, the APM port is unrelated, and clients do not discover ports automatically.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#configure-ports",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-041",
+      "topic": "Datadog IP Addresses",
+      "question": "An organization on the US1 site (app.datadoghq.com) needs Datadog's published IP prefixes for its firewall. Which URL provides them?",
+      "choices": [
+        "https://app.datadoghq.com/ip-ranges.json",
+        "https://ip-ranges.datadoghq.com/",
+        "https://api.datadoghq.com/api/v1/ip-ranges",
+        "https://status.datadoghq.com/ip-ranges"
+      ],
+      "answer": 1,
+      "explanation": "The IP Ranges API is a GET on https://ip-ranges.datadoghq.com/ for US1, and every other site has its own ip-ranges.<site> host. The web app, API and status-page URLs shown are not where Datadog publishes its IP prefixes.",
+      "reference": "https://docs.datadoghq.com/api/latest/ip-ranges/",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-042",
+      "topic": "Datadog IP Addresses",
+      "question": "In the ip-ranges JSON document, what does the api section list?",
+      "choices": [
+        "Datadog IPs the Agent calls for non-critical API queries",
+        "Source IPs Datadog uses to call third-party HTTP endpoints",
+        "IPs used by Synthetic API tests to reach your applications",
+        "IPs of the Datadog web application used for user logins"
+      ],
+      "answer": 0,
+      "explanation": "The schema describes api as the IPs used by the Agent for non-critical functionality, querying information from the API, such as displaying whether the configured API key is valid. Datadog's outbound calls to third parties are the webhooks section, Synthetic test sources are the synthetics section, and there is no web-login section.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#static-ip-addresses",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-043",
+      "topic": "Datadog IP Addresses",
+      "question": "An internal ticketing system behind a firewall must accept HTTP calls from Datadog webhook notifications. Which ip-ranges section should its inbound allowlist use?",
+      "choices": [
+        "agents",
+        "api",
+        "synthetics",
+        "webhooks"
+      ],
+      "answer": 3,
+      "explanation": "The webhooks section lists the source IPs Datadog uses to connect to third-party infrastructure over HTTP, so those are the addresses to allow inbound. agents and api are Datadog intake addresses the Agent connects out to, and synthetics lists the sources of Synthetic test traffic, not webhook calls.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#static-ip-addresses",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-044",
+      "topic": "Datadog IP Addresses",
+      "question": "A web app's firewall is blocking API tests run from Datadog managed Synthetic locations. Which list of addresses should be allowed inbound?",
+      "choices": [
+        "The synthetics-private-locations section",
+        "The agents section used for metric intake",
+        "The synthetics section (synthetics.json)",
+        "The webhooks section used for notifications"
+      ],
+      "answer": 2,
+      "explanation": "Managed locations send test traffic from the source IPs in the synthetics section, published at https://ip-ranges.<site>/synthetics.json and broken down by location. synthetics-private-locations lists the Datadog IPs that private location workers send results to, not test sources, and agents and webhooks serve other purposes.",
+      "reference": "https://docs.datadoghq.com/synthetics/guide/identify_synthetics_bots/",
+      "difficulty": 3
+    },
+    {
+      "id": "net-q-045",
+      "topic": "Datadog IP Addresses",
+      "question": "Which top-level field of the ip-ranges JSON is incremented every time the published information changes?",
+      "choices": [
+        "modified",
+        "version",
+        "revision",
+        "serial"
+      ],
+      "answer": 1,
+      "explanation": "The schema defines version as a number incremented every time the information changes, while modified is the timestamp of the last modification. revision and serial are not fields in this document. Tracking version lets automation detect when firewall rules need refreshing.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#static-ip-addresses",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-046",
+      "topic": "Datadog IP Addresses",
+      "question": "An Agent v7.31.0 on US1 sends metrics to 7-31-0-app.agent.datadoghq.com. What should a hostname-based firewall allow so this keeps working after Agent upgrades?",
+      "choices": [
+        "*.agent.datadoghq.com",
+        "app.datadoghq.com",
+        "api.datadoghq.com",
+        "7-31-0-app.agent.datadoghq.com"
+      ],
+      "answer": 0,
+      "explanation": "The metrics hostname embeds the Agent version, so Datadog says you must add *.agent.<YOUR_DATADOG_SITE> to your firewall inclusion list; the wildcard also covers flares and trace.agent. Allowing only the current versioned host breaks after an upgrade, and the app. and api. hosts are used for non-critical API queries, not metric intake.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#destinations",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-047",
+      "topic": "Datadog IP Addresses",
+      "question": "A firewall can only filter on IP addresses, not hostnames. Why is it still possible to allowlist the Agent's Datadog destinations?",
+      "choices": [
+        "The Agent falls back to raw IPs when DNS is not available",
+        "Datadog assigns each customer a dedicated fixed intake IP",
+        "The Agent only sends data to one IP address per site",
+        "Its domains are CNAMEs to static IPs listed at ip-ranges"
+      ],
+      "answer": 3,
+      "explanation": "Datadog states that all Agent destination domains are CNAME records pointing to a set of static IP addresses, published at https://ip-ranges.<site>. The Agent does not bypass DNS with hardcoded IPs, customers do not get dedicated intake IPs, and the published data is a set of CIDR ranges rather than a single address.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#static-ip-addresses",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-048",
+      "topic": "Datadog IP Addresses",
+      "question": "A firewall for Agents reporting to us5.datadoghq.com was built from https://ip-ranges.datadoghq.com. What is the problem?",
+      "choices": [
+        "Nothing, because all Datadog sites share one common list of IP ranges",
+        "US5 publishes no IP ranges, so only hostname-based rules can work",
+        "It is the US1 list; US5 has its own at ip-ranges.us5.datadoghq.com",
+        "It should use only the api section of the US1 list instead"
+      ],
+      "answer": 2,
+      "explanation": "Each Datadog site is independent and publishes its own ranges at ip-ranges.<site>, so US5 Agents need https://ip-ranges.us5.datadoghq.com. The US1 list (ip-ranges.datadoghq.com) describes different infrastructure, and the IP Ranges API lists an endpoint for every site, including US5.",
+      "reference": "https://docs.datadoghq.com/api/latest/ip-ranges/",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-049",
+      "topic": "Datadog IP Addresses",
+      "question": "A network team wants only the IP prefixes for APM intake on US1, not the whole ip-ranges document. Which URL should they use?",
+      "choices": [
+        "https://ip-ranges.datadoghq.com/?section=apm",
+        "https://ip-ranges.datadoghq.com/apm.json",
+        "https://apm.ip-ranges.datadoghq.com/",
+        "https://trace.agent.datadoghq.com/ip-ranges"
+      ],
+      "answer": 1,
+      "explanation": "Each section of the ip-ranges document has a dedicated endpoint named after it, for example https://ip-ranges.<site>/apm.json for APM and /logs.json for logs. There is no query-string filter or per-service ip-ranges host, and trace.agent.<site> is the APM intake itself, not a list of addresses.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#static-ip-addresses",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-050",
+      "topic": "Datadog IP Addresses",
+      "question": "An ip-ranges section lists the IPv4 prefix 3.233.144.0/20 in prefixes_ipv4. How many IPv4 addresses does that single entry cover?",
+      "choices": [
+        "4,096",
+        "1,024",
+        "2,048",
+        "65,536"
+      ],
+      "answer": 0,
+      "explanation": "A /20 prefix leaves 32 - 20 = 12 host bits, and 2^12 = 4,096 addresses. 1,024 would be a /22, 2,048 a /21, and 65,536 a /16. Firewalls that cannot take CIDR notation must expand entries like this into address ranges.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#static-ip-addresses",
+      "difficulty": 3
+    },
+    {
+      "id": "net-q-051",
+      "topic": "Datadog IP Addresses",
+      "question": "Packet captures show the Agent currently connects to only a few Datadog IPs, and the team plans to allowlist just those. What does Datadog recommend?",
+      "choices": [
+        "Allowlist only the observed IPs and review them every quarter",
+        "Allowlist the IPs the Agent resolved when it was first installed",
+        "Pin the Agent to one IP with a hosts file entry for each domain",
+        "Add all the published ranges, since the active subset changes"
+      ],
+      "answer": 3,
+      "explanation": "Datadog says to add all of the ip-ranges to your inclusion list: only a subset is active at any given moment, but it varies over time due to regular network operation and maintenance. Allowlisting observed or install-time IPs, or pinning hosts-file entries, breaks when traffic moves to other addresses in the published ranges.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#inclusion",
+      "difficulty": 2
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "net-fc-001",
+      "topic": "Networking",
+      "front": "What are the RFC 1918 private IPv4 ranges?",
+      "back": "10.0.0.0/8 (10.0.0.0-10.255.255.255)\n172.16.0.0/12 (172.16.0.0-172.31.255.255)\n192.168.0.0/16 (192.168.0.0-192.168.255.255)\nThey are not routable on the public internet, so hosts reach the internet through NAT.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc1918"
+    },
+    {
+      "id": "net-fc-002",
+      "topic": "Networking",
+      "front": "CIDR notation (for example 10.1.2.0/24)",
+      "back": "The number after the slash is how many leading bits form the network prefix; the block holds 2^(32 - prefix) addresses.\n/8 = 255.0.0.0 (16,777,216)\n/16 = 255.255.0.0 (65,536)\n/20 = 255.255.240.0 (4,096)\n/24 = 255.255.255.0 (256; 254 usable hosts)\n/32 = a single host",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc4632"
+    },
+    {
+      "id": "net-fc-003",
+      "topic": "Networking",
+      "front": "Loopback addresses (localhost)",
+      "back": "IPv4: 127.0.0.0/8, usually 127.0.0.1. IPv6: ::1.\nLoopback traffic never leaves the host. The Agent's DogStatsD port 8125 is available on IPv4 localhost (127.0.0.1) unless dogstatsd_non_local_traffic is enabled.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#inbound"
+    },
+    {
+      "id": "net-fc-004",
+      "topic": "Networking",
+      "front": "IPv4 vs IPv6",
+      "back": "IPv4: 32-bit, dotted decimal (192.0.2.10), about 4.3 billion addresses.\nIPv6: 128-bit, eight groups of hex separated by colons (2001:db8::1); '::' compresses one run of zero groups.\nDatadog's ip-ranges lists both as prefixes_ipv4 and prefixes_ipv6.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc4291#section-2.2"
+    },
+    {
+      "id": "net-fc-005",
+      "topic": "Networking",
+      "front": "Common DNS record types",
+      "back": "A: name to IPv4 address\nAAAA: name to IPv6 address\nCNAME: alias of another name (Datadog's Agent destinations are CNAMEs)\nPTR: IP to name (reverse lookup)\nMX: mail servers\nDNS uses port 53 (UDP, plus TCP for large responses).",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc1035#section-3.2.2"
+    },
+    {
+      "id": "net-fc-006",
+      "topic": "Networking",
+      "front": "TCP vs UDP",
+      "back": "TCP: connection-oriented (handshake), acknowledgments, retransmission, ordered delivery. Used for HTTPS 443 and the APM receiver 8126.\nUDP: connectionless, no delivery or ordering guarantee, low overhead. Used for DogStatsD 8125, DNS 53 and NTP 123.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc9293"
+    },
+    {
+      "id": "net-fc-007",
+      "topic": "Networking",
+      "front": "TCP three-way handshake",
+      "back": "1. Client sends SYN\n2. Server replies SYN-ACK\n3. Client sends ACK\nThe connection is then established. FIN closes a connection gracefully; RST aborts it.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc9293#section-3.5"
+    },
+    {
+      "id": "net-fc-008",
+      "topic": "Networking",
+      "front": "Well-known ports to memorize",
+      "back": "22 SSH\n23 Telnet\n25 SMTP\n53 DNS\n80 HTTP\n123 NTP (UDP)\n443 HTTPS\n3389 RDP",
+      "reference": "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml"
+    },
+    {
+      "id": "net-fc-009",
+      "topic": "Networking",
+      "front": "Port number ranges",
+      "back": "0-1023: well-known (system) ports\n1024-49151: registered (user) ports\n49152-65535: dynamic/private (ephemeral) ports\nA client connection uses an ephemeral source port; Linux defaults to 32768-60999.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc6335#section-6"
+    },
+    {
+      "id": "net-fc-010",
+      "topic": "Networking",
+      "front": "HTTP status code classes",
+      "back": "1xx informational\n2xx success (200 OK, 202 Accepted)\n3xx redirection (301, 302)\n4xx client error (400, 401, 403, 404, 407, 413, 429)\n5xx server error (500, 502, 503, 504)",
+      "reference": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status"
+    },
+    {
+      "id": "net-fc-011",
+      "topic": "Networking",
+      "front": "401 vs 403 vs 407",
+      "back": "401 Unauthorized: semantically 'unauthenticated'; valid credentials are needed.\n403 Forbidden: the server refuses access (Datadog's API returns 403 for a missing or invalid API key).\n407 Proxy Authentication Required: the proxy itself needs credentials (put them in the Agent's proxy URL).",
+      "reference": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status"
+    },
+    {
+      "id": "net-fc-012",
+      "topic": "Networking",
+      "front": "Common HTTP methods",
+      "back": "GET: retrieve a resource\nPOST: submit data or create (for example sending metrics to Datadog)\nPUT: replace a resource\nPATCH: partially update\nDELETE: remove\nHEAD: like GET but headers only",
+      "reference": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods"
+    },
+    {
+      "id": "net-fc-013",
+      "topic": "Networking",
+      "front": "How do you point the Datadog Agent at an HTTP/HTTPS proxy?",
+      "back": "In datadog.yaml, a proxy section with http, https and optional no_proxy keys, e.g. https: http://<USER>:<PASSWORD>@<PROXY_HOST>:<PROXY_PORT>. Or use DD_PROXY_HTTP, DD_PROXY_HTTPS and DD_PROXY_NO_PROXY; environment variables override the file. Restart the Agent afterwards.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/proxy/#configure-the-datadog-agent"
+    },
+    {
+      "id": "net-fc-014",
+      "topic": "Networking",
+      "front": "no_proxy matching when no_proxy_nonexact_match is true",
+      "back": "datadoghq.com: the domain and all its subdomains\n.datadoghq.com: subdomains only\n192.168.1.0/24: any IP in the CIDR\nExact IPs (169.254.169.254) and hostnames (webserver1) also work.\nWithout the flag, Agent requests must match no_proxy entries exactly.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/proxy/#no_proxy-accepted-values"
+    },
+    {
+      "id": "net-fc-015",
+      "topic": "Networking",
+      "front": "Network troubleshooting tools",
+      "back": "ping: ICMP reachability (no ports)\ntraceroute: hop-by-hop path\nnslookup / dig: DNS resolution\nnc -vz / telnet: test a TCP port\ncurl -v: full HTTP(S) request with TLS and status details\nss / netstat: local listening sockets and connections",
+      "reference": "https://man7.org/linux/man-pages/man8/ss.8.html"
+    },
+    {
+      "id": "net-fc-016",
+      "topic": "Networking",
+      "front": "Listening on 0.0.0.0 vs 127.0.0.1",
+      "back": "0.0.0.0: every IPv4 interface, so other hosts can connect if the firewall allows.\n127.0.0.1: loopback only, so only local processes can connect.\nThe Agent's DogStatsD and APM listeners accept only local traffic unless dogstatsd_non_local_traffic or apm_non_local_traffic is true.",
+      "reference": "https://man7.org/linux/man-pages/man7/ip.7.html"
+    },
+    {
+      "id": "net-fc-017",
+      "topic": "Networking",
+      "front": "NAT (Network Address Translation)",
+      "back": "A router or NAT gateway rewrites private source addresses to its own public IP for outbound traffic and maps replies back. External services such as Datadog see the NAT's public IP, not the host's RFC 1918 address.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc3022"
+    },
+    {
+      "id": "net-fc-018",
+      "topic": "Datadog Ports",
+      "front": "Datadog Agent outbound ports",
+      "back": "443/TCP: most Agent data (metrics, APM, containers, live processes, Cloud Network Monitoring, USM); logs over HTTPS also use 443\n123/UDP: NTP\nListed for US1 and EU only: 8443/TCP Custom Agent Autoscaling, 8042/TCP Remote Configuration connectivity test\nDeprecated TCP logs: 10516 (US1), 443 (EU)",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#outbound"
+    },
+    {
+      "id": "net-fc-019",
+      "topic": "Datadog Ports",
+      "front": "Datadog Agent local (inbound) ports",
+      "back": "5000/TCP go_expvar integration server\n5001/TCP IPC API\n5002/TCP browser GUI\n5012/TCP go_expvar server (APM)\n6062/TCP Process Agent debug\n6162/TCP Process Agent runtime configuration\n8125/UDP DogStatsD\n8126/TCP APM receiver (tracing and profiler)",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#inbound"
+    },
+    {
+      "id": "net-fc-020",
+      "topic": "Datadog Ports",
+      "front": "datadog.yaml settings that change the Agent's local ports",
+      "back": "expvar_port (default 5000)\ncmd_port (5001, IPC API)\nGUI_port (5002 on Windows/macOS; -1 on Linux, which disables the GUI)\ndogstatsd_port (8125)\napm_config receiver_port (8126; 0 disables the HTTP receiver)",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#configure-ports"
+    },
+    {
+      "id": "net-fc-021",
+      "topic": "Datadog Ports",
+      "front": "Which Datadog Agent ports use UDP rather than TCP?",
+      "back": "8125/UDP: DogStatsD (inbound, local)\n123/UDP: NTP (outbound)\nEvery other port in the Network Traffic tables (443, 8443, 8042, 5000, 5001, 5002, 5012, 6062, 6162, 8126) is TCP.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#open-ports"
+    },
+    {
+      "id": "net-fc-022",
+      "topic": "Datadog Ports",
+      "front": "Accepting traces from other hosts or containers",
+      "back": "The APM receiver listens on TCP 8126. Set apm_non_local_traffic (DD_APM_NON_LOCAL_TRAFFIC=true) and publish -p 8126:8126/tcp; -p 127.0.0.1:8126:8126/tcp keeps it host-only. Apps find the Agent via DD_AGENT_HOST and DD_TRACE_AGENT_PORT.",
+      "reference": "https://docs.datadoghq.com/containers/docker/apm/"
+    },
+    {
+      "id": "net-fc-023",
+      "topic": "Datadog Ports",
+      "front": "Agent log transport and ports",
+      "back": "Agent v6.19+/v7.19+: compressed HTTPS on port 443 (agent-http-intake.logs.<site>), chosen by a startup connectivity test; falls back to TCP if HTTPS fails.\nForce HTTPS with logs_config.force_use_http: true.\nLegacy TCP (not supported): US1 port 10516 with TLS or 10514 without; EU 443.",
+      "reference": "https://docs.datadoghq.com/agent/logs/log_transport/"
+    },
+    {
+      "id": "net-fc-024",
+      "topic": "Datadog Ports",
+      "front": "NTP requirements for the Agent",
+      "back": "The NTP check is enabled by default and reports clock offset every 15 minutes. It needs outbound UDP 123 to the cloud provider's NTP server or 0-3.datadog.pool.ntp.org, and NTP requests do not use proxy settings. An offset over 15 seconds can cause wrong alerts, metric delays and graph gaps.",
+      "reference": "https://docs.datadoghq.com/integrations/ntp/"
+    },
+    {
+      "id": "net-fc-025",
+      "topic": "Datadog Ports",
+      "front": "What else must change when you move the DogStatsD or APM port?",
+      "back": "Edit dogstatsd_port or apm_config receiver_port in datadog.yaml and restart the Agent, then update the client/SDK configuration (for example DD_TRACE_AGENT_PORT for tracers) to use the same port. Clients do not discover the new port on their own.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#configure-ports"
+    },
+    {
+      "id": "net-fc-026",
+      "topic": "Datadog Ports",
+      "front": "Port used by Synthetics private location workers",
+      "back": "Outbound TCP 443 to the Synthetics intake endpoint (intake.synthetics.<site> for worker v1.5.0+), used to pull test configurations and push test results.",
+      "reference": "https://docs.datadoghq.com/synthetics/private_locations/"
+    },
+    {
+      "id": "net-fc-027",
+      "topic": "Datadog IP Addresses",
+      "front": "ip-ranges endpoint for each Datadog site",
+      "back": "US1: https://ip-ranges.datadoghq.com\nUS3: ip-ranges.us3.datadoghq.com\nUS5: ip-ranges.us5.datadoghq.com\nEU1: ip-ranges.datadoghq.eu\nAP1: ip-ranges.ap1.datadoghq.com\nAP2: ip-ranges.ap2.datadoghq.com\nUK1: ip-ranges.uk1.datadoghq.com\nUS1-FED: ip-ranges.ddog-gov.com\nUS2-FED: ip-ranges.us2.ddog-gov.com",
+      "reference": "https://docs.datadoghq.com/api/latest/ip-ranges/"
+    },
+    {
+      "id": "net-fc-028",
+      "topic": "Datadog IP Addresses",
+      "front": "Structure of the ip-ranges JSON",
+      "back": "version (incremented on every change) and modified (timestamp), then sections with prefixes_ipv4 / prefixes_ipv6 CIDR lists: agents, api, apm, logs, process, orchestrator, remote-configuration, synthetics, synthetics-private-locations, webhooks. Each section also has its own endpoint, such as /apm.json or /logs.json.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#static-ip-addresses"
+    },
+    {
+      "id": "net-fc-029",
+      "topic": "Datadog IP Addresses",
+      "front": "Which ip-ranges sections are NOT used by the Agent?",
+      "back": "synthetics: source IPs of managed-location Synthetic tests (allow inbound to your apps)\nsynthetics-private-locations: IPs that private location workers send data to\nwebhooks: source IPs Datadog uses to call third-party HTTP endpoints (allow inbound)",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#static-ip-addresses"
+    },
+    {
+      "id": "net-fc-030",
+      "topic": "Datadog IP Addresses",
+      "front": "Hostnames to allow for Agent traffic",
+      "back": "*.agent.<site> (covers <VERSION>-app.agent metrics, <VERSION>-flare.agent flares, trace.agent APM)\napi.<site> for non-critical API queries (Agent 6.18/7.18+)\nProduct intakes such as process.<site>, orchestrator.<site>, config.<site>\nInstall: install, yum, apt, keys and windows-agent .datadoghq.com",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#destinations"
+    },
+    {
+      "id": "net-fc-031",
+      "topic": "Datadog IP Addresses",
+      "front": "Best practices for IP allowlisting Datadog",
+      "back": "Add all published ranges for the sections you need, not just IPs you observe; only a subset is active at a time and it varies. Consume the JSON programmatically and watch version/modified for changes. Always use the list for your own Datadog site.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#inclusion"
+    },
+    {
+      "id": "net-fc-032",
+      "topic": "Datadog IP Addresses",
+      "front": "Synthetic Monitoring IP ranges for managed locations",
+      "back": "Published at https://ip-ranges.<site>/synthetics.json as CIDR blocks, including prefixes_ipv4_by_location (e.g. aws:ap-northeast-1). They rarely change except when new managed locations are added. To be alerted on changes, create an API test on that URL with a JSONPath assertion on the location's list length.",
+      "reference": "https://docs.datadoghq.com/synthetics/guide/identify_synthetics_bots/"
+    }
+  ]
+}
