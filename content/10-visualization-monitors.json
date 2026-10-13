@@ -1019,6 +1019,471 @@
       "explanation": "Datadog recommends a 15-minute evaluation delay (900 seconds) for cloud metrics, which are backfilled by service providers, so the monitor evaluates a window ending 15 minutes in the past. New group delay only applies to newly created groups, and auto resolve and renotification do not change which data is evaluated.",
       "reference": "https://docs.datadoghq.com/monitors/configuration/",
       "difficulty": 3
+    },
+    {
+      "id": "viz-q-069",
+      "topic": "Dashboards",
+      "question": "Which Datadog feature is best for combining graphs, text, and analysis into a shareable, sequential narrative around an incident or investigation?",
+      "choices": [
+        "Notebooks",
+        "Metrics Explorer",
+        "Service Catalog",
+        "Host Map"
+      ],
+      "answer": 0,
+      "explanation": "Notebooks combine text, timeseries graphs, and query results in a linear document format. They are well suited for post-incident reviews, investigations, and knowledge sharing because the narrative and the graphs live together in one shareable artifact.",
+      "reference": "https://docs.datadoghq.com/notebooks/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-070",
+      "topic": "Dashboards",
+      "question": "What is the fastest built-in way to graph a metric from anywhere in Datadog without first building a dashboard?",
+      "choices": [
+        "Open Quick Graphs",
+        "Export the metric to CSV",
+        "Rotate the API key",
+        "Create a new organization"
+      ],
+      "answer": 0,
+      "explanation": "Quick Graphs is the lightweight graphing workflow that lets you visualize data from anywhere in the app. It is intended for fast exploration before you decide whether a permanent dashboard widget is needed.",
+      "reference": "https://docs.datadoghq.com/dashboards/guide/quick-graphs/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-071",
+      "topic": "Host Map",
+      "question": "What is the main purpose of Datadog's Host Map?",
+      "choices": [
+        "To visualize hosts or containers and compare them by metric and tags",
+        "To author integration YAML files",
+        "To compile tracer libraries",
+        "To rotate API keys across organizations"
+      ],
+      "answer": 0,
+      "explanation": "Host Map is an infrastructure visualization for comparing hosts or containers by a chosen metric and tag context. It is meant for analysis, not configuration authoring.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-072",
+      "topic": "Monitors and Alerts",
+      "question": "A team wants a single alert only when CPU is high and available memory is low at the same time. Which monitor type best fits that need?",
+      "choices": [
+        "Log archive",
+        "SLO monitor",
+        "Host Map widget",
+        "Composite monitor"
+      ],
+      "answer": 3,
+      "explanation": "A composite monitor can combine the states of other monitors with logical operators like AND or OR. That is the right choice when the alert should depend on multiple conditions simultaneously.",
+      "reference": "https://docs.datadoghq.com/monitors/types/composite/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-073",
+      "topic": "Dashboards",
+      "question": "What is the main benefit of using dashboard template variables such as `$env` or `$service`?",
+      "choices": [
+        "They disable rollups on timeseries widgets",
+        "They permanently rename underlying metrics",
+        "They generate application keys automatically",
+        "They let you change query scope without rewriting every widget query"
+      ],
+      "answer": 3,
+      "explanation": "Template variables make dashboards reusable because one variable selection can update many widget queries at once. That is cleaner than cloning separate dashboards per environment or service.",
+      "reference": "https://docs.datadoghq.com/dashboards/template_variables/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-074",
+      "topic": "Host Map",
+      "question": "In Host Map, what does `Group by` accomplish?",
+      "choices": [
+        "It changes the Datadog site region",
+        "It forces one hexagon per dashboard",
+        "It arranges resources into visual groups based on tags or attributes",
+        "It encrypts telemetry before intake"
+      ],
+      "answer": 2,
+      "explanation": "Group by organizes Host Map entities into sections using tags or Datadog-provided attributes such as availability zone or instance type. That helps you see whether an issue is isolated to one group or spread across the environment.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-075",
+      "topic": "Monitors and Alerts",
+      "question": "Which monitor type is best when you want to compare a metric against a fixed threshold?",
+      "choices": [
+        "API key validation",
+        "Metric monitor",
+        "Host Map",
+        "Dashboard list"
+      ],
+      "answer": 1,
+      "explanation": "A metric monitor is designed to evaluate metric values against alert and warning thresholds. That is the standard choice when you want an alert such as CPU above a limit or request latency beyond an accepted boundary.",
+      "reference": "https://docs.datadoghq.com/monitors/types/metric/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-076",
+      "topic": "Host Map",
+      "question": "What is Datadog's Host Map primarily used for?",
+      "choices": [
+        "Storing raw log archives for long-term retention",
+        "Compiling new Agent integrations",
+        "Visualizing hosts, pods, containers, and clusters to spot patterns and issues",
+        "Rotating API keys"
+      ],
+      "answer": 2,
+      "explanation": "Host Map gives a visual view of infrastructure entities so you can quickly see concentration, grouping, and problem areas. It is a troubleshooting and exploration tool, not a credential-management or archival feature.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-077",
+      "topic": "Monitors and Alerts",
+      "question": "When creating a metric monitor, what does the avg by field do?",
+      "choices": [
+        "It converts monitor tags into metric tags",
+        "It turns the monitor into a multi-alert grouped by the chosen tag values",
+        "It changes the monitor into a dashboard widget",
+        "It disables alert grouping entirely"
+      ],
+      "answer": 1,
+      "explanation": "Using avg by tells Datadog to evaluate the monitor separately for each value of the selected tag key, such as host or availability zone. That is how one monitor can open distinct alert states for multiple entities.",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-078",
+      "topic": "Host Map",
+      "question": "What is Host Map primarily used for in Datadog?",
+      "choices": [
+        "Storing Agent configuration files",
+        "Sending DogStatsD packets",
+        "Visualizing hosts or containers and their health across infrastructure",
+        "Creating API keys for integrations"
+      ],
+      "answer": 2,
+      "explanation": "Host Map provides a visual view of infrastructure entities so you can spot unhealthy groups, hotspots, or odd patterns quickly. It is designed for infrastructure visibility, not credential management or metric submission.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-079",
+      "topic": "Monitors and Alerts",
+      "question": "What is the practical value of enabling monitor notifications for missing data on the right use cases?",
+      "choices": [
+        "It converts no-data states into success states",
+        "It removes the need for thresholds",
+        "It makes every monitor composite",
+        "It helps detect telemetry stoppage, not just bad metric values"
+      ],
+      "answer": 3,
+      "explanation": "Missing-data alerts are useful when silence itself is a problem, such as stopped Agents or broken pipelines. They complement threshold alerts rather than replace them.",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-080",
+      "topic": "Monitors and Alerts",
+      "question": "Which statement about monitor tags is correct?",
+      "choices": [
+        "They are the same thing as metric tags in the monitor query",
+        "They can be set only through the DogStatsD protocol",
+        "They are separate from metric tags and are used to search and organize monitors",
+        "They determine the Agent hostname"
+      ],
+      "answer": 2,
+      "explanation": "Monitor tags are metadata on the monitor object itself, not the same as the metric tags used in its scope or group-by logic. They are useful for ownership, filtering, and management workflows in the monitors UI.",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-081",
+      "topic": "Monitors and Alerts",
+      "question": "A Datadog Host monitor is best suited for which problem?",
+      "choices": [
+        "Editing YAML files",
+        "Alerting when hosts stop reporting data",
+        "Storing custom metrics",
+        "Installing the Agent on Windows"
+      ],
+      "answer": 1,
+      "explanation": "Host monitors are used to track whether hosts are still reporting, commonly via the datadog.agent.up service check. They are meant for alerting on infrastructure visibility gaps, not for deployment or storage tasks.",
+      "reference": "https://docs.datadoghq.com/monitors/types/host/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-082",
+      "topic": "Monitors and Alerts",
+      "question": "In an alert monitor notification, which variable type renders a value only when a specific tag is present on the triggering group?",
+      "choices": [
+        "Rollup variable",
+        "Conditional variable",
+        "Hostname variable",
+        "Space aggregation variable"
+      ],
+      "answer": 1,
+      "explanation": "Conditional variables such as `{{#is_tag_set}}...{{/is_tag_set}}` render their content only when a given tag is present on the alert group. That lets a single notification template adapt its wording depending on which tags the triggering scope carries.",
+      "reference": "https://docs.datadoghq.com/monitors/notify/variables/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-083",
+      "topic": "Host Map",
+      "question": "By default, what does the Host Map use to color each host or container?",
+      "choices": [
+        "Application key age",
+        "Number of active monitors",
+        "Disk mount count",
+        "Percentage of CPU usage"
+      ],
+      "answer": 3,
+      "explanation": "The Host Map defaults to coloring infrastructure by CPU utilization so hotspots stand out quickly. You can change the fill metric, but CPU usage is the standard starting view.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-084",
+      "topic": "Monitors and Alerts",
+      "question": "In Datadog, what is an SLO primarily used to track?",
+      "choices": [
+        "How long the Agent takes to restart",
+        "The number of dashboards owned by a team",
+        "The total custom-metric bill for an organization",
+        "A target reliability level for a service over a rolling time window, such as 99.9% successful requests over 30 days"
+      ],
+      "answer": 3,
+      "explanation": "An SLO (service-level objective) defines a target reliability level, such as 99.9% of requests succeeding over a 30-day window. Datadog tracks SLOs against error budgets so teams can see whether they are burning budget too quickly and alert before the objective is breached.",
+      "reference": "https://docs.datadoghq.com/service_level_objectives/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-085",
+      "topic": "Monitors and Alerts",
+      "question": "A team wants one summarized alert instead of separate alerts for every group that breaches a threshold. What monitor behavior should they think about?",
+      "choices": [
+        "DogStatsD buffering interval",
+        "Alert aggregation strategy",
+        "API key propagation delay",
+        "Log rollover settings"
+      ],
+      "answer": 1,
+      "explanation": "Datadog alert aggregation affects whether you receive one summarized notification or many group-specific ones. Choosing the right strategy matters because too many alerts create noise, while too much aggregation can hide which group actually failed.",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/#set-alert-aggregation",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-086",
+      "topic": "Using Metrics",
+      "question": "A metric is known to exist but it does not appear in the Metrics Explorer query editor. What is the most likely reason?",
+      "choices": [
+        "The metric has not reported in the last 24 hours, so it is hidden from the editor unless entered manually",
+        "Metrics Explorer shows only metrics created by dashboards",
+        "The metric contains tags, which the editor does not support",
+        "Only distribution metrics appear in the editor"
+      ],
+      "answer": 0,
+      "explanation": "The query editor lists metrics that have reported recently, which keeps the picker manageable. If a metric has been quiet for more than 24 hours, you can still graph it by typing the metric name or full query manually.",
+      "reference": "https://docs.datadoghq.com/metrics/explorer/",
+      "difficulty": 3
+    },
+    {
+      "id": "viz-q-087",
+      "topic": "Monitors and Alerts",
+      "question": "Which monitor setting helps catch a host or service that stops reporting altogether?",
+      "choices": [
+        "JSON editor mode",
+        "No-data handling or no-data notification",
+        "API key scope",
+        "Host rename"
+      ],
+      "answer": 1,
+      "explanation": "No-data options tell Datadog how to behave when expected telemetry disappears. That is often the right choice when silence itself is the signal you care about, such as a host going offline or an integration stopping unexpectedly.",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-088",
+      "topic": "Dashboards",
+      "question": "Which widget is designed to show how a metric changes over time?",
+      "choices": [
+        "Note widget",
+        "Timeseries widget",
+        "Host Map",
+        "Service Catalog"
+      ],
+      "answer": 1,
+      "explanation": "The timeseries widget is specifically built to show the evolution of metrics and other supported data over a selected time window. It is the default mental model when you want to answer 'how did this change over time?'",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/timeseries/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-089",
+      "topic": "Monitors and Alerts",
+      "question": "When creating a metric monitor for low disk space, why might you group by both host and device?",
+      "choices": [
+        "To force UDP delivery",
+        "To convert the metric into logs",
+        "To create separate alert evaluations for each disk on each host",
+        "To hide tags from dashboards"
+      ],
+      "answer": 2,
+      "explanation": "Grouping by host and device lets the monitor evaluate each disk on each system independently. Without that grouping, an aggregate view can hide a single failing disk inside a larger fleet.",
+      "reference": "https://docs.datadoghq.com/monitors/configuration/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-090",
+      "topic": "Monitors and Alerts",
+      "question": "When customizing alert monitor notifications, what does a template variable like `{{host.name}}` let you do?",
+      "choices": [
+        "Insert dynamic, per-alert-group context such as the triggering host into the notification message",
+        "Encrypt the notification payload before it is sent",
+        "Permanently rename the host in the Agent config",
+        "Disable the monitor's recovery notification"
+      ],
+      "answer": 0,
+      "explanation": "Template variables such as `{{host.name}}`, `{{value}}`, or `{{triggering_scope}}` render dynamic, group-specific context inside monitor notification messages. That makes alerts more descriptive without writing a separate monitor for every group.",
+      "reference": "https://docs.datadoghq.com/monitors/notify/variables/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-091",
+      "topic": "Dashboards",
+      "question": "Why are dashboards useful after data starts flowing into Datadog?",
+      "choices": [
+        "They replace the Agent binary",
+        "They create operating system users",
+        "They let you visualize and correlate metrics, logs, and other signals",
+        "They remove the need for tags"
+      ],
+      "answer": 2,
+      "explanation": "Dashboards turn raw telemetry into views that teams can inspect, share, and discuss. They are especially useful for seeing multiple signals together so you can connect symptom, scope, and likely cause more quickly.",
+      "reference": "https://docs.datadoghq.com/dashboards/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-092",
+      "topic": "Host Map",
+      "question": "On the Host Map, what does the `Group by` control do?",
+      "choices": [
+        "It forces monitors to use composite logic",
+        "It changes the Agent hostname on selected hosts",
+        "It spatially arranges hosts or containers by shared tag values",
+        "It deletes hosts that do not match the group"
+      ],
+      "answer": 2,
+      "explanation": "`Group by` changes the layout by clustering entities that share tag values. It helps you spot patterns across roles, regions, environments, or services.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-093",
+      "topic": "Monitors and Alerts",
+      "question": "A team wants to alert when the error rate of a service exceeds 1% over a 5-minute window. Which Datadog monitor type is most appropriate?",
+      "choices": [
+        "Host Map widget",
+        "Metric monitor based on a service-level error rate query",
+        "API key validation monitor",
+        "Notebook template variable"
+      ],
+      "answer": 1,
+      "explanation": "A metric monitor evaluates a metric query against thresholds over a chosen evaluation window. For an error-rate SLO-style alert, the team builds a query that divides error requests by total requests and sets the threshold at 1% over 5 minutes.",
+      "reference": "https://docs.datadoghq.com/monitors/types/metric/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-094",
+      "topic": "Host Map",
+      "question": "On a Host Map, what does the optional size by setting control?",
+      "choices": [
+        "The rollup interval for all graphs in Datadog",
+        "The number of tags attached to the host",
+        "The size of each host or container tile using a second metric",
+        "The retention period of host metrics"
+      ],
+      "answer": 2,
+      "explanation": "Host Map can communicate more than one metric at once by using color for one metric and size for another. That makes it easy to spot, for example, large hosts with high load or containers with both high CPU and high memory use.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-095",
+      "topic": "Using Metrics",
+      "question": "What does changing the space aggregation from avg to max do in Metrics Explorer?",
+      "choices": [
+        "It changes the timezone of the graph",
+        "It changes how values from multiple reporting sources are combined at each time point",
+        "It forces the metric to use TCP transport",
+        "It disables all tag filtering"
+      ],
+      "answer": 1,
+      "explanation": "Space aggregation controls how Datadog combines values across hosts, containers, or other tag groups at a given timestamp. Switching from average to max can expose worst-case behavior that the average would hide.",
+      "reference": "https://docs.datadoghq.com/dashboards/guide/query-to-the-graph/",
+      "difficulty": 2
+    },
+    {
+      "id": "viz-q-096",
+      "topic": "Host Map",
+      "question": "On the Host Map, what does the `Fill by` setting control?",
+      "choices": [
+        "Which API key is used for the widget",
+        "Which metric determines the color of each host or container",
+        "Which log source is collected by the Agent",
+        "Which monitor escalation policy is attached"
+      ],
+      "answer": 1,
+      "explanation": "`Fill by` controls the metric used for color intensity on the map. For example, you might color by CPU while looking at the same set of hosts grouped by availability zone or service.",
+      "reference": "https://docs.datadoghq.com/infrastructure/hostmap/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-097",
+      "topic": "Dashboards",
+      "question": "What is a dashboard widget in Datadog?",
+      "choices": [
+        "A visual building block that displays data such as timeseries, tables, or logs",
+        "A firewall rule for Datadog intake",
+        "A credential used by the Agent",
+        "A type of API key"
+      ],
+      "answer": 0,
+      "explanation": "Widgets are the pieces that make up a dashboard and visualize selected data sources. Datadog supports many widget types so teams can present metrics, logs, events, and related signals in a form that fits the question they are asking.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-098",
+      "topic": "Monitors and Alerts",
+      "question": "Which tag variable syntax in a monitor message inserts the value of the `env` tag for the triggering group?",
+      "choices": [
+        "`{{tag_env}}`",
+        "`{{env.value}}`",
+        "`{{env.tag}}`",
+        "`{{tag.env}}`"
+      ],
+      "answer": 3,
+      "explanation": "Tag variables in monitor notifications use the `{{tag.<key>}}` syntax, so `{{tag.env}}` renders the value of the `env` tag for the triggering scope. This is part of Datadog's template variable system for dynamic alert messages.",
+      "reference": "https://docs.datadoghq.com/monitors/notify/variables/",
+      "difficulty": 1
+    },
+    {
+      "id": "viz-q-099",
+      "topic": "Using Metrics",
+      "question": "When graphing or alerting on a count-style metric, which modifier is used to show the absolute variation over the rollup interval?",
+      "choices": [
+        "`fill(null)`",
+        "`as_count()`",
+        "`as_rate()`",
+        "`rollup(last)`"
+      ],
+      "answer": 1,
+      "explanation": "`as_count()` is the modifier used when you want count-style absolute variation over the rollup interval. `as_rate()` answers a different question by normalizing to per-second behavior.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/type_modifiers/",
+      "difficulty": 2
     }
   ],
   "flashcards": [

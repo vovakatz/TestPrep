@@ -734,6 +734,201 @@
       "explanation": "`find` walks a directory tree recursively, and `-name conf.yaml` matches files by name, so it finds every `conf.d/<integration>.d/conf.yaml`. `grep -r` searches file contents for the text rather than matching file names, `ls` checks one exact path, and the `cat` glob reaches only one directory level and prints file contents.",
       "reference": "https://man7.org/linux/man-pages/man1/find.1.html",
       "difficulty": 2
+    },
+    {
+      "id": "hwl-q-050",
+      "topic": "Hardware Concepts",
+      "question": "A host with eight CPU cores has many runnable threads competing for execution time. Which resource is most directly saturated?",
+      "choices": [
+        "CPU execution capacity",
+        "Available DNS records",
+        "Disk partition labels",
+        "GPU video memory"
+      ],
+      "answer": 0,
+      "explanation": "If many threads are ready to run but cannot get CPU time quickly, the bottleneck is compute capacity on the cores. That is different from memory pressure, disk I/O waits, or network congestion.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-051",
+      "topic": "Hardware Concepts",
+      "question": "Which hardware resource is most directly used when a process needs temporary working memory while it runs?",
+      "choices": [
+        "CPU",
+        "RAM",
+        "Network interface card",
+        "SSD"
+      ],
+      "answer": 1,
+      "explanation": "RAM is the host's short-term working memory, so running processes use it to hold active data and instructions. CPUs execute instructions, but they do not replace memory for temporarily storing the process state.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-052",
+      "topic": "Hardware Concepts",
+      "question": "A single-threaded application on a 4-vCPU host becomes slow even though total host CPU is around 30%. Which explanation is best?",
+      "choices": [
+        "One hot thread can saturate a single core even if host-wide CPU looks moderate",
+        "CPU percentages are always rounded down by Datadog",
+        "Any process automatically uses all cores equally",
+        "Low total CPU means DNS must be the cause"
+      ],
+      "answer": 0,
+      "explanation": "Host-wide CPU averages can hide single-core bottlenecks. A single-threaded process can max out one core and experience latency even while other cores remain relatively idle.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-053",
+      "topic": "Linux Basics",
+      "question": "On a Linux host, what does `cd /etc/datadog-agent` do before you edit Agent settings?",
+      "choices": [
+        "Changes the shell's working directory to the Agent config folder",
+        "Restarts the Datadog Agent service",
+        "Validates YAML syntax in `datadog.yaml`",
+        "Sends the current directory to Datadog intake"
+      ],
+      "answer": 0,
+      "explanation": "`cd` only changes where your current shell session is working. It is a navigation step before you open files, not an edit, restart, or validation command.",
+      "reference": "https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-054",
+      "topic": "Linux Basics",
+      "question": "Which shell command prints the current working directory?",
+      "choices": [
+        "pwd",
+        "ls",
+        "ps",
+        "cd"
+      ],
+      "answer": 0,
+      "explanation": "The pwd command prints the full path of the directory your shell is currently using. It is a basic navigation command and is often helpful before editing or reading local config files.",
+      "reference": "https://man7.org/linux/man-pages/man1/pwd.1.html",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-055",
+      "topic": "Linux Basics",
+      "question": "On Linux, why is `sudo` often needed when editing `/etc/datadog-agent/datadog.yaml`?",
+      "choices": [
+        "Regular shells cannot edit YAML files",
+        "API keys can be written only by root",
+        "DogStatsD opens only after `sudo` writes the file",
+        "The file is typically under a privileged system path owned by root"
+      ],
+      "answer": 3,
+      "explanation": "`/etc` is generally a protected system directory, so elevated permissions are often required to modify files there. This is an operating system file ownership issue, not a Datadog-specific rule.",
+      "reference": "https://www.sudo.ws/docs/man/sudo.man/",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-056",
+      "topic": "Hardware Concepts",
+      "question": "Which hardware component primarily holds the data and instructions that a running process needs right now?",
+      "choices": [
+        "Network interface card (NIC)",
+        "RAM",
+        "Solid-state drive (SSD)",
+        "CPU heatsink"
+      ],
+      "answer": 1,
+      "explanation": "RAM stores active working data for currently running processes so the CPU can access it quickly. Disks provide persistent storage, but they are much slower and are not the main workspace for executing programs.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-057",
+      "topic": "Linux Basics",
+      "question": "Why might you need sudo to edit /etc/datadog-agent/datadog.yaml on Linux?",
+      "choices": [
+        "Because Datadog requires every config change to be signed",
+        "Because only shell built-ins can open YAML files",
+        "Because YAML files can be edited only over SSH tunnels",
+        "Because the file is usually protected by root-owned permissions"
+      ],
+      "answer": 3,
+      "explanation": "System configuration files under /etc are commonly writable only by privileged users. Using sudo temporarily elevates your permissions so you can change host-level configuration safely.",
+      "reference": "https://www.sudo.ws/docs/man/sudo.man/",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-058",
+      "topic": "Linux Basics",
+      "question": "Why is using a shell search tool such as `grep` or `rg` useful during Datadog work?",
+      "choices": [
+        "It quickly searches logs or configs for matching text",
+        "It encrypts Agent configuration files",
+        "It bypasses Datadog authentication",
+        "It creates API keys automatically"
+      ],
+      "answer": 0,
+      "explanation": "Shell search tools let you find errors, hostnames, ports, or integration names quickly in large files. That speeds up common tasks like checking whether a config key exists or whether a log contains a specific failure message.",
+      "reference": "https://man7.org/linux/man-pages/man1/grep.1.html",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-059",
+      "topic": "Hardware Concepts",
+      "question": "A host has normal CPU usage, but applications slow down when memory fills and the operating system starts reclaiming pages. Which type of metric should you inspect first?",
+      "choices": [
+        "Dashboard refresh rate",
+        "Memory usage or available memory",
+        "DNS TTL values",
+        "TLS certificate age"
+      ],
+      "answer": 1,
+      "explanation": "If the issue is memory pressure, the first place to look is memory consumption and how much memory remains available. CPU can look healthy while the system still suffers because the OS is reclaiming memory or swapping.",
+      "reference": "https://docs.datadoghq.com/integrations/system/#metrics",
+      "difficulty": 2
+    },
+    {
+      "id": "hwl-q-060",
+      "topic": "Linux Basics",
+      "question": "Which shell command is commonly used to print the current hostname on a Linux system?",
+      "choices": [
+        "hostname",
+        "chmod",
+        "lsblk",
+        "route"
+      ],
+      "answer": 0,
+      "explanation": "The hostname command prints the system's current hostname. That makes it a quick way to confirm the identity a host is likely to report with in monitoring and troubleshooting workflows.",
+      "reference": "https://man7.org/linux/man-pages/man1/hostname.1.html",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-061",
+      "topic": "Hardware Concepts",
+      "question": "If a disk is almost full, which metric is most directly relevant for an alert?",
+      "choices": [
+        "System load average",
+        "CPU steal time",
+        "Host alias count",
+        "Disk usage or free-space utilization"
+      ],
+      "answer": 3,
+      "explanation": "A disk-space problem should be measured with a disk metric such as used percentage or available space. CPU and load can be important context, but they do not directly tell you whether the disk is running out of room.",
+      "reference": "https://docs.datadoghq.com/integrations/disk/#metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "hwl-q-062",
+      "topic": "Linux Basics",
+      "question": "What is the practical difference between the shell redirects `>` and `>>`?",
+      "choices": [
+        "`>>` can be used only by root",
+        "`>` appends to a file, while `>>` overwrites it",
+        "Both always send output to stderr",
+        "`>` overwrites a file, while `>>` appends to it"
+      ],
+      "answer": 3,
+      "explanation": "A single greater-than sign replaces the file contents with new output, while the double sign adds new output to the end. That distinction matters when capturing diagnostics or preserving existing log content.",
+      "reference": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html",
+      "difficulty": 1
     }
   ],
   "flashcards": [

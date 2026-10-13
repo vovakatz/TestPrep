@@ -554,6 +554,126 @@
       "explanation": "Datadog lists Ceph, Varnish, Postfix, Cassandra Nodetool and Gunicorn as incompatible with Autodiscovery because they need process tree data or filesystem access. A workaround is to expose metrics with a Prometheus exporter in the pod and collect them with the OpenMetrics integration, which supports Autodiscovery. Redis, Apache and PostgreSQL are routinely configured through Autodiscovery templates.",
       "reference": "https://docs.datadoghq.com/containers/docker/integrations/",
       "difficulty": 3
+    },
+    {
+      "id": "ad-q-038",
+      "topic": "Auto-discovery",
+      "question": "configcheck shows 'No service found with this AD identifier: redis' for a Redis template. What does that usually mean?",
+      "choices": [
+        "The API key is expired",
+        "The Host Map widget is disabled",
+        "The template did not match any running service or container with that identifier",
+        "Redis metrics were already sent successfully"
+      ],
+      "answer": 2,
+      "explanation": "That message means the Agent could not find a running workload that matched the Autodiscovery identifier in the template. In practice, the check cannot be resolved until the identifier, labels, annotations, or target workload line up correctly.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/autodiscovery/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-039",
+      "topic": "Auto-discovery",
+      "question": "Which statement best describes Datadog Autodiscovery in containerized environments?",
+      "choices": [
+        "It compiles custom Agent binaries for each container",
+        "It replaces API keys with DNS TXT records",
+        "It only works on Windows virtual machines",
+        "It generates check configurations from templates when services match identifiers"
+      ],
+      "answer": 3,
+      "explanation": "Autodiscovery watches container and service activity, then resolves templates into live check configurations when identifiers match. That lets the Agent attach the right integration settings to dynamic workloads without manually editing each container by hand.",
+      "reference": "https://docs.datadoghq.com/getting_started/containers/autodiscovery/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-040",
+      "topic": "Auto-discovery",
+      "question": "What is Autodiscovery designed to do in containerized environments?",
+      "choices": [
+        "Automatically rotate API keys every hour",
+        "Convert all logs into traces",
+        "Rename hosts based on dashboard titles",
+        "Automatically apply integration templates to matching services or containers"
+      ],
+      "answer": 3,
+      "explanation": "Autodiscovery matches running containers or services to integration templates and builds concrete check configs automatically. That reduces manual per-container configuration.",
+      "reference": "https://docs.datadoghq.com/getting_started/containers/autodiscovery/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-041",
+      "topic": "Auto-discovery",
+      "question": "On Kubernetes, where are Datadog Autodiscovery templates commonly defined so they travel with the workload being monitored?",
+      "choices": [
+        "In a cloud provider's billing console",
+        "In the Cluster Agent's binary",
+        "In the host's /etc/hosts file",
+        "In Kubernetes pod annotations or Docker labels on the application container"
+      ],
+      "answer": 3,
+      "explanation": "Autodiscovery templates are commonly attached as Kubernetes pod annotations or Docker labels on the application container. Keeping templates with the workload means the Agent can match the right integration config to the right service as pods are rescheduled.",
+      "reference": "https://docs.datadoghq.com/containers/kubernetes/integrations/",
+      "difficulty": 2
+    },
+    {
+      "id": "ad-q-042",
+      "topic": "Auto-discovery",
+      "question": "In Kubernetes, which metadata field is commonly used to attach Datadog Autodiscovery templates to an application container?",
+      "choices": [
+        "ServiceAccount tokens",
+        "PersistentVolume claims",
+        "Namespace DNS records",
+        "Pod annotations"
+      ],
+      "answer": 3,
+      "explanation": "On Kubernetes, Datadog commonly reads Autodiscovery templates from pod annotations. Docker labels, files, and other sources also exist, but annotations are a standard pattern in Kubernetes.",
+      "reference": "https://docs.datadoghq.com/containers/kubernetes/integrations/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-043",
+      "topic": "Auto-discovery",
+      "question": "What problem does Datadog Autodiscovery primarily solve?",
+      "choices": [
+        "It applies integration configs automatically to dynamic containers and services",
+        "It performs billing reconciliation",
+        "It creates user accounts for new nodes",
+        "It encrypts dashboards before sharing"
+      ],
+      "answer": 0,
+      "explanation": "Autodiscovery helps in dynamic containerized environments where services move between hosts and pods. The Agent watches container events, matches templates to the service it finds, and generates the right check configuration automatically.",
+      "reference": "https://docs.datadoghq.com/getting_started/containers/autodiscovery/",
+      "difficulty": 1
+    },
+    {
+      "id": "ad-q-044",
+      "topic": "Auto-discovery",
+      "question": "If both Kubernetes annotations or Docker labels and an auto_conf.yaml file provide Autodiscovery settings for the same integration, which takes precedence?",
+      "choices": [
+        "Helm chart values always override every other source automatically",
+        "The auto_conf.yaml file always wins because it ships with the Agent",
+        "The Agent randomly picks one at startup",
+        "Kubernetes annotations or Docker labels take precedence over auto_conf.yaml"
+      ],
+      "answer": 3,
+      "explanation": "Datadog's default auto-configuration files provide a baseline, but explicit container metadata configuration is treated as the stronger signal. That lets operators override the built-in behavior for a specific workload when needed.",
+      "reference": "https://docs.datadoghq.com/containers/guide/auto_conf/#override-auto-configuration",
+      "difficulty": 3
+    },
+    {
+      "id": "ad-q-045",
+      "topic": "Auto-discovery",
+      "question": "An Autodiscovery template is not being resolved for a container. Which command is most useful for seeing loaded and unresolved Agent configurations?",
+      "choices": [
+        "`datadog-agent configcheck -v`",
+        "`datadog-agent import`",
+        "`datadog-agent secret`",
+        "`datadog-agent flare`"
+      ],
+      "answer": 0,
+      "explanation": "`configcheck -v` is built for inspecting resolved and unresolved configs, especially in Autodiscovery scenarios. A flare is useful later for support, but it is not the first command for seeing template resolution.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/autodiscovery/",
+      "difficulty": 2
     }
   ],
   "flashcards": [

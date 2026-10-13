@@ -634,6 +634,366 @@
       "explanation": "Datadog API clients target the US site by default, and sites are fully independent, so EU keys aren't recognized by the US1 API. Configure the client for the EU site so it calls `https://api.datadoghq.eu`; in the Python client, set `configuration.server_variables[\"site\"] = \"datadoghq.eu\"` or the `DD_SITE` environment variable. There is no region header, and client tokens don't authenticate API calls.",
       "reference": "https://docs.datadoghq.com/api/latest/authentication/",
       "difficulty": 2
+    },
+    {
+      "id": "api-q-049",
+      "topic": "API Endpoints",
+      "question": "A team uses an official Datadog API client from an EU organization but leaves the client at its default US site. What is the most likely fix?",
+      "choices": [
+        "Switch DogStatsD from UDP to TCP",
+        "Regenerate the hostnames for all monitored systems",
+        "Set the client host or site for the correct Datadog region",
+        "Move the dashboard into the Host Map view"
+      ],
+      "answer": 2,
+      "explanation": "Official Datadog API clients default to the US site unless configured otherwise. If your organization is on another site, you must point the client at the correct Datadog host so requests reach the right regional API.",
+      "reference": "https://docs.datadoghq.com/getting_started/site/",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-050",
+      "topic": "API Endpoints",
+      "question": "Which Datadog API area would you use to submit a custom metric directly over HTTP?",
+      "choices": [
+        "The metrics endpoint",
+        "The host map endpoint",
+        "Only the authentication settings page",
+        "The monitor mute endpoint"
+      ],
+      "answer": 0,
+      "explanation": "Datadog's API includes metrics endpoints for programmatically submitting metric data. That is a direct alternative when you are not sending custom metrics through DogStatsD or an Agent-based check.",
+      "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-051",
+      "topic": "API Endpoints",
+      "question": "An organization uses the Datadog EU site. What must be configured correctly on the Agent or API client?",
+      "choices": [
+        "The Windows desktop theme",
+        "A local SMTP relay",
+        "The shell prompt color",
+        "The correct Datadog site or API host, such as datadoghq.eu"
+      ],
+      "answer": 3,
+      "explanation": "Datadog accounts are tied to specific sites, and the Agent or API client must be pointed at the correct one. If the site is wrong, data and API calls may go to the wrong intake or fail entirely.",
+      "reference": "https://docs.datadoghq.com/getting_started/site/",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-052",
+      "topic": "Application Key",
+      "question": "One-Time Read mode is enabled for application keys. What should an engineer expect when creating a new application key?",
+      "choices": [
+        "The key can only be used over DogStatsD on port 8125",
+        "The secret automatically becomes an API key after an Agent restart",
+        "The secret is shown once at creation time and should be stored immediately",
+        "The secret can be viewed later by any admin in plain text"
+      ],
+      "answer": 2,
+      "explanation": "Datadog's One-Time Read behavior means the application key secret is only displayed when the key is created. If you do not store it securely at that moment, you cannot retrieve the secret later and must create a new key.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#one-time-read-mode",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-053",
+      "topic": "API Endpoints",
+      "question": "If you cannot run the Agent but still need to submit a custom metric directly to Datadog, which public API area should you use?",
+      "choices": [
+        "The Monitors Search API",
+        "The SAML settings API",
+        "The Host Map API",
+        "The Metrics submission API, such as the series endpoint"
+      ],
+      "answer": 3,
+      "explanation": "Datadog exposes public intake endpoints for metrics, logs, events, and traces when Agent-based collection is not the right fit. For custom metrics, the metrics submission endpoint is the relevant API family.",
+      "reference": "https://docs.datadoghq.com/api/latest/metrics/#submit-metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-054",
+      "topic": "API Endpoints",
+      "question": "An organization uses the EU1 Datadog site. Which site parameter should the Agent or API client use?",
+      "choices": [
+        "us3.datadoghq.com",
+        "ddog-gov.com",
+        "datadoghq.com",
+        "datadoghq.eu"
+      ],
+      "answer": 3,
+      "explanation": "The site parameter must match the Datadog site your organization actually uses. EU1 uses `datadoghq.eu`, not the default US site.",
+      "reference": "https://docs.datadoghq.com/getting_started/site/",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-055",
+      "topic": "Application Key",
+      "question": "A team automates Datadog resource creation with Terraform. Which credential pair does the provider typically need?",
+      "choices": [
+        "A SAML assertion and a browser cookie",
+        "An SSH key and a hostname",
+        "A client token and a DogStatsD port",
+        "An API key and an application key with sufficient permissions"
+      ],
+      "answer": 3,
+      "explanation": "The Datadog Terraform provider authenticates with an API key and an application key associated with a user or service account that has the required permissions. The API key identifies the organization and the application key authorizes the API operations the provider performs.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#application-keys",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-056",
+      "topic": "Application Key",
+      "question": "What is an application key primarily used for in Datadog?",
+      "choices": [
+        "Replacing the host hostname",
+        "Enabling DogStatsD on port 8125",
+        "Calling the Datadog programmatic API together with an API key",
+        "Encrypting telemetry inside the Agent"
+      ],
+      "answer": 2,
+      "explanation": "Datadog's programmatic API uses an API key plus an application key for user-level access. The Agent itself does not need an application key just to forward host data.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#application-keys",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-057",
+      "topic": "Application Key",
+      "question": "A script needs to create dashboards through the Datadog API. Which credential set is typically required?",
+      "choices": [
+        "Only an API key",
+        "An API key plus an application key",
+        "Only an application key",
+        "No credentials if the script runs on a private network"
+      ],
+      "answer": 1,
+      "explanation": "Most Datadog API actions that manage resources require an API key and an application key together. The API key identifies the organization, while the application key provides the caller's authorized API access.",
+      "reference": "https://docs.datadoghq.com/api/latest/authentication/",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-058",
+      "topic": "Application Key",
+      "question": "Why do teams often prefer a service account application key for automation instead of a personal user's key?",
+      "choices": [
+        "It forces all automation to run from the UI",
+        "It avoids tying critical automation to one employee's account lifecycle",
+        "It automatically scopes requests to one host only",
+        "It removes the need for an API key on requests"
+      ],
+      "answer": 1,
+      "explanation": "Service account keys survive personnel changes more cleanly than personal keys. That reduces surprise outages when a user's role or account changes.",
+      "reference": "https://docs.datadoghq.com/account_management/org_settings/service_accounts/",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-059",
+      "topic": "API Key",
+      "question": "Why should a browser-based application not use a Datadog API key directly?",
+      "choices": [
+        "Because API keys work only over UDP",
+        "Because API keys can create dashboards only from Linux",
+        "Because browsers cannot make HTTPS requests to Datadog",
+        "Because the key would be exposed client-side; end-user apps should use client tokens instead"
+      ],
+      "answer": 3,
+      "explanation": "Datadog API keys are sensitive credentials and should not be embedded in code that runs on a user's device. For browser, mobile, and similar end-user applications, Datadog provides client tokens for the supported telemetry products.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#client-tokens",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-060",
+      "topic": "Application Key",
+      "question": "Which key is used together with an API key to access Datadog's programmatic management APIs?",
+      "choices": [
+        "Windows registry key",
+        "Application key",
+        "SSH key",
+        "DogStatsD key"
+      ],
+      "answer": 1,
+      "explanation": "Application keys are paired with an organization's API key for authenticated access to many Datadog API operations. They are associated with a user or service account and inherit allowed scopes or permissions.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#application-keys",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-061",
+      "topic": "Application Key",
+      "question": "Why is a service account application key usually safer for shared automation than a personal application key?",
+      "choices": [
+        "It replaces the need for an API key",
+        "It can be embedded safely in browser JavaScript",
+        "It avoids breaking automation when the employee who created the key is deactivated",
+        "It makes the Datadog site parameter unnecessary"
+      ],
+      "answer": 2,
+      "explanation": "Application keys created by individual users are tied to those user accounts. If that person is disabled, their application keys are revoked, so shared automation is more durable when it uses a service account instead.",
+      "reference": "https://docs.datadoghq.com/account_management/org_settings/service_accounts/#service-account-application-keys",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-062",
+      "topic": "API Key",
+      "question": "A Datadog API key is stored in a configuration file. Which file-permission approach best follows least privilege?",
+      "choices": [
+        "Make the file executable by all users",
+        "Place the file in a publicly accessible web directory",
+        "Make the file world-writable so any user can edit it",
+        "Allow read and write access only to the required service or administrator accounts"
+      ],
+      "answer": 3,
+      "explanation": "Least privilege means only the users or services that truly need access should have it. Configuration files that contain secrets should not be writable or readable by everyone on the system.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/secrets-management/",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-063",
+      "topic": "API Key",
+      "question": "Which credential must a Datadog Agent have to submit metrics and events to your Datadog organization?",
+      "choices": [
+        "Application key",
+        "API key",
+        "SAML assertion",
+        "Client token"
+      ],
+      "answer": 1,
+      "explanation": "API keys are organization-level credentials used by the Agent for telemetry intake. Application keys are for programmatic API access, not basic Agent data submission.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#api-keys",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-064",
+      "topic": "API Key",
+      "question": "A user who created both API keys and application keys is deactivated. What happens by default?",
+      "choices": [
+        "Application keys are revoked, but API keys created by that user remain valid",
+        "Both API keys and application keys are automatically deleted",
+        "API keys are revoked, but application keys remain valid",
+        "Nothing changes until Support is contacted"
+      ],
+      "answer": 0,
+      "explanation": "Application keys are tied to the creating user, so disabling that user revokes those keys. API keys are organization-level intake credentials, so keys created by that account are not automatically deleted and remain valid until you revoke them.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#disabling-a-user-account",
+      "difficulty": 3
+    },
+    {
+      "id": "api-q-065",
+      "topic": "API Key",
+      "question": "Why might an organization deliberately create multiple Datadog API keys instead of sharing one everywhere?",
+      "choices": [
+        "Each dashboard requires its own API key",
+        "It increases metric retention automatically",
+        "It makes rotation and revocation easier for specific deployments",
+        "Application keys stop working without it"
+      ],
+      "answer": 2,
+      "explanation": "Datadog recommends considering multiple API keys for different deployment methods or services. That makes key rotation safer and lets you revoke a compromised or retired key without breaking every Agent and automation workflow at once.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#using-multiple-api-keys",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-066",
+      "topic": "API Key",
+      "question": "Which credential must the Datadog Agent have to submit metrics and events to Datadog?",
+      "choices": [
+        "API key",
+        "Application key",
+        "OAuth redirect URI",
+        "SSH public key"
+      ],
+      "answer": 0,
+      "explanation": "The Datadog Agent uses an API key to send telemetry data into your Datadog organization. Application keys are for authenticated programmatic access to many API endpoints, not basic Agent submission.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#api-keys",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-067",
+      "topic": "API Endpoints",
+      "question": "Which approach is Datadog's recommended method for managing dashboards, monitors, and integrations as code in a version-controlled workflow?",
+      "choices": [
+        "Storing dashboards as screenshots in object storage",
+        "Exporting browser cookies into a git repository",
+        "Editing YAML files on each host manually",
+        "Using the Datadog Terraform provider to declare and apply resources"
+      ],
+      "answer": 3,
+      "explanation": "Datadog publishes an official Terraform provider that lets teams declare dashboards, monitors, synthetic tests, and other resources as code. Applying Terraform keeps configuration version-controlled and repeatable across environments.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/terraform/",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-068",
+      "topic": "Application Key",
+      "question": "To read data from many Datadog API endpoints programmatically, which credentials are typically required?",
+      "choices": [
+        "Hostname and DogStatsD port",
+        "Application key only",
+        "API key only",
+        "Both an API key and an application key"
+      ],
+      "answer": 3,
+      "explanation": "Write operations require an API key, and many read operations also require an application key associated with a user or service account that has the needed permissions. Together, the key pair authenticates the client and authorizes access to the endpoint.",
+      "reference": "https://docs.datadoghq.com/api/latest/authentication/",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-069",
+      "topic": "API Key",
+      "question": "Right after creating a new API key, an automation job fails for a few seconds before succeeding. What is the best explanation?",
+      "choices": [
+        "Application keys are required for all DogStatsD traffic",
+        "New Datadog keys only work during business hours",
+        "API keys must be activated by restarting the Agent service",
+        "Datadog key changes are eventually consistent and may take a few seconds to propagate"
+      ],
+      "answer": 3,
+      "explanation": "Datadog documents a short propagation delay for API and application key creation or revocation. Short retries with backoff or use of the validation endpoints are the right response to that brief consistency window.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#key-propagation-delay-and-eventual-consistency",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-070",
+      "topic": "API Endpoints",
+      "question": "An EU-based organization's host Agent shows healthy local checks, but no fresh data reaches the Datadog site after install. Which misconfiguration is a strong suspect?",
+      "choices": [
+        "The host uses too many dashboard widgets",
+        "The host has more than one CPU core",
+        "The `DD_SITE` or site setting still points to the wrong Datadog site",
+        "The application key has more permissions than the API key"
+      ],
+      "answer": 2,
+      "explanation": "A host can look healthy locally while still sending to the wrong intake site. If an EU organization points at the US default site, data may not land where the team expects.",
+      "reference": "https://docs.datadoghq.com/getting_started/site/",
+      "difficulty": 2
+    },
+    {
+      "id": "api-q-071",
+      "topic": "API Key",
+      "question": "Which credential is required by the Datadog Agent to submit metrics and events to your organization?",
+      "choices": [
+        "Client token",
+        "OAuth refresh token",
+        "Application key",
+        "API key"
+      ],
+      "answer": 3,
+      "explanation": "API keys are organization-scoped and are required for Agents to send metrics and events. Application keys serve a different purpose: authenticated API access on behalf of a user or service account.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#api-keys",
+      "difficulty": 1
+    },
+    {
+      "id": "api-q-072",
+      "topic": "Application Key",
+      "question": "Which statement about Datadog application keys is correct?",
+      "choices": [
+        "They are automatically shared across all organizations",
+        "They are never associated with a user or service account",
+        "They are required for the Agent to submit metrics and events",
+        "They are used with an API key to access Datadog's programmatic API"
+      ],
+      "answer": 3,
+      "explanation": "Application keys are used alongside an organization's API key for many Datadog API actions. They are tied to a user or service account context, which is why they are different from organization-wide API keys used for intake.",
+      "reference": "https://docs.datadoghq.com/account_management/api-app-keys/#application-keys",
+      "difficulty": 1
     }
   ],
   "flashcards": [

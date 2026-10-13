@@ -734,6 +734,276 @@
       "explanation": "Reserved attributes such as `host`, `source`, `status`, `service`, `trace_id`, and `message` don't require `@`, so `status:error` works directly. `http.url`, `duration`, and `usr.id` are standard attributes, searched as `@http.url`, `@duration`, and `@usr.id`.",
       "reference": "https://docs.datadoghq.com/logs/explorer/search_syntax/#reserved-attributes",
       "difficulty": 1
+    },
+    {
+      "id": "tag-q-050",
+      "topic": "Tagging Best Practices",
+      "question": "Which three tags make up Datadog unified service tagging?",
+      "choices": [
+        "cluster, node, pod",
+        "host, ip, subnet",
+        "env, service, version",
+        "app, team, owner"
+      ],
+      "answer": 2,
+      "explanation": "Datadog recommends unified service tagging with env, service, and version. Those three tags make it much easier to correlate telemetry across metrics, traces, logs, and other product areas.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-051",
+      "topic": "Tagging Best Practices",
+      "question": "In Kubernetes Autodiscovery, which label trio supports Datadog unified service tagging best practices?",
+      "choices": [
+        "team, owner, tier",
+        "host, cluster, node",
+        "env, service, version",
+        "cpu, memory, disk"
+      ],
+      "answer": 2,
+      "explanation": "Unified service tagging uses the reserved tags `env`, `service`, and `version` to keep telemetry consistently labeled. Datadog recommends this because it makes correlation across metrics, logs, and traces much cleaner.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-052",
+      "topic": "Using Tags",
+      "question": "In Metrics Explorer, what is the from box mainly used for?",
+      "choices": [
+        "Selecting graph colors",
+        "Filtering the query scope by tag values",
+        "Changing the Datadog site",
+        "Editing monitor notification text"
+      ],
+      "answer": 1,
+      "explanation": "The from box narrows a metric query to only the sources with matching tags, such as env:prod or service:web. That scope control is central to getting a relevant graph instead of querying everything.",
+      "reference": "https://docs.datadoghq.com/metrics/explorer/",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-053",
+      "topic": "Tagging Best Practices",
+      "question": "Which tag format is the Datadog-recommended standard?",
+      "choices": [
+        "#key:value",
+        "key=value=value",
+        "key:value",
+        "key/value"
+      ],
+      "answer": 2,
+      "explanation": "Datadog recommends key:value tags because they are consistent and easy to filter, group, and search across products. A stable tagging format also helps keep dashboards and monitors reusable.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#define-tags",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-054",
+      "topic": "Tagging Best Practices",
+      "question": "Why is grouping or tagging with extremely high-cardinality values often a bad practice?",
+      "choices": [
+        "It can create too many distinct series and make analysis harder and more expensive",
+        "It disables Host Map filtering",
+        "It prevents the Agent from using TCP 443",
+        "It forces all metrics to become gauges"
+      ],
+      "answer": 0,
+      "explanation": "Very high-cardinality tags explode the number of distinct series and groups. That makes dashboards noisier and can increase cost or operational overhead.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/custom_metrics/",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-055",
+      "topic": "Using Tags",
+      "question": "Why are tags especially powerful when analyzing time-series metrics in Datadog?",
+      "choices": [
+        "They let you slice and compare the same metric by environment, service, or host",
+        "They remove timestamps from the data",
+        "They prevent monitors from triggering",
+        "They convert metrics into logs"
+      ],
+      "answer": 0,
+      "explanation": "Tags let you reuse one metric for many questions by changing the filter or grouping instead of creating separate metrics. That is why tagging is central to Datadog workflows for dashboards, monitors, explorers, and infrastructure views.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-056",
+      "topic": "Using Tags",
+      "question": "Why are tags especially useful on dashboards and in Metrics Explorer?",
+      "choices": [
+        "They let you filter and group telemetry by attributes such as env or service",
+        "They replace hostnames everywhere in the product",
+        "They remove the need for monitors",
+        "They automatically change a metric's type"
+      ],
+      "answer": 0,
+      "explanation": "Tags are a primary way to scope and compare data in Datadog. They let you break views down by environment, service, team, region, or other stable dimensions without changing the underlying metric.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/#dashboards",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-057",
+      "topic": "Tagging Best Practices",
+      "question": "Why are tags valuable when submitting custom metrics or integration data?",
+      "choices": [
+        "They permanently lock a metric to one dashboard",
+        "They prevent monitors from evaluating missing data",
+        "They allow filtering, scoping, and grouping in Datadog views",
+        "They replace the metric name during ingestion"
+      ],
+      "answer": 2,
+      "explanation": "Tags make the same metric more useful by adding context like `env:prod` or `service:checkout`. Datadog can then filter, group, and scope graphs or monitors using those tags.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#overview",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-058",
+      "topic": "Log & Event Search",
+      "question": "In the Datadog Log Explorer, what are facets primarily used for?",
+      "choices": [
+        "Rotating application keys",
+        "Calculating metric rollup intervals",
+        "Filtering and grouping logs by indexed attributes such as service, status, or host",
+        "Editing YAML configuration files"
+      ],
+      "answer": 2,
+      "explanation": "Facets are indexed log attributes that power the Log Explorer's search, filtering, and grouping. Common facets include `service`, `status`, `host`, and `env`; teams use them to slice large log volumes into focused views during investigations.",
+      "reference": "https://docs.datadoghq.com/logs/explorer/facets/",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-059",
+      "topic": "Tagging Best Practices",
+      "question": "What is the main risk of attaching highly unique tags such as request_id or an ephemeral container ID to every custom metric?",
+      "choices": [
+        "The Agent immediately drops the metric as invalid",
+        "The metric can be queried only through the API",
+        "It forces the metric type to become a distribution",
+        "It can create excessive cardinality and many extra timeseries"
+      ],
+      "answer": 3,
+      "explanation": "Very high-cardinality tags multiply the number of distinct timeseries Datadog must index and query. That can make dashboards harder to use and can materially increase custom metric volume.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/custom_metrics/",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-060",
+      "topic": "Using Tags",
+      "question": "If you want one graph line per host for the same metric, which query approach is most relevant?",
+      "choices": [
+        "Revoke all host tags",
+        "Group by `host`",
+        "Disable time aggregation entirely",
+        "Use only a table widget"
+      ],
+      "answer": 1,
+      "explanation": "In Datadog querying, the grouping choice determines what becomes a separate line or series on the graph. Grouping by `host` splits the same metric into one series per host instead of combining all hosts into a single aggregate line.",
+      "reference": "https://docs.datadoghq.com/dashboards/querying/",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-061",
+      "topic": "Tagging Best Practices",
+      "question": "Which tagging practice is most likely to create custom-metric cardinality problems?",
+      "choices": [
+        "Tagging by region",
+        "Tagging by service version",
+        "Tagging by request_id for every request",
+        "Tagging by stable environment name"
+      ],
+      "answer": 2,
+      "explanation": "Request IDs are effectively unbounded and create a new tag value constantly. That makes metrics harder to aggregate meaningfully and can drive up custom metric usage and cost.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/custom_metrics/",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-062",
+      "topic": "Tagging Best Practices",
+      "question": "Which unified service tagging trio is most useful for correlating traces, logs, and metrics in APM?",
+      "choices": [
+        "env, service, version",
+        "cluster, node, pod",
+        "host, ip, port",
+        "team, owner, cost_center"
+      ],
+      "answer": 0,
+      "explanation": "Datadog recommends unified service tagging with `env`, `service`, and `version`. When these three tags are applied consistently across traces, logs, and metrics, teams can pivot between signals and correlate a deployment version with reliability changes.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-063",
+      "topic": "Tagging Best Practices",
+      "question": "A team proposes tagging every metric with user_id:<unique-id>. What is the biggest problem with that plan?",
+      "choices": [
+        "It allows the Agent to skip API-key validation",
+        "It is required for the Host Map to work",
+        "It can create unbounded cardinality and increase custom-metric cost",
+        "It makes aggregation easier across services"
+      ],
+      "answer": 2,
+      "explanation": "Datadog recommends avoiding tags from unbounded sources such as user IDs, request IDs, or timestamps. Those values can explode metric cardinality, make analysis noisier, and increase billing.",
+      "reference": "https://docs.datadoghq.com/account_management/billing/custom_metrics/",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-064",
+      "topic": "Using Tags",
+      "question": "In a metric query, what does grouping by a tag key such as service do?",
+      "choices": [
+        "It deletes every series that has more than one tag",
+        "It forces the metric into a one-minute rollup",
+        "It converts the metric into a log index",
+        "It splits the data into separate series for each tag value"
+      ],
+      "answer": 3,
+      "explanation": "Grouping by a tag key creates one series per value of that key, such as one line for each service. That is how you compare multiple tagged populations inside the same graph.",
+      "reference": "https://docs.datadoghq.com/dashboards/querying/",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-065",
+      "topic": "Tagging Best Practices",
+      "question": "Why is env:prod usually a better design than putting the environment inside every metric name?",
+      "choices": [
+        "Tags are visible only to administrators",
+        "Tags automatically encrypt the metric payload",
+        "Tags let you filter and group consistently without multiplying metric names",
+        "Metric names cannot contain alphabetic characters"
+      ],
+      "answer": 2,
+      "explanation": "A tag like env:prod can be reused across metrics, logs, traces, and monitors, which keeps queries flexible. Encoding the environment into the metric name creates unnecessary metric sprawl and makes grouping harder.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#define-tags",
+      "difficulty": 2
+    },
+    {
+      "id": "tag-q-066",
+      "topic": "Using Tags",
+      "question": "Why are tags so useful on dashboards and infrastructure views?",
+      "choices": [
+        "They are required for every monitor message",
+        "They only work on logs, not metrics",
+        "They let you filter and group telemetry by meaningful context",
+        "They replace the need for metrics"
+      ],
+      "answer": 2,
+      "explanation": "Tags add business or technical context that dashboards can filter and group on. Without tags, views are much harder to scope to the right environment, service, or team.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/using_tags/#dashboards",
+      "difficulty": 1
+    },
+    {
+      "id": "tag-q-067",
+      "topic": "Tagging Best Practices",
+      "question": "Why is unified service tagging with `env`, `service`, and `version` useful?",
+      "choices": [
+        "It converts all logs into metrics",
+        "It disables host tags to reduce cardinality to zero",
+        "It correlates telemetry consistently across products and views",
+        "It lets Datadog infer your API key automatically"
+      ],
+      "answer": 2,
+      "explanation": "`env`, `service`, and `version` form Datadog's unified service tagging convention. Using them consistently makes it much easier to correlate dashboards, logs, traces, service views, and deployments.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/unified_service_tagging/",
+      "difficulty": 1
     }
   ],
   "flashcards": [

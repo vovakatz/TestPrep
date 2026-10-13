@@ -819,6 +819,351 @@
       "explanation": "The status page's Paths section lists the Config File in use along with the `conf.d` and `checks.d` directories. `configcheck` lists the check configurations the Agent resolved, `hostname` prints only the reported hostname, and `version` prints build information.",
       "reference": "https://docs.datadoghq.com/agent/configuration/agent-status-page/#paths",
       "difficulty": 2
+    },
+    {
+      "id": "ts-q-056",
+      "topic": "Agent Commands",
+      "question": "What is the main purpose of an Agent flare?",
+      "choices": [
+        "Reset the Agent to factory defaults",
+        "Send a troubleshooting bundle of sanitized configs and logs to Datadog Support",
+        "Rotate application keys",
+        "Benchmark dashboard queries"
+      ],
+      "answer": 1,
+      "explanation": "A flare packages logs and configuration details into a support-friendly troubleshooting bundle. Sensitive values such as API keys are scrubbed before upload.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-057",
+      "topic": "Agent Commands",
+      "question": "What does the `flare` command do?",
+      "choices": [
+        "It restarts the host operating system",
+        "It bundles troubleshooting information and sends it to Datadog support",
+        "It rotates API keys automatically",
+        "It opens DogStatsD port 8125"
+      ],
+      "answer": 1,
+      "explanation": "A flare collects helpful troubleshooting artifacts such as configuration and log details and prepares them for Datadog support. It is a standard escalation tool when local checks and logs are not enough to resolve an Agent issue.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-058",
+      "topic": "Agent Commands",
+      "question": "Which command should you run first for a high-level view of Agent health, checks, and configuration state?",
+      "choices": [
+        "`datadog-agent license`",
+        "`datadog-agent status`",
+        "`datadog-agent hostname`",
+        "`datadog-agent uninstall`"
+      ],
+      "answer": 1,
+      "explanation": "`datadog-agent status` is the standard first-stop health view. It summarizes checks, collectors, configuration state, and other operational details.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-status-page/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-059",
+      "topic": "Agent Logs",
+      "question": "An engineer wants the Agent to tail application logs from a host. Which statement is most accurate?",
+      "choices": [
+        "Logs can only be sent through DogStatsD",
+        "Application keys replace all log-collection settings",
+        "Log collection requires Agent configuration for the desired path, source, and service",
+        "Logs are collected automatically from every file on disk with no configuration"
+      ],
+      "answer": 2,
+      "explanation": "Host log collection requires configuration telling the Agent what to read and how to label it. Path, source, and service are core pieces of context that help Datadog ingest and organize those logs correctly.",
+      "reference": "https://docs.datadoghq.com/agent/logs/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-060",
+      "topic": "Agent Config Files",
+      "question": "On a standard Linux host, which file is the main Datadog Agent configuration file?",
+      "choices": [
+        "/usr/local/datadog/conf/agent.json",
+        "/etc/datadog-agent/datadog.yaml",
+        "/var/log/datadog-agent/datadog.yaml",
+        "/opt/datadog-agent/conf.d/main.conf"
+      ],
+      "answer": 1,
+      "explanation": "On Linux, the Agent's main configuration file is /etc/datadog-agent/datadog.yaml. This is where host-wide settings such as the API key, site, proxy, and global tags are commonly defined.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#main-configuration-file",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-061",
+      "topic": "Agent Commands",
+      "question": "What does the configcheck command show for a running Agent?",
+      "choices": [
+        "Only the Agent version",
+        "All loaded and resolved configurations",
+        "Every monitor in the Datadog organization",
+        "Only the last 10 log lines"
+      ],
+      "answer": 1,
+      "explanation": "configcheck shows the configurations the running Agent has actually loaded after templates and settings are resolved. That makes it especially useful for checking whether an integration or Autodiscovery template was interpreted as expected.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/config/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-062",
+      "topic": "Agent Config Files",
+      "question": "Which path is the standard Windows location for the main Datadog Agent configuration file?",
+      "choices": [
+        "%USERPROFILE%\\Datadog\\conf.yaml",
+        "C:\\Datadog\\conf\\datadog.yaml",
+        "C:\\Windows\\System32\\datadog.yaml",
+        "%ProgramData%\\Datadog\\datadog.yaml"
+      ],
+      "answer": 3,
+      "explanation": "On Windows, the Datadog Agent stores its main configuration under `%ProgramData%\\Datadog\\`. Linux and macOS use different standard locations.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#main-configuration-file",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-063",
+      "topic": "Agent Commands",
+      "question": "An integration was configured in `conf.d`, but it still does not load. Which command helps confirm what the running Agent actually loaded?",
+      "choices": [
+        "configcheck",
+        "launch-gui",
+        "version",
+        "health"
+      ],
+      "answer": 0,
+      "explanation": "The `configcheck` subcommand prints the configurations the running Agent has loaded and resolved. That makes it useful for spotting whether the Agent is seeing the file you expect and how template values are being interpreted.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/config/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-064",
+      "topic": "Agent Logs",
+      "question": "If a newly configured integration is still not reporting and you need immediate diagnostic detail, what is a strong next step after checking Agent status?",
+      "choices": [
+        "Delete the API key",
+        "Disable TLS everywhere",
+        "Review Agent logs and enable debug mode if needed",
+        "Rebuild all dashboards"
+      ],
+      "answer": 2,
+      "explanation": "Datadog troubleshooting guidance recommends checking the Agent logs and, when needed, turning on debug logging for more detail. Logs often reveal whether the problem is authentication, parsing, connectivity, or an invalid integration configuration.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/debug_mode/",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-065",
+      "topic": "Agent Commands",
+      "question": "Which command gives a broad status view of the running Agent and enabled integrations?",
+      "choices": [
+        "datadog-agent status",
+        "datadog-agent encrypt",
+        "dogstatsd flush",
+        "dd ping"
+      ],
+      "answer": 0,
+      "explanation": "The status command is the standard first look when troubleshooting an Agent. It shows high-level health information and details about loaded checks and other Agent components.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-status-page/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-066",
+      "topic": "Agent Commands",
+      "question": "Which Agent subcommand collects a diagnostic bundle for Datadog Support?",
+      "choices": [
+        "flare",
+        "diagnose",
+        "status",
+        "check"
+      ],
+      "answer": 0,
+      "explanation": "The flare command packages useful troubleshooting information from the Agent into a bundle. It is one of the standard next steps when local investigation is not enough and Support needs more context.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-067",
+      "topic": "Agent Logs",
+      "question": "On a systemd-based Linux host, the Agent service will not start and systemctl status is not detailed enough. Which command is the best next step?",
+      "choices": [
+        "ls /tmp",
+        "ping app.datadoghq.com",
+        "journalctl -u datadog-agent.service",
+        "datadog-agent hostname"
+      ],
+      "answer": 2,
+      "explanation": "The systemd journal provides the service's full logs, which often include startup errors that do not appear in the short status output. That is the fastest way to see permission issues, parse errors, or missing dependencies during boot.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/agent_check_status/#systemd",
+      "difficulty": 2
+    },
+    {
+      "id": "ts-q-068",
+      "topic": "Agent Config Files",
+      "question": "Which setting pair belongs in the main datadog.yaml because it defines how the Agent connects to Datadog?",
+      "choices": [
+        "useradd and groupadd",
+        "service and source",
+        "api_key and site",
+        "apache_status_url and min_collection_interval"
+      ],
+      "answer": 2,
+      "explanation": "The main Agent configuration holds organization-wide connection details such as the API key and the Datadog site. Check-specific URLs and instance settings belong in integration configuration files instead.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#main-configuration-file",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-069",
+      "topic": "Agent Logs",
+      "question": "Which setting in `datadog.yaml` enables host-based log collection?",
+      "choices": [
+        "`flare_enabled: true`",
+        "`logs_enabled: true`",
+        "`apm_config.enabled: true`",
+        "`dogstatsd_port: 8125`"
+      ],
+      "answer": 1,
+      "explanation": "Host log collection is off by default. Setting `logs_enabled: true` in `datadog.yaml` turns the logs pipeline on for the Agent.",
+      "reference": "https://docs.datadoghq.com/agent/logs/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-070",
+      "topic": "Agent Logs",
+      "question": "A tailed custom log file is written without newline terminators at the end of each line. What effect can that have?",
+      "choices": [
+        "The Agent converts the file into JSON format",
+        "The Agent automatically inserts timestamps and sends the partial line immediately",
+        "The Agent treats the file as a metric source instead",
+        "The Agent can wait indefinitely and not ship the incomplete line"
+      ],
+      "answer": 3,
+      "explanation": "The log tailer expects complete line boundaries. If the application never ends the line, the Agent may keep waiting because it has not seen a finished record to forward.",
+      "reference": "https://docs.datadoghq.com/agent/logs/",
+      "difficulty": 3
+    },
+    {
+      "id": "ts-q-071",
+      "topic": "Agent Commands",
+      "question": "Which command is best for confirming which integration configs the Agent has actually loaded?",
+      "choices": [
+        "`datadog-agent import`",
+        "`datadog-agent tagger-list`",
+        "`datadog-agent check`",
+        "`datadog-agent configcheck`"
+      ],
+      "answer": 3,
+      "explanation": "`configcheck` shows which configs the Agent has actually loaded. That helps separate a bad config file from a bad dashboard query or monitor issue.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/config/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-072",
+      "topic": "Agent Commands",
+      "question": "Which command prints the hostname currently used by the Datadog Agent?",
+      "choices": [
+        "datadog-agent stopservice",
+        "datadog-agent version",
+        "datadog-agent import",
+        "datadog-agent hostname"
+      ],
+      "answer": 3,
+      "explanation": "The `hostname` subcommand reports the hostname the Agent is using for host identification. That is a fast way to verify whether hostname detection or an explicit override is behaving as expected.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#other-commands",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-073",
+      "topic": "Agent Commands",
+      "question": "You have checked Agent status and logs but still need Datadog Support to inspect the host. What should you send next?",
+      "choices": [
+        "A copy of browser cookies",
+        "A screenshot of the Host Map only",
+        "An Agent flare diagnostic bundle",
+        "A BIOS export"
+      ],
+      "answer": 2,
+      "explanation": "The flare command collects a diagnostic bundle that Datadog Support can use for deeper troubleshooting. It is the documented next step when local inspection is not enough to explain the problem.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/send_a_flare/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-074",
+      "topic": "Agent Config Files",
+      "question": "After a standard Linux Agent installation, which file and directory pair is most relevant for core configuration and integrations?",
+      "choices": [
+        "/opt/datadog/config.json and /opt/datadog/plugins/",
+        "/var/lib/datadog/agent.ini and /var/lib/datadog/checks/",
+        "/usr/local/etc/dd.conf and /usr/local/etc/dd-integrations/",
+        "/etc/datadog-agent/datadog.yaml and /etc/datadog-agent/conf.d/"
+      ],
+      "answer": 3,
+      "explanation": "`datadog.yaml` holds global Agent settings, while `conf.d/` contains per-integration configs. That separation is central to how the Agent is administered on Linux.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#main-configuration-file",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-075",
+      "topic": "Agent Config Files",
+      "question": "On Linux, where is a typical integration configuration stored?",
+      "choices": [
+        "/usr/bin/datadog-agent/<CHECK_NAME>.json",
+        "/etc/datadog-agent/conf.d/<CHECK_NAME>.d/conf.yaml",
+        "/var/log/datadog/<CHECK_NAME>.log",
+        "/etc/systemd/system/<CHECK_NAME>.service"
+      ],
+      "answer": 1,
+      "explanation": "Linux integration configs normally live in `conf.d/<CHECK_NAME>.d/conf.yaml`. The main config file and log directories are separate concerns.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#check-configuration-files",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-076",
+      "topic": "Agent Commands",
+      "question": "After configuring a new integration, where should you look in datadog-agent status to confirm the check loaded?",
+      "choices": [
+        "Host Map view",
+        "Audit Trail",
+        "Checks section",
+        "Billing section"
+      ],
+      "answer": 2,
+      "explanation": "Datadog's integrations getting-started docs recommend using the status command and inspecting the Checks section to validate configuration. If the integration is loaded correctly, that section shows the check and its runtime details.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/agent_check_status/",
+      "difficulty": 1
+    },
+    {
+      "id": "ts-q-077",
+      "topic": "Agent Config Files",
+      "question": "Two YAML log collection files point to the same log source. How does the Agent handle that situation?",
+      "choices": [
+        "It disables log collection for the whole host permanently",
+        "It uses the first file alphabetically and ignores the others to prevent duplicates",
+        "It merges all matching YAML files into one combined pipeline",
+        "It duplicates every log line once per file"
+      ],
+      "answer": 1,
+      "explanation": "Datadog avoids sending duplicate logs from multiple definitions of the same source. When more than one YAML file matches that source, the Agent chooses the first alphabetically and ignores the rest.",
+      "reference": "https://docs.datadoghq.com/agent/logs/",
+      "difficulty": 3
+    },
+    {
+      "id": "ts-q-078",
+      "topic": "Agent Commands",
+      "question": "Which command is best for printing the configurations the Agent has loaded and resolved, especially when troubleshooting Autodiscovery?",
+      "choices": [
+        "datadog-agent configcheck",
+        "datadog-agent launch-gui",
+        "datadog-agent hostname",
+        "datadog-agent import"
+      ],
+      "answer": 0,
+      "explanation": "The configcheck command prints the configurations the running Agent has loaded and resolved. That makes it especially useful when you suspect template, integration, or Autodiscovery problems.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/autodiscovery/",
+      "difficulty": 2
     }
   ],
   "flashcards": [

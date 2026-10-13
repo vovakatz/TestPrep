@@ -794,6 +794,276 @@
       "explanation": "To avoid double counting, the Agent must read the instance ID from instance metadata and report it so Datadog can reconcile the Agent host with the AWS integration's host. Agent 7.64.0 and later use IMDSv2 by default, while older versions need `ec2_prefer_imdsv2: true` (DD_EC2_PREFER_IMDSV2 in containers). FQDN reporting, matching host tags or Name tags do not give Datadog the instance ID it uses for matching.",
       "reference": "https://docs.datadoghq.com/account_management/billing/aws/",
       "difficulty": 3
+    },
+    {
+      "id": "agt-q-054",
+      "topic": "Agent Hostname",
+      "question": "If the Agent runs in a containerized environment and cannot determine a reliable hostname automatically, which configuration can explicitly set it?",
+      "choices": [
+        "DD_API_KEY",
+        "DD_HOSTNAME",
+        "DD_DOGSTATSD_PORT",
+        "DD_PROCESS_AGENT_ENABLED"
+      ],
+      "answer": 1,
+      "explanation": "DD_HOSTNAME lets you explicitly control the hostname the Agent reports. That is useful when automatic hostname detection is unavailable or unreliable in certain containerized environments.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/hostname_containers/",
+      "difficulty": 2
+    },
+    {
+      "id": "agt-q-055",
+      "topic": "Agent Installation",
+      "question": "For a basic host-based Agent install, which two values are required so the Agent can send data to the correct Datadog organization and site?",
+      "choices": [
+        "Monitor ID and dashboard ID",
+        "API key and site",
+        "Hostname and log path",
+        "Application key and password"
+      ],
+      "answer": 1,
+      "explanation": "The Agent's main required settings are your organization's API key and the Datadog site value. The API key authorizes intake, and the site tells the Agent which Datadog region or domain to send data to.",
+      "reference": "https://docs.datadoghq.com/getting_started/agent/",
+      "difficulty": 1
+    },
+    {
+      "id": "agt-q-056",
+      "topic": "Agent Hostname",
+      "question": "If hostname autodetection fails in a containerized environment, which explicit setting can be used as a fallback?",
+      "choices": [
+        "DD_HOSTNAME",
+        "DD_TAGS",
+        "DD_API_KEY",
+        "DD_SITE"
+      ],
+      "answer": 0,
+      "explanation": "Datadog documents `DD_HOSTNAME` as a way to explicitly set the hostname when autodetection is not reliable. That can be important in containers, CI environments, or sidecar patterns where the Agent cannot infer a trustworthy host identity.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/hostname_containers/",
+      "difficulty": 2
+    },
+    {
+      "id": "agt-q-057",
+      "topic": "Agent Hostname",
+      "question": "A single machine starts appearing as two slightly different hosts in Datadog over time. Which area should you investigate first?",
+      "choices": [
+        "Dashboard color palettes",
+        "Hostname detection and any explicit Agent hostname overrides",
+        "The browser used to view the Host Map",
+        "DogStatsD sample rate defaults"
+      ],
+      "answer": 1,
+      "explanation": "Duplicate or drifting host identities usually point to hostname detection, cloud metadata, or explicit hostname settings. That is the right layer to inspect before looking at dashboards or visualizations.",
+      "reference": "https://docs.datadoghq.com/agent/faq/how-datadog-agent-determines-the-hostname/",
+      "difficulty": 2
+    },
+    {
+      "id": "agt-q-058",
+      "topic": "Agent Installation",
+      "question": "On Kubernetes, which method is Datadog's recommended way to install and configure the Agent and its integrations declaratively?",
+      "choices": [
+        "Copying datadog.yaml into each pod manually",
+        "Running dogstatsd inside every application container",
+        "Installing the Agent through the host package manager only",
+        "Using the Datadog Helm chart or the Datadog Operator"
+      ],
+      "answer": 3,
+      "explanation": "Datadog provides a Helm chart and a Datadog Operator for installing the Agent on Kubernetes. Both declare the Agent, Cluster Agent, and collection settings as Kubernetes resources so configuration is reproducible and versionable.",
+      "reference": "https://docs.datadoghq.com/containers/kubernetes/installation/",
+      "difficulty": 1
+    },
+    {
+      "id": "agt-q-059",
+      "topic": "Agent Hostname",
+      "question": "Why does an operating system hostname matter to monitoring tools such as Datadog?",
+      "choices": [
+        "It helps identify and group telemetry from the correct host",
+        "It sets the CPU clock speed",
+        "It changes UDP traffic into TCP traffic",
+        "It determines disk encryption type"
+      ],
+      "answer": 0,
+      "explanation": "A hostname gives Datadog a stable way to associate incoming telemetry with a specific machine or node. Without a reliable host identity, dashboards, maps, and correlations can become misleading or incomplete.",
+      "reference": "https://docs.datadoghq.com/agent/faq/how-datadog-agent-determines-the-hostname/",
+      "difficulty": 1
+    },
+    {
+      "id": "agt-q-060",
+      "topic": "Running the Agent",
+      "question": "After installing the Agent on a Linux host, what is the best first check to confirm integrations are running cleanly?",
+      "choices": [
+        "Create a dashboard immediately",
+        "Run the Agent status command",
+        "Open more inbound firewall ports",
+        "Revoke the API key"
+      ],
+      "answer": 1,
+      "explanation": "The Agent status output shows running checks, warnings, and integration health. Datadog's troubleshooting guidance points to the status command early because it exposes whether the Agent and integrations are actually working on the host.",
+      "reference": "https://docs.datadoghq.com/agent/supported_platforms/linux/",
+      "difficulty": 1
+    },
+    {
+      "id": "agt-q-061",
+      "topic": "Running the Agent",
+      "question": "After editing datadog.yaml or an integration conf.yaml, what usually must happen before the new settings take effect?",
+      "choices": [
+        "Rotate the API key",
+        "Rebuild the Datadog web UI",
+        "Restart the Agent",
+        "Delete all old host tags"
+      ],
+      "answer": 2,
+      "explanation": "Agent-side configuration changes are typically loaded when the Agent starts. Restarting ensures the process re-reads the updated files and applies the new settings.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#restart-the-agent",
+      "difficulty": 1
+    },
+    {
+      "id": "agt-q-062",
+      "topic": "Running the Agent",
+      "question": "Why is the Datadog Agent typically installed to run as a service or daemon rather than launched from an interactive shell?",
+      "choices": [
+        "So the Agent can use application keys instead of API keys",
+        "So integration files are stored only in memory",
+        "So collection continues after the user logs out and the host reboots",
+        "So dashboards update without network connectivity"
+      ],
+      "answer": 2,
+      "explanation": "A service or daemon can keep running independently of an interactive login session. That lets the Agent start at boot and continue collecting telemetry even after a user disconnects.",
+      "reference": "https://docs.datadoghq.com/agent/supported_platforms/linux/",
+      "difficulty": 1
+    },
+    {
+      "id": "agt-q-063",
+      "topic": "Agent Hostname",
+      "question": "Why is a stable hostname important for Datadog host monitoring?",
+      "choices": [
+        "It replaces the need for API keys",
+        "It encrypts logs automatically",
+        "It helps Datadog associate telemetry with the correct host over time",
+        "It increases CPU speed on the host"
+      ],
+      "answer": 2,
+      "explanation": "A stable hostname helps Datadog recognize that data belongs to the same machine across time and across products. If host identity changes unexpectedly, visibility can fragment or duplicate host entries can appear.",
+      "reference": "https://docs.datadoghq.com/agent/faq/how-datadog-agent-determines-the-hostname/",
+      "difficulty": 1
+    },
+    {
+      "id": "agt-q-064",
+      "topic": "Agent Hostname",
+      "question": "Cloned virtual machines all appear under the same host in Datadog after the Agent starts. Which action most directly fixes the identity problem?",
+      "choices": [
+        "Replace the API key with an application key",
+        "Explicitly set a unique Agent hostname on each machine",
+        "Lower the DogStatsD flush interval",
+        "Change the dashboard rollup function"
+      ],
+      "answer": 1,
+      "explanation": "Datadog uses host identity to merge telemetry correctly. If cloned machines share the same detected name, explicitly setting unique hostnames prevents collisions.",
+      "reference": "https://docs.datadoghq.com/agent/faq/how-datadog-agent-determines-the-hostname/",
+      "difficulty": 2
+    },
+    {
+      "id": "agt-q-065",
+      "topic": "Agent Hostname",
+      "question": "Why should the Datadog Agent have a stable, correct hostname?",
+      "choices": [
+        "To compress logs before shipping them",
+        "To increase CPU speed on the monitored host",
+        "To rotate API keys automatically",
+        "To associate telemetry with the correct infrastructure entity in Datadog"
+      ],
+      "answer": 3,
+      "explanation": "The Agent hostname is a key part of how Datadog identifies hosts and joins related data together. If that hostname is wrong or unstable, metrics and metadata can be split across multiple apparent hosts or attached to the wrong one.",
+      "reference": "https://docs.datadoghq.com/agent/faq/how-datadog-agent-determines-the-hostname/",
+      "difficulty": 1
+    },
+    {
+      "id": "agt-q-066",
+      "topic": "Agent Hostname",
+      "question": "If you explicitly change the Agent hostname in datadog.yaml, what is true in Datadog?",
+      "choices": [
+        "The new hostname is ignored until you create a new organization",
+        "Both old and new hostnames permanently receive the same new metrics",
+        "The old hostname can remain visible for about two hours, but new metrics arrive under the new hostname",
+        "The old hostname immediately disappears from the UI and its historical data is deleted"
+      ],
+      "answer": 2,
+      "explanation": "Datadog keeps the previous hostname visible for a short period so recent history does not vanish abruptly. New telemetry is attributed to the newly configured hostname, while the old name stops receiving fresh metrics.",
+      "reference": "https://docs.datadoghq.com/agent/faq/how-datadog-agent-determines-the-hostname/",
+      "difficulty": 3
+    },
+    {
+      "id": "agt-q-067",
+      "topic": "Running the Agent",
+      "question": "Why is the Datadog Agent typically installed as a background service or daemon on a host?",
+      "choices": [
+        "It converts all TCP traffic on the host into UDP traffic",
+        "It can continuously collect and forward telemetry without an interactive session",
+        "It is required to compile dashboards locally on the host",
+        "It can only run while an interactive user is logged in"
+      ],
+      "answer": 1,
+      "explanation": "The Agent is designed to run continuously so it can keep collecting metrics, events, logs, and traces as the host operates. Running it as a service or daemon means monitoring continues through reboots and user logouts.",
+      "reference": "https://docs.datadoghq.com/agent/architecture/",
+      "difficulty": 1
+    },
+    {
+      "id": "agt-q-068",
+      "topic": "Running the Agent",
+      "question": "After installing or changing an Agent integration package, what action is typically required before new data starts flowing?",
+      "choices": [
+        "Restart the Agent",
+        "Clear the browser cache",
+        "Rotate the API key immediately",
+        "Change the host's timezone"
+      ],
+      "answer": 0,
+      "explanation": "Integration installs and configuration changes generally require the Agent to reload or restart so the new check can initialize cleanly. Without that step, the running process may continue using the old configuration state.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#restart-the-agent",
+      "difficulty": 1
+    },
+    {
+      "id": "agt-q-069",
+      "topic": "Agent Hostname",
+      "question": "In Kubernetes, the Agent exits soon after startup with an error saying it was unable to reliably determine the host name. What is the best interpretation?",
+      "choices": [
+        "A dashboard permission is missing",
+        "DogStatsD has a port conflict on localhost",
+        "Hostname resolution failed, so the Agent cannot safely identify the host",
+        "An application key is missing for metric intake"
+      ],
+      "answer": 2,
+      "explanation": "Datadog documents this as a hostname detection problem in containerized environments, not as a dashboard or API-key issue. The Agent depends on a reliable host identity, so it may exit rather than send ambiguous host telemetry.",
+      "reference": "https://docs.datadoghq.com/agent/troubleshooting/hostname_containers/",
+      "difficulty": 2
+    },
+    {
+      "id": "agt-q-070",
+      "topic": "Agent Installation",
+      "question": "What is the role of the Datadog Cluster Agent in a Kubernetes deployment?",
+      "choices": [
+        "It replaces the Node Agents entirely",
+        "It collects host metrics directly from the kernel",
+        "It acts as a control-plane component that aggregates cluster metadata and serves Autodiscovery and cluster-level checks to Node Agents",
+        "It forwards DogStatsD traffic to Datadog over UDP port 53"
+      ],
+      "answer": 2,
+      "explanation": "The Cluster Agent runs as a Kubernetes deployment and provides cluster-wide context such as pod metadata, service-to-service mapping, and cluster-level checks. Node Agents communicate with the Cluster Agent to enrich host-level telemetry and coordinate Autodiscovery.",
+      "reference": "https://docs.datadoghq.com/containers/cluster_agent/",
+      "difficulty": 2
+    },
+    {
+      "id": "agt-q-071",
+      "topic": "Agent Installation",
+      "question": "For Datadog Agent v6+, how can most settings from datadog.yaml also be supplied in containerized deployments?",
+      "choices": [
+        "Through browser local storage",
+        "Through dashboard template variables",
+        "Through DD_ environment variables",
+        "Through monitor tags"
+      ],
+      "answer": 2,
+      "explanation": "The Agent supports environment-variable forms for most main configuration settings, typically by uppercasing the option name and prefixing it with DD_. This is especially common in containers where editing files directly is less convenient.",
+      "reference": "https://docs.datadoghq.com/agent/guide/environment-variables/",
+      "difficulty": 1
     }
   ],
   "flashcards": [

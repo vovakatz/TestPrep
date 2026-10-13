@@ -764,6 +764,246 @@
       "explanation": "Datadog says to add all of the ip-ranges to your inclusion list: only a subset is active at any given moment, but it varies over time due to regular network operation and maintenance. Allowlisting observed or install-time IPs, or pinning hosts-file entries, breaks when traffic moves to other addresses in the published ranges.",
       "reference": "https://docs.datadoghq.com/agent/configuration/network/#inclusion",
       "difficulty": 2
+    },
+    {
+      "id": "net-q-052",
+      "topic": "Datadog Ports",
+      "question": "The Agent is installed and checks run locally, but outbound TCP 443 to Datadog intake is blocked by a firewall. What is the most likely result?",
+      "choices": [
+        "The Agent can collect locally but cannot send most data to Datadog",
+        "Hostnames change every minute because time sync fails",
+        "Dashboards keep updating because 443 only affects login traffic",
+        "The Agent automatically changes to UDP 443"
+      ],
+      "answer": 0,
+      "explanation": "Local collection can still happen, but the Agent cannot successfully forward most telemetry upstream without outbound 443. In restricted environments, the correct site endpoints or allowlisted destinations must also match your Datadog site.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#outbound",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-053",
+      "topic": "Datadog Ports",
+      "question": "Which network statement is accurate for a basic Datadog Agent deployment?",
+      "choices": [
+        "Datadog initiates inbound management sessions to the Agent over SSH",
+        "The Agent normally initiates outbound connectivity to Datadog, most commonly over TCP 443",
+        "DogStatsD data is sent to Datadog directly over ICMP",
+        "The Agent must receive inbound TCP 443 from Datadog to upload metrics"
+      ],
+      "answer": 1,
+      "explanation": "The Datadog Agent is designed to open outbound connections to Datadog services. For common deployments, allowing outbound TCP 443 is the key requirement rather than opening inbound access from Datadog.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#outbound",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-054",
+      "topic": "Datadog IP Addresses",
+      "question": "If the Agent is running but no data arrives because outbound internet access is blocked, which remediation best matches Datadog guidance?",
+      "choices": [
+        "Allow outbound connectivity to required Datadog domains or use a proxy",
+        "Open inbound SSH access from Datadog",
+        "Switch every monitor to no-data",
+        "Replace the API key with an application key"
+      ],
+      "answer": 0,
+      "explanation": "Datadog expects the Agent to initiate outbound encrypted traffic to Datadog services. If direct outbound access is restricted, the documented alternative is to allow the required destinations or route the traffic through a proxy.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#destinations",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-055",
+      "topic": "Datadog IP Addresses",
+      "question": "What does Datadog document about the domains used by Agent destinations?",
+      "choices": [
+        "They require inbound NAT from Datadog to the Agent host",
+        "They are rewritten into local-only IPs on each reboot",
+        "They are available only over UDP",
+        "They are CNAME records that point to static IP ranges published by Datadog"
+      ],
+      "answer": 3,
+      "explanation": "Datadog's network traffic documentation notes that these domains are CNAMEs backed by static IP addresses that Datadog publishes. That is helpful for organizations that maintain strict allowlists and need a supported source of current IP ranges.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#static-ip-addresses",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-056",
+      "topic": "Networking",
+      "question": "Which statement best describes TCP compared with UDP?",
+      "choices": [
+        "TCP provides ordered delivery and acknowledgments, while UDP does not",
+        "UDP automatically encrypts application traffic",
+        "TCP can be used only on port 443",
+        "UDP guarantees retransmission of lost packets"
+      ],
+      "answer": 0,
+      "explanation": "TCP is connection-oriented and tracks delivery, which makes it useful when reliability matters. UDP is lighter weight and does not guarantee delivery or ordering, which is why some telemetry protocols use it for lower overhead.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc9293",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-057",
+      "topic": "Datadog IP Addresses",
+      "question": "When building firewall rules for Datadog endpoints, what is the better practice than allowlisting a few currently observed IPs?",
+      "choices": [
+        "Use Datadog's published IP ranges for the relevant product endpoints",
+        "Disable DNS and route by hostname aliases",
+        "Allow only RFC1918 private address space",
+        "Allow only the last IP address returned by DNS"
+      ],
+      "answer": 0,
+      "explanation": "Datadog publishes product-specific IP ranges so you can build a more durable allowlist. Relying on a few currently observed addresses is brittle because endpoint addresses can change over time.",
+      "reference": "https://docs.datadoghq.com/api/latest/ip-ranges/",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-058",
+      "topic": "Networking",
+      "question": "Which set of fields best distinguishes one TCP connection from another between the same hosts?",
+      "choices": [
+        "Destination IP and DNS TTL",
+        "Hostname and subnet mask",
+        "CPU usage and process owner",
+        "Source IP, source port, destination IP, destination port, and protocol"
+      ],
+      "answer": 3,
+      "explanation": "Transport connections are identified by endpoint addresses and ports together with the protocol. Looking at only an IP or only a destination port is not enough when many connections exist at once.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc9293",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-059",
+      "topic": "Networking",
+      "question": "If packet loss appears between an application and the Datadog Agent, which area is most directly implicated?",
+      "choices": [
+        "Filesystem permissions on `/etc`",
+        "CPU instruction set compatibility",
+        "Storage subsystem performance",
+        "Network connectivity between the endpoints"
+      ],
+      "answer": 3,
+      "explanation": "Packet loss points first to a networking path problem, not to storage or CPU architecture. In monitoring environments, that can affect whether telemetry reaches the Agent or whether Agents reach Datadog endpoints consistently.",
+      "reference": "https://man7.org/linux/man-pages/man8/ping.8.html",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-060",
+      "topic": "Datadog Ports",
+      "question": "What is the default port and protocol for the Agent's APM trace receiver?",
+      "choices": [
+        "5002/TCP",
+        "8126/TCP",
+        "443/UDP",
+        "8125/UDP"
+      ],
+      "answer": 1,
+      "explanation": "The Agent's trace receiver listens on TCP port 8126 by default. If you customize that port, your tracing libraries must be pointed at the same value or traces will not arrive.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#open-ports",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-061",
+      "topic": "Datadog IP Addresses",
+      "question": "What is the safest general firewall approach for Agent communication with Datadog?",
+      "choices": [
+        "Allow all inbound traffic from the internet",
+        "Allow required Datadog domains for your site and outbound SSL traffic",
+        "Disable TLS to simplify packet inspection",
+        "Allow only whatever public IP appears in a search result"
+      ],
+      "answer": 1,
+      "explanation": "Datadog documents outbound SSL traffic from the Agent to site-specific Datadog destinations. In practice, you allow the required Datadog domains and endpoints for your site rather than opening broad inbound access.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#destinations",
+      "difficulty": 2
+    },
+    {
+      "id": "net-q-062",
+      "topic": "Datadog Ports",
+      "question": "How is Agent traffic initiated in a standard Datadog deployment?",
+      "choices": [
+        "Only browsers establish the telemetry tunnel",
+        "Datadog opens inbound sessions directly to the Agent",
+        "Agents communicate only with each other",
+        "The Agent initiates outbound connections to Datadog"
+      ],
+      "answer": 3,
+      "explanation": "Datadog's network documentation states that traffic is initiated by the Agent to Datadog, not the other way around. That is why firewall planning usually focuses on outbound access to required Datadog domains rather than inbound sessions from Datadog.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#outbound",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-063",
+      "topic": "Datadog Ports",
+      "question": "Most data sent from the Agent to Datadog leaves the host over which outbound port and protocol?",
+      "choices": [
+        "22 over TCP",
+        "80 over TCP",
+        "123 over UDP",
+        "443 over TCP"
+      ],
+      "answer": 3,
+      "explanation": "Most Agent traffic to Datadog uses HTTPS on TCP port 443. This is the standard outbound path for common telemetry submission from the Agent to the Datadog intake.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#outbound",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-064",
+      "topic": "Datadog Ports",
+      "question": "Which port does the Datadog Agent use by default for the APM receiver?",
+      "choices": [
+        "5001 over TCP",
+        "8126 over TCP",
+        "443 over UDP",
+        "8125 over UDP"
+      ],
+      "answer": 1,
+      "explanation": "The default APM receiver port is 8126 over TCP. That listener handles trace intake for Datadog APM and related features such as the profiler.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#open-ports",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-065",
+      "topic": "Networking",
+      "question": "What does a port number let two programs on the same host do?",
+      "choices": [
+        "Encrypt packets automatically",
+        "Share the same process ID",
+        "Use the same IP address while receiving different traffic streams",
+        "Bypass DNS resolution entirely"
+      ],
+      "answer": 2,
+      "explanation": "An IP address identifies the host or interface, while the port identifies the listening service on that host. That separation is why a web server and a trace intake can coexist on the same machine with different ports.",
+      "reference": "https://datatracker.ietf.org/doc/html/rfc6335#section-6",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-066",
+      "topic": "Datadog Ports",
+      "question": "Which port and protocol are used for most outbound Datadog Agent traffic?",
+      "choices": [
+        "80/TCP",
+        "8126/TCP",
+        "443/TCP",
+        "8125/UDP"
+      ],
+      "answer": 2,
+      "explanation": "Most Agent egress uses HTTPS on TCP 443. The local-only ports such as 8125 and 8126 serve different on-host functions.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#outbound",
+      "difficulty": 1
+    },
+    {
+      "id": "net-q-067",
+      "topic": "Datadog Ports",
+      "question": "What is the default port and protocol for the Datadog Agent APM receiver?",
+      "choices": [
+        "8125/UDP",
+        "53/UDP",
+        "443/TCP",
+        "8126/TCP"
+      ],
+      "answer": 3,
+      "explanation": "The Agent's APM receiver listens on TCP 8126 by default. Tracers must target the same port if you change it.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/network/#open-ports",
+      "difficulty": 1
     }
   ],
   "flashcards": [

@@ -809,6 +809,441 @@
       "explanation": "Logging without Limits decouples log ingestion from indexing, so you can collect, process, archive and monitor all logs while choosing which ones to index, for example with exclusion filters. It does not make indexing unlimited or free, it still relies on log collection, and pipelines still parse logs.",
       "reference": "https://docs.datadoghq.com/logs/guide/getting-started-lwl/",
       "difficulty": 2
+    },
+    {
+      "id": "ess-q-055",
+      "topic": "Metadata",
+      "question": "In a monitoring context, what does metadata usually refer to?",
+      "choices": [
+        "Information about the data, such as hostnames, tags, and cloud attributes",
+        "Only raw CPU percentages",
+        "Encrypted secrets stored in the Agent",
+        "Dashboard screenshots"
+      ],
+      "answer": 0,
+      "explanation": "Metadata is descriptive context attached to telemetry, such as host identity, region, team, or environment. Datadog uses that context to filter, group, correlate, and navigate between related signals.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-056",
+      "topic": "Datadog Observability",
+      "question": "What is Datadog's Service Catalog primarily used for?",
+      "choices": [
+        "Compiling Agent integration packages locally",
+        "Rotating API keys for services",
+        "Storing raw log archives for compliance",
+        "Discovering, inventorying, and managing metadata and ownership for services in your estate"
+      ],
+      "answer": 3,
+      "explanation": "Service Catalog aggregates services observed across metrics, traces, logs, and real-user monitoring into a single inventory. Teams use it to attach ownership, tier, on-call, and metadata so service health and dependencies are easier to navigate.",
+      "reference": "https://docs.datadoghq.com/service_catalog/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-057",
+      "topic": "Datadog Observability",
+      "question": "What is Bits (AI) Chat in Datadog used for?",
+      "choices": [
+        "Generating Kubernetes pod annotations automatically",
+        "Encrypting API keys before they are stored",
+        "Asking natural-language questions to investigate data and run triage across telemetry",
+        "Compiling custom Agent binaries"
+      ],
+      "answer": 2,
+      "explanation": "Bits (AI) Chat is Datadog's assistant for interacting with telemetry in natural language. It can help query data, summarize investigations, and suggest next steps across dashboards, logs, metrics, and incidents.",
+      "reference": "https://docs.datadoghq.com/bits_ai/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-058",
+      "topic": "Config File Modification",
+      "question": "An engineer edits datadog.yaml with a tab character for indentation. Why can this break the Agent configuration?",
+      "choices": [
+        "The Agent requires UTF-16 text files",
+        "YAML indentation is whitespace-sensitive, and tabs commonly invalidate parsing",
+        "Tabs automatically expose the API key in plaintext",
+        "Tabs force the Agent to switch from TCP to UDP"
+      ],
+      "answer": 1,
+      "explanation": "YAML parsers rely on clean, consistent indentation to understand nested structure. Tabs are a common source of syntax errors, which can prevent the Agent from loading the configuration at all.",
+      "reference": "https://yaml.org/spec/1.2.2/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-059",
+      "topic": "Config File Modification",
+      "question": "Which format is commonly used for Datadog Agent configuration because it is human-readable and supports nested key-value data?",
+      "choices": [
+        "CSV",
+        "Plain text without structure",
+        "YAML",
+        "Markdown"
+      ],
+      "answer": 2,
+      "explanation": "The Datadog Agent's main configuration file is `datadog.yaml`, which uses YAML syntax. YAML is easy for humans to read and is well suited to nested settings such as lists of tags and integration options.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-060",
+      "topic": "Config File Modification",
+      "question": "In a YAML configuration file such as datadog.yaml, what do leading spaces usually control?",
+      "choices": [
+        "Network bandwidth",
+        "Structure and nesting",
+        "TLS encryption",
+        "File ownership"
+      ],
+      "answer": 1,
+      "explanation": "YAML uses indentation to show which settings belong under other settings. If the nesting is wrong, the Agent may read a value under the wrong parent key or fail to parse the file.",
+      "reference": "https://yaml.org/spec/1.2.2/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-061",
+      "topic": "Datadog Observability",
+      "question": "Which Datadog product analyzes network traffic between services, hosts, containers, and availability zones to help identify dependencies and bottlenecks?",
+      "choices": [
+        "Metrics Explorer",
+        "Network Performance Monitoring",
+        "Host Map",
+        "Service Catalog"
+      ],
+      "answer": 1,
+      "explanation": "Network Performance Monitoring (NPM) collects and correlates network-level traffic data so teams can visualize dependencies, find noisy neighbors, and troubleshoot connectivity or latency between services and endpoints across cloud and on-prem environments.",
+      "reference": "https://docs.datadoghq.com/network_monitoring/cloud_network_monitoring/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-062",
+      "topic": "Datadog Observability",
+      "question": "In Datadog Infrastructure & Cloud Network Monitoring, what does a connection between two endpoints in the network map typically represent?",
+      "choices": [
+        "A dashboard template variable",
+        "A static firewall rule exported from a router",
+        "A pending Agent installation",
+        "Observed network traffic or a dependency between two services, hosts, or containers over a selected time window"
+      ],
+      "answer": 3,
+      "explanation": "The network map in Datadog's Infrastructure & Cloud Network Monitoring visualizes observed traffic and dependencies between endpoints. Edges reflect actual flow data over the selected window, which makes service dependencies and bottlenecks easier to spot than with static topology diagrams.",
+      "reference": "https://docs.datadoghq.com/network_monitoring/cloud_network_monitoring/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-063",
+      "topic": "Scripting Basics",
+      "question": "A team needs automation with loops, conditionals, and API calls around Datadog tasks. What is the role of a programming language such as Python in that workflow?",
+      "choices": [
+        "It removes the need to know shell commands",
+        "It changes the Agent into a kernel module",
+        "It auto-discovers containers without configuration",
+        "It can execute automation logic and call Datadog tools or APIs programmatically"
+      ],
+      "answer": 3,
+      "explanation": "A programming language gives you a way to express automation logic in code, including API calls and conditional behavior. Datadog is still the target system; the language is simply the tool used to automate around it.",
+      "reference": "https://docs.datadoghq.com/api/latest/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-064",
+      "topic": "Config File Modification",
+      "question": "Which example shows a valid YAML list of tags for a Datadog config file?",
+      "choices": [
+        "tags = env:prod, service:web",
+        "tags: ['env:prod', 'service:web']",
+        "tags: env:prod -> service:web",
+        "tags: [env:prod service:web]"
+      ],
+      "answer": 1,
+      "explanation": "YAML accepts list syntax in brackets when the items are comma separated. That represents two distinct tag strings, whereas the other examples are not valid YAML list syntax.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/assigning_tags/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-065",
+      "topic": "Datadog Observability",
+      "question": "What does the Datadog APM Service Map visualize?",
+      "choices": [
+        "Hostnames sorted alphabetically",
+        "The geographic location of office buildings",
+        "API key rotation schedules",
+        "Services and the observed request-level dependencies and traffic between them"
+      ],
+      "answer": 3,
+      "explanation": "The APM Service Map shows services as nodes with edges representing observed request flow and dependencies inferred from traces. It helps teams understand which services call which, and where latency, errors, or throughput concentration sit in the topology.",
+      "reference": "https://docs.datadoghq.com/tracing/services/services_map/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-066",
+      "topic": "Datadog Observability",
+      "question": "What are the three pillars of observability that Datadog is built around?",
+      "choices": [
+        "Dashboards, monitors, and alerts",
+        "Metrics, logs, and traces",
+        "CPU, memory, and disk",
+        "API keys, application keys, and client tokens"
+      ],
+      "answer": 1,
+      "explanation": "The three pillars of observability are metrics, logs, and traces. Datadog unifies these signals so teams can correlate numerical trends, discrete event records, and request-level execution paths across the same services and environments.",
+      "reference": "https://www.datadoghq.com/knowledge-center/observability/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-067",
+      "topic": "Config File Modification",
+      "question": "Why is indentation important in a YAML configuration file?",
+      "choices": [
+        "It alphabetizes the keys",
+        "It defines the data hierarchy and nesting",
+        "It encrypts sensitive values",
+        "It controls comment color"
+      ],
+      "answer": 1,
+      "explanation": "YAML uses indentation to represent structure, so the placement of spaces determines which values belong under which keys. If indentation is wrong, the Agent may read the file incorrectly or fail to load the configuration at all.",
+      "reference": "https://yaml.org/spec/1.2.2/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-068",
+      "topic": "Scripting Basics",
+      "question": "What is an environment variable such as DD_API_KEY primarily used for when configuring the Datadog Agent?",
+      "choices": [
+        "To replace the operating system's hostname permanently",
+        "To convert YAML configuration files into JSON",
+        "To encrypt all network traffic on the host automatically",
+        "To supply configuration values to a process without hardcoding them in the command itself"
+      ],
+      "answer": 3,
+      "explanation": "Environment variables let software read configuration values from the process environment instead of embedding them directly in scripts or binaries. This is a common way to pass secrets and site settings to containerized or automated Agent deployments.",
+      "reference": "https://docs.datadoghq.com/agent/guide/environment-variables/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-069",
+      "topic": "Config File Modification",
+      "question": "An engineer adds a new setting to datadog.yaml, but the Agent fails to start because of a YAML error. Which mistake is most likely?",
+      "choices": [
+        "Using tabs or inconsistent indentation in the YAML structure",
+        "Adding comments that start with #",
+        "Writing keys in lowercase letters",
+        "Using consistent indentation for nested keys"
+      ],
+      "answer": 0,
+      "explanation": "YAML is whitespace-sensitive, so indentation must be consistent for nested structures to parse correctly. Tabs and mismatched indentation commonly break configuration files such as datadog.yaml.",
+      "reference": "https://yaml.org/spec/1.2.2/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-070",
+      "topic": "Datadog Observability",
+      "question": "In Datadog APM, what is a trace?",
+      "choices": [
+        "A single numeric metric sample collected at a timestamp",
+        "A line of text emitted from a log file",
+        "A request-level execution path made up of spans that show how a request moves through services",
+        "A snapshot of host CPU and memory usage"
+      ],
+      "answer": 2,
+      "explanation": "A trace represents the journey of a single request through one or more services. It is composed of spans, each capturing a unit of work with timing, tags, and resource metadata so teams can see where latency or errors originate across distributed services.",
+      "reference": "https://docs.datadoghq.com/tracing/glossary/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-071",
+      "topic": "Config File Modification",
+      "question": "Why must indentation be consistent in `datadog.yaml`?",
+      "choices": [
+        "Because `DD_SITE` must appear in the first column",
+        "Because Datadog sorts YAML keys by whitespace depth before sending",
+        "Because YAML uses whitespace indentation to represent nesting and structure",
+        "Because the Agent only accepts tab characters in YAML"
+      ],
+      "answer": 2,
+      "explanation": "YAML uses indentation to express hierarchy. Incorrect spacing can move a setting into the wrong scope or make the configuration invalid.",
+      "reference": "https://yaml.org/spec/1.2.2/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-072",
+      "topic": "Scripting Basics",
+      "question": "What best describes an environment variable such as `DD_API_KEY` when used to configure the Agent?",
+      "choices": [
+        "A dashboard variable generated by the Datadog UI",
+        "A runtime value the operating system provides to the Agent process",
+        "A host tag automatically inherited by every metric",
+        "A secret stored only in Datadog cloud"
+      ],
+      "answer": 1,
+      "explanation": "Environment variables are values the operating system or process launcher passes to a running program. The Datadog Agent can read many `DD_` variables as alternatives to file-based settings.",
+      "reference": "https://docs.datadoghq.com/agent/guide/environment-variables/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-073",
+      "topic": "Metadata",
+      "question": "In observability, what is metadata?",
+      "choices": [
+        "An encrypted archive of logs",
+        "A compiled Agent binary",
+        "Descriptive context such as hostnames, tags, and cloud attributes",
+        "The numeric value of a metric sample"
+      ],
+      "answer": 2,
+      "explanation": "Metadata adds context around telemetry so you can filter, group, and understand what a data point represents. Examples include host names, instance types, regions, and tags like env:prod.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-074",
+      "topic": "Config File Modification",
+      "question": "Which data format is commonly used for Datadog APIs and many other web service request bodies?",
+      "choices": [
+        "Bash aliases",
+        "ELF",
+        "JSON",
+        "INI comments"
+      ],
+      "answer": 2,
+      "explanation": "JSON is a structured text format based on key-value pairs and arrays, which makes it well suited for APIs. Datadog's public APIs commonly accept and return JSON payloads.",
+      "reference": "https://www.json.org/json-en.html",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-075",
+      "topic": "Datadog Observability",
+      "question": "Which statement best contrasts logs and metrics as observability signals?",
+      "choices": [
+        "Metrics are numeric timeseries that capture trends, while logs are discrete records that capture what happened at a moment",
+        "Logs and metrics are the same signal stored in different places",
+        "Metrics can only come from logs after parsing",
+        "Logs are timestamped numeric points, while metrics are discrete event records"
+      ],
+      "answer": 0,
+      "explanation": "Metrics are numeric timeseries well suited to tracking rates, utilization, and trends over time. Logs are discrete records of events or transactions that add detail such as request bodies, stack traces, or messages. Datadog correlates both so context from each can be used together.",
+      "reference": "https://www.datadoghq.com/knowledge-center/observability/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-076",
+      "topic": "Metadata",
+      "question": "A service's metadata in Service Catalog is missing an on-call team. What is the most practical way to keep that metadata current as ownership changes?",
+      "choices": [
+        "Email the change to Datadog Support each quarter",
+        "Define service definitions through the Service Catalog API or integrations so ownership is stored as code and updated alongside deployments",
+        "Edit the host's /etc/hostname file",
+        "Rotate the API key every time ownership changes"
+      ],
+      "answer": 1,
+      "explanation": "Service Catalog metadata such as on-call, tier, and ownership can be defined through the Service Catalog API, Terraform, or integrations with tools like PagerDuty and ServiceNow. Storing definitions as code keeps metadata current without manual UI edits each time ownership changes.",
+      "reference": "https://docs.datadoghq.com/service_catalog/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-077",
+      "topic": "Metadata",
+      "question": "In Datadog, what does host or cloud metadata mainly provide?",
+      "choices": [
+        "A replacement for all monitor thresholds",
+        "A compression method for metric payloads",
+        "A required license file for the Agent",
+        "Context such as cloud attributes, host details, and labels that enrich telemetry"
+      ],
+      "answer": 3,
+      "explanation": "Metadata adds context like cloud region, instance type, container labels, or host details. That context makes filtering, grouping, and attribution more useful once the data is in Datadog.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-078",
+      "topic": "Metadata",
+      "question": "Which of the following is metadata rather than a timeseries metric?",
+      "choices": [
+        "system.cpu.user",
+        "system.mem.used",
+        "os:linux",
+        "system.disk.in_use"
+      ],
+      "answer": 2,
+      "explanation": "A tag like os:linux is descriptive metadata that helps with filtering and grouping. Metrics such as CPU, memory, and disk utilization are numerical timeseries values that change over time.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-079",
+      "topic": "Metadata",
+      "question": "Which metadata tag would be most useful for grouping all database servers in Datadog?",
+      "choices": [
+        "uptime:10432",
+        "region:us-east-1",
+        "role:database",
+        "kernel:5.15"
+      ],
+      "answer": 2,
+      "explanation": "A tag like role:database expresses what the host does, which makes it useful for scoping dashboards, monitors, and investigations. The other values may still be informative, but they do not directly identify database servers as a functional group.",
+      "reference": "https://docs.datadoghq.com/getting_started/tagging/#define-tags",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-080",
+      "topic": "Scripting Basics",
+      "question": "A team wants to automate dashboard creation through the Datadog API. Which tool is the most appropriate starting point?",
+      "choices": [
+        "A spreadsheet that has no HTTP support",
+        "An image editor",
+        "A Python script that makes HTTP requests to the Datadog API",
+        "A BIOS setup utility"
+      ],
+      "answer": 2,
+      "explanation": "The Datadog API is an HTTP REST API, so a scripting language with HTTP support is a practical way to automate it. Python is a common choice because it can easily handle authentication, JSON payloads, and repeatable workflows.",
+      "reference": "https://docs.datadoghq.com/api/latest/",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-081",
+      "topic": "Config File Modification",
+      "question": "A tag value in `datadog.yaml` contains a colon and spaces. Why might quoting that value be safer in YAML?",
+      "choices": [
+        "It makes the tag case-insensitive across Datadog",
+        "It helps YAML avoid misreading special characters as structure",
+        "It forces the Agent to encrypt the value before upload",
+        "It converts the value into a monitor variable"
+      ],
+      "answer": 1,
+      "explanation": "Quoting is useful when values contain colons, hashes, or other characters YAML might interpret specially. It helps preserve the exact literal string you intended to set.",
+      "reference": "https://yaml.org/spec/1.2.2/",
+      "difficulty": 2
+    },
+    {
+      "id": "ess-q-082",
+      "topic": "Config File Modification",
+      "question": "Which statement correctly contrasts YAML and JSON in common Datadog workflows?",
+      "choices": [
+        "YAML is only for dashboards, while JSON is only for shell scripts",
+        "YAML is often used for Agent configuration, while Datadog API responses commonly use JSON",
+        "YAML cannot store strings",
+        "JSON cannot represent arrays"
+      ],
+      "answer": 1,
+      "explanation": "Datadog Agent configuration files are commonly written in YAML, while Datadog's REST API uses JSON for request and response bodies. Both formats can represent structured data, but they are used in different parts of typical Datadog workflows.",
+      "reference": "https://www.json.org/json-en.html",
+      "difficulty": 1
+    },
+    {
+      "id": "ess-q-083",
+      "topic": "Config File Modification",
+      "question": "An engineer edits a YAML file and replaces the indentation spaces with tabs. What is the most likely result?",
+      "choices": [
+        "Datadog automatically converts the tabs to spaces",
+        "The file becomes valid JSON",
+        "Only the comments are affected",
+        "The YAML parser may reject the file"
+      ],
+      "answer": 3,
+      "explanation": "YAML is sensitive to indentation rules, and tabs commonly cause parsing problems. In practice, that can prevent the Agent from loading the changed configuration and delay data collection until the formatting is fixed.",
+      "reference": "https://yaml.org/spec/1.2.2/",
+      "difficulty": 1
     }
   ],
   "flashcards": [

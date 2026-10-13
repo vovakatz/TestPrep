@@ -1034,6 +1034,516 @@
       "explanation": "For a GAUGE, DogStatsD sends the latest data point received during the flush interval, so 20 is forwarded. Summing values is how COUNT aggregation works, and neither the maximum nor the first value is kept for a gauge.",
       "reference": "https://docs.datadoghq.com/developers/dogstatsd/data_aggregation/",
       "difficulty": 2
+    },
+    {
+      "id": "dc-q-070",
+      "topic": "Crawlers",
+      "question": "A cloud service is outside your network and cannot run the Datadog Agent. Which collection pattern is most appropriate?",
+      "choices": [
+        "DogStatsD over a serial cable",
+        "An Agent-based host check running directly on that service",
+        "An API-based integration that queries the service remotely",
+        "A Host Map widget"
+      ],
+      "answer": 2,
+      "explanation": "Some Datadog integrations collect data by querying a remote service API instead of installing an Agent on that system. That pattern is especially useful for SaaS platforms and managed services where you cannot deploy the Agent locally.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-071",
+      "topic": "Agent Integrations",
+      "question": "Compared with crawler-based integrations, what is a key benefit of Agent-based integrations running on hosts?",
+      "choices": [
+        "They eliminate the need for tags",
+        "They require no credentials under any circumstances",
+        "They can collect host-local telemetry directly from the machine",
+        "They always replace cloud integrations completely"
+      ],
+      "answer": 2,
+      "explanation": "Agent-based integrations can observe the local host directly, including processes, sockets, and service-specific endpoints that a remote API may not expose. Crawler-based integrations are valuable too, but they usually provide a narrower external view of a platform or service.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-072",
+      "topic": "Crawlers",
+      "question": "Why can metrics from a cloud integration such as AWS arrive later than host metrics from the Agent?",
+      "choices": [
+        "Cloud integration metrics are often pulled by API with a crawler, so provider and polling delay is expected",
+        "Agent metrics are delayed until the cloud crawler confirms them",
+        "Cloud metrics are stored only after a dashboard is created",
+        "Datadog refuses to ingest cloud metrics more than once per day"
+      ],
+      "answer": 0,
+      "explanation": "Many cloud integrations collect data through provider APIs instead of a local Agent running on the resource. That means the cloud provider's publication delay and Datadog's crawler interval can add latency before the metric appears.",
+      "reference": "https://docs.datadoghq.com/integrations/guide/cloud-metric-delay/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-073",
+      "topic": "Agent Integrations",
+      "question": "Which command family is used to manage official Datadog Agent integrations on supported Agent versions?",
+      "choices": [
+        "dd compile",
+        "dogstatsd monitor",
+        "datadog-agent integration",
+        "datadog-agent dashboard"
+      ],
+      "answer": 2,
+      "explanation": "The datadog-agent integration command family manages official integration packages with actions such as install, remove, show, and freeze. It is specifically meant for Agent integrations, not dashboards or DogStatsD operations.",
+      "reference": "https://docs.datadoghq.com/agent/guide/integration-management/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-074",
+      "topic": "Metrics & Timeseries",
+      "question": "Which statement is most accurate for sending business KPIs such as `checkout.success` into Datadog?",
+      "choices": [
+        "Only logs can represent business data",
+        "Host Map must be configured first",
+        "DogStatsD or the HTTP metrics API are suitable options",
+        "Only cloud crawlers can send business KPIs"
+      ],
+      "answer": 2,
+      "explanation": "Custom business metrics can be submitted with DogStatsD or directly through the Datadog metrics API. That is how teams track application-specific numbers like orders, signups, or queue events that infrastructure integrations do not emit.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/#submitting-custom-metrics",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-075",
+      "topic": "Metrics & Timeseries",
+      "question": "Why can a Datadog metric graph look smoother when you zoom out from one hour to one week?",
+      "choices": [
+        "Datadog automatically rolls up points into larger time buckets to fit graph display limits",
+        "The Agent resends the data as moving averages",
+        "Datadog deletes short spikes after 24 hours",
+        "Older metric points are converted into logs"
+      ],
+      "answer": 0,
+      "explanation": "Datadog limits how many points are displayed on a graph, so larger time windows are aggregated into larger buckets. You still have the underlying stored data, but the rendered graph usually shows rolled-up values rather than every raw sample.",
+      "reference": "https://docs.datadoghq.com/dashboards/functions/rollup/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-076",
+      "topic": "DogStatsD",
+      "question": "A DogStatsD `COUNT` metric sometimes appears with decimal values in Datadog. Why?",
+      "choices": [
+        "Counts are decimals only when an application key is missing",
+        "Datadog converts every count metric into a histogram",
+        "DogStatsD normalizes count data over the flush interval, so it can display as a rate-like value",
+        "Decimal points indicate packet loss on port 8125"
+      ],
+      "answer": 2,
+      "explanation": "DogStatsD count submissions are normalized over the flush interval, so they can appear as decimal per-second values in Datadog. That behavior is expected and not automatically a data quality problem.",
+      "reference": "https://docs.datadoghq.com/metrics/types/#submission-types-and-datadog-in-app-types",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-077",
+      "topic": "Agent Integrations",
+      "question": "You edited an integration `conf.yaml`, but the expected new metrics never appeared. What common step is often missed?",
+      "choices": [
+        "Reinstalling the operating system",
+        "Deleting all old dashboards",
+        "Restarting the Agent so the updated configuration is loaded",
+        "Creating a second API key"
+      ],
+      "answer": 2,
+      "explanation": "After changing many Agent or integration configs, a restart is required for the new settings to take effect. Editing the file alone does not guarantee the running Agent reloads it.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-commands/#restart-the-agent",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-078",
+      "topic": "Crawlers",
+      "question": "What best describes a crawler-based integration in Datadog?",
+      "choices": [
+        "A browser extension that edits dashboards",
+        "An integration that reads local log files from the host",
+        "A script that only creates application keys",
+        "An authenticated integration that pulls data from a cloud or SaaS provider API"
+      ],
+      "answer": 3,
+      "explanation": "Crawler-based integrations are authentication-based integrations where Datadog collects data through the provider's API. They are common for cloud platforms and SaaS services, but they do not replace all of the host-level visibility you get from the Agent.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-079",
+      "topic": "DogStatsD",
+      "question": "An application sends custom timing and counter data to the local Agent without calling the Datadog HTTP API directly. Which feature is it using?",
+      "choices": [
+        "Composite monitors",
+        "DogStatsD",
+        "Crawlers",
+        "Host Map"
+      ],
+      "answer": 1,
+      "explanation": "DogStatsD lets application code submit custom metrics to the local Agent rather than directly to the HTTP API. Client libraries in multiple programming languages wrap that protocol.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-080",
+      "topic": "Agent Integrations",
+      "question": "On the Integrations page, what does an integration status of Missing Data usually indicate?",
+      "choices": [
+        "The account has exceeded its dashboard limit",
+        "Integration metrics have not been detected in the last 24 hours",
+        "The integration package is not supported on the operating system",
+        "The integration has too many tags to display"
+      ],
+      "answer": 1,
+      "explanation": "Missing Data does not necessarily mean the integration was never installed. It usually means Datadog has not seen fresh metrics from that integration recently, so you should verify the config and the source system.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-081",
+      "topic": "Crawlers",
+      "question": "In Datadog data collection, what do crawlers typically provide?",
+      "choices": [
+        "They discover platform entities and metadata that enrich monitoring data",
+        "They encrypt application keys before storage",
+        "They render Host Map hexagons faster in the browser",
+        "They force every integration into Autodiscovery mode"
+      ],
+      "answer": 0,
+      "explanation": "Crawlers and discovery components pull entity and metadata information from platforms so Datadog can enrich what it collects. That extra context helps infrastructure views, tagging, and correlation.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-082",
+      "topic": "DogStatsD",
+      "question": "A developer attaches the tag `algorithm:two` to a DogStatsD timer. What is the main advantage of doing that?",
+      "choices": [
+        "The metric becomes encrypted automatically",
+        "The host tag is removed from all telemetry",
+        "Later analysis can filter or group results by algorithm version",
+        "An application key is no longer needed anywhere"
+      ],
+      "answer": 2,
+      "explanation": "DogStatsD supports tagging, which lets you compare the same metric across dimensions such as algorithm, service, or environment. That makes it much easier to measure whether one code path, version, or experiment behaves differently from another.",
+      "reference": "https://docs.datadoghq.com/metrics/custom_metrics/dogstatsd_metrics_submission/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-083",
+      "topic": "DogStatsD",
+      "question": "Why would an application send metrics to DogStatsD?",
+      "choices": [
+        "To submit custom application metrics through the local Agent",
+        "To manage RBAC permissions",
+        "To replace every dashboard widget",
+        "To open inbound SSH access to the host"
+      ],
+      "answer": 0,
+      "explanation": "DogStatsD gives applications a simple local path to submit custom metrics, events, and service checks to the Agent. That is useful for business KPIs and app-level telemetry that cloud integrations do not collect for you.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-084",
+      "topic": "DogStatsD",
+      "question": "What is DogStatsD primarily used for?",
+      "choices": [
+        "Editing cloud integration credentials",
+        "Rotating application keys automatically",
+        "Downloading dashboards from the Datadog UI",
+        "Receiving custom metrics, events, and service checks from local code"
+      ],
+      "answer": 3,
+      "explanation": "DogStatsD is the Agent's local ingestion service for custom telemetry from applications and scripts. It lets code emit metrics with very low overhead without calling Datadog's public APIs directly.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-085",
+      "topic": "Agent Integrations",
+      "question": "What is the purpose of a `conf.yaml.example` file inside an integration directory?",
+      "choices": [
+        "It is the only file the Agent loads automatically",
+        "It stores historical metrics for that integration",
+        "It is a sample configuration you copy and adapt into an active config",
+        "It contains only monitor notification templates"
+      ],
+      "answer": 2,
+      "explanation": "`conf.yaml.example` is a reference template, not the active config itself. Operators typically copy or adapt it into a real `conf.yaml` for the integration they want to run.",
+      "reference": "https://docs.datadoghq.com/agent/configuration/agent-configuration-files/#check-configuration-files",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-086",
+      "topic": "Metrics & Timeseries",
+      "question": "Why can the newest point on a timeseries graph appear shaded as partial data?",
+      "choices": [
+        "The graph is showing only archived data",
+        "The metric type is always invalid on the newest point",
+        "The last time bucket is still incomplete",
+        "The API key expired during rendering"
+      ],
+      "answer": 2,
+      "explanation": "Datadog shades the latest incomplete bucket as partial data by default on timeseries graphs. It is a visualization cue, not necessarily an error.",
+      "reference": "https://docs.datadoghq.com/dashboards/widgets/timeseries/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-087",
+      "topic": "Crawlers",
+      "question": "After installing the Datadog AWS integration, what is the typical way to collect metrics from specific AWS services such as Lambda or RDS?",
+      "choices": [
+        "Reboot the AWS account root user",
+        "Convert the services to run on self-managed hosts first",
+        "Manually install the Agent inside every AWS service",
+        "Enable the corresponding sub-integrations and grant the required IAM permissions"
+      ],
+      "answer": 3,
+      "explanation": "The AWS integration ships with sub-integrations for services such as Lambda, RDS, ELB, and SQS. Enabling a sub-integration and granting the AWS integration's IAM role the required read permissions lets Datadog pull service-specific metrics through the cloud provider API.",
+      "reference": "https://docs.datadoghq.com/integrations/amazon_web_services/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-088",
+      "topic": "DogStatsD",
+      "question": "Why do many applications send custom metrics to the local Datadog Agent with DogStatsD instead of posting directly to Datadog for every point?",
+      "choices": [
+        "The Agent can aggregate and forward metrics with minimal application overhead",
+        "Direct API submissions are unsupported by Datadog",
+        "DogStatsD automatically creates dashboards for every metric",
+        "DogStatsD replaces all tags with the hostname"
+      ],
+      "answer": 0,
+      "explanation": "DogStatsD lets the application emit metrics to the local Agent quickly, usually over UDP or UDS, rather than making a remote API call for each point. The Agent can then aggregate and forward that data efficiently to Datadog.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/#how-it-works",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-089",
+      "topic": "Agent Integrations",
+      "question": "To enable an integration from its example configuration on a host-based Agent, what is the usual first step?",
+      "choices": [
+        "Place conf.yaml.example in /tmp and restart the host",
+        "Copy or rename conf.yaml.example to conf.yaml and add the needed settings",
+        "Delete conf.yaml.example so the Agent auto-generates a new one",
+        "Compile conf.yaml.example with gcc"
+      ],
+      "answer": 1,
+      "explanation": "Datadog integration folders typically include a conf.yaml.example file to show the available options. Creating a conf.yaml from that example is the standard way to enable and customize the check.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/#configuring-agent-integrations",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-090",
+      "topic": "DogStatsD",
+      "question": "A containerized application needs to send DogStatsD metrics to an Agent from outside localhost. What configuration is typically required?",
+      "choices": [
+        "Enable DD_DOGSTATSD_NON_LOCAL_TRAFFIC and expose UDP port 8125",
+        "Use an application key instead of an API key",
+        "Switch DogStatsD to HTTPS on port 443",
+        "Disable tagging on the Agent"
+      ],
+      "answer": 0,
+      "explanation": "By default, DogStatsD is bound to localhost. If metrics come from outside localhost, Datadog documents enabling non-local traffic and making the UDP 8125 listener reachable to the sender.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/?tab=containeragent#setup",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-091",
+      "topic": "Metrics & Timeseries",
+      "question": "An engineer edits a metric's type on the Metrics Summary page from gauge to count. What is the main caution?",
+      "choices": [
+        "It rotates the API key automatically",
+        "It disables the Host Map widget",
+        "It only affects one open dashboard tab",
+        "It changes how that metric behaves across all dashboards and monitors that use it"
+      ],
+      "answer": 3,
+      "explanation": "Datadog warns that changing a metric type affects the metric globally, not just in one view. That means dashboards, monitors, and other queries using the metric can all change behavior after the edit.",
+      "reference": "https://docs.datadoghq.com/metrics/summary/",
+      "difficulty": 3
+    },
+    {
+      "id": "dc-q-092",
+      "topic": "Agent Integrations",
+      "question": "When developing a custom Datadog Agent integration, which tool scaffolds the integration structure and dependencies?",
+      "choices": [
+        "dogstatsd integration scaffold",
+        "ddtrace integration init",
+        "ddev create",
+        "datadog-ci integration new"
+      ],
+      "answer": 2,
+      "explanation": "The Datadog developer toolkit's `ddev create` command scaffolds a new Agent integration, generating the directory structure, manifest, and configuration files needed to build and package the check. The `datadog-agent integration` subcommands install, remove, and show existing integration packages; they do not scaffold new ones.",
+      "reference": "https://docs.datadoghq.com/extend/integrations/agent_integration/",
+      "difficulty": 2
+    },
+    {
+      "id": "dc-q-093",
+      "topic": "Agent Integrations",
+      "question": "Where is an Agent-based integration usually enabled after the Agent is installed?",
+      "choices": [
+        "Only in the monitor message body",
+        "Inside `conf.d/<integration>.d/conf.yaml`",
+        "Only in browser local storage",
+        "Inside `agent.log`"
+      ],
+      "answer": 1,
+      "explanation": "Agent-based integrations are typically configured with integration-specific YAML files under `conf.d`. Once the correct `conf.yaml` is present and valid, the Agent can load the check and begin collecting telemetry from that service.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/#configuring-agent-integrations",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-094",
+      "topic": "DogStatsD",
+      "question": "What is the default DogStatsD listening port and protocol on the Datadog Agent?",
+      "choices": [
+        "8126/TCP",
+        "10518/TCP",
+        "443/TCP",
+        "8125/UDP"
+      ],
+      "answer": 3,
+      "explanation": "DogStatsD listens on UDP port 8125 by default. If you change that port on the Agent, the sending application or library must be updated to match.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-095",
+      "topic": "DogStatsD",
+      "question": "By default, which local port does DogStatsD listen on?",
+      "choices": [
+        "5001/TCP",
+        "443/TCP",
+        "8125/UDP",
+        "8126/TCP"
+      ],
+      "answer": 2,
+      "explanation": "DogStatsD listens on UDP 8125 by default. Applications send custom metrics to that local endpoint unless you reconfigure it.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-096",
+      "topic": "Agent Integrations",
+      "question": "When you enable an Agent-based integration, what is the usual active configuration filename inside `conf.d/<integration>.d/`?",
+      "choices": [
+        "datadog.yaml",
+        "hosts.yml",
+        "monitor.json",
+        "conf.yaml"
+      ],
+      "answer": 3,
+      "explanation": "Agent integrations are typically enabled by creating or editing a `conf.yaml` file inside the integration's `conf.d/<integration>.d/` directory. Sample settings usually appear in `conf.yaml.example`, while `conf.yaml` is the active file the Agent loads.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/#configuring-agent-integrations",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-097",
+      "topic": "Metrics & Timeseries",
+      "question": "Roughly how often does the Datadog Agent collect standard host metrics by default?",
+      "choices": [
+        "Once per hour",
+        "Once every 24 hours",
+        "About every 15 seconds",
+        "Only when a user logs in"
+      ],
+      "answer": 2,
+      "explanation": "Datadog's documentation states that the default collection interval for standard Agent integrations and system metrics is 15 seconds. That cadence is what makes host metrics feel near real-time in dashboards and monitors.",
+      "reference": "https://docs.datadoghq.com/developers/custom_checks/write_agent_check/#collection-interval",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-098",
+      "topic": "Metrics & Timeseries",
+      "question": "What makes a metric a timeseries in Datadog?",
+      "choices": [
+        "It is stored only in dashboards",
+        "It has exactly one tag",
+        "It can be queried only by the API",
+        "It consists of timestamped numeric values collected over time"
+      ],
+      "answer": 3,
+      "explanation": "A timeseries metric is a sequence of numeric points tied to timestamps. That structure lets Datadog graph trends, compute rollups, and evaluate time-based alert conditions.",
+      "reference": "https://docs.datadoghq.com/metrics/#what-are-metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-099",
+      "topic": "DogStatsD",
+      "question": "By default, DogStatsD listens on which port and protocol?",
+      "choices": [
+        "443 over TCP",
+        "8125 over UDP",
+        "53 over UDP",
+        "8126 over TCP"
+      ],
+      "answer": 1,
+      "explanation": "DogStatsD listens on UDP port 8125 by default. Applications send custom metrics to that local listener, and the Agent forwards the resulting telemetry onward to Datadog.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-100",
+      "topic": "Agent Integrations",
+      "question": "How do you normally turn a packaged Agent integration example into an active integration configuration?",
+      "choices": [
+        "Create a dashboard first and the Agent loads the config automatically",
+        "Move the check into the Agent binary directory",
+        "Copy or rename conf.yaml.example to conf.yaml and edit it",
+        "Rename datadog.yaml to conf.yaml"
+      ],
+      "answer": 2,
+      "explanation": "Packaged integrations ship with example configuration files that show the expected fields. The active configuration is the conf.yaml file inside the integration's conf.d subdirectory.",
+      "reference": "https://docs.datadoghq.com/getting_started/integrations/#configuring-agent-integrations",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-101",
+      "topic": "Metrics & Timeseries",
+      "question": "What makes a metric a time series?",
+      "choices": [
+        "It can never be grouped by tags",
+        "It contains only text logs",
+        "It records values over time with timestamps",
+        "It stores permissions for dashboards"
+      ],
+      "answer": 2,
+      "explanation": "A time series is a stream of measurements attached to points in time. Datadog uses that structure to graph trends, compare intervals, and evaluate alert conditions over rolling windows.",
+      "reference": "https://docs.datadoghq.com/metrics/#what-are-metrics",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-102",
+      "topic": "DogStatsD",
+      "question": "Besides UDP, what transport can DogStatsD use when the client and Agent are on the same host and the library supports it?",
+      "choices": [
+        "ICMP",
+        "SMTP",
+        "HTTPS",
+        "Unix Domain Socket"
+      ],
+      "answer": 3,
+      "explanation": "Datadog supports DogStatsD over a Unix Domain Socket as an alternative to UDP. On the same host, that can be a useful local transport when the client library supports it.",
+      "reference": "https://docs.datadoghq.com/developers/dogstatsd/unix_socket/",
+      "difficulty": 1
+    },
+    {
+      "id": "dc-q-103",
+      "topic": "Crawlers",
+      "question": "For AWS Lambda functions, which Datadog mechanism forwards enhanced invocation, error, and trace metrics without running a host-based Agent on each function?",
+      "choices": [
+        "The Datadog Lambda layer combined with the AWS integration",
+        "A Kubernetes DaemonSet deployed inside Lambda",
+        "An SSH tunnel into the Lambda runtime",
+        "DogStatsD over UDP port 8125 from inside the Lambda VPC"
+      ],
+      "answer": 0,
+      "explanation": "Datadog provides a Lambda layer that instruments function invocations and forwards enhanced metrics, logs, and traces. Combined with the AWS integration pulling CloudWatch data, this gives serverless visibility without installing the host Agent on each function.",
+      "reference": "https://docs.datadoghq.com/serverless/aws_lambda/",
+      "difficulty": 2
     }
   ],
   "flashcards": [
