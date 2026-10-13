@@ -1,0 +1,11 @@
+services:
+  ddprep:
+    build: .
+    image: ddprep
+    ports:
+      # Host port 5000 is taken by AirPlay Receiver on macOS; override with DDPREP_PORT=...
+      - "${DDPREP_PORT:-5050}:5000"
+    volumes:
+      # Same instance/ folder as a local `python app.py` run, so both share one database.
+      - ./instance:/app/instance
+    restart: unless-stopped
