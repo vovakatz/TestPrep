@@ -146,5 +146,5 @@
     cancelAnimationFrame(raf);
     raf = requestAnimationFrame(draw);
   });
-  document.addEventListener("ddprep:theme", draw);
+  document.addEventListener("testprep:theme", draw);
 })();

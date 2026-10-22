@@ -6,14 +6,14 @@ from authlib.integrations.base_client import OAuthError
 from joserfc import jwt
 from joserfc.jwk import RSAKey
 
-from ddprep import auth, create_app
-from ddprep.db import connect
+from testprep import auth, create_app
+from testprep.db import connect
 
 MS_ISSUER = "https://login.microsoftonline.com/{tenantid}/v2.0"
 
 
 def oauth_client(app, provider):
-    return app.extensions["ddprep_auth"]["oauth"].create_client(provider)
+    return app.extensions["testprep_auth"]["oauth"].create_client(provider)
 
 
 def fake_provider(monkeypatch, app, provider, userinfo=None, error=None, issuer="https://accounts.google.com"):
@@ -66,7 +66,7 @@ def test_every_page_requires_sign_in(anon_client):
 
 def test_login_page_without_providers(tmp_path, content_dir, monkeypatch):
     for key in ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "MICROSOFT_CLIENT_ID", "MICROSOFT_CLIENT_SECRET"]:
-        monkeypatch.delenv(f"DDPREP_{key}", raising=False)
+        monkeypatch.delenv(f"TESTPREP_{key}", raising=False)
     app = create_app({"TESTING": True, "DATABASE": str(tmp_path / "x.sqlite"), "CONTENT_DIR": str(content_dir),
                       "SECRET_KEY": "test"})
     client = app.test_client()
@@ -75,12 +75,12 @@ def test_login_page_without_providers(tmp_path, content_dir, monkeypatch):
 
 
 def test_settings_come_from_prefixed_env(tmp_path, content_dir, monkeypatch):
-    monkeypatch.setenv("DDPREP_GOOGLE_CLIENT_ID", "from-env")
-    monkeypatch.setenv("DDPREP_GOOGLE_CLIENT_SECRET", "secret")
-    monkeypatch.setenv("DDPREP_SESSION_COOKIE_SECURE", "true")
+    monkeypatch.setenv("TESTPREP_GOOGLE_CLIENT_ID", "from-env")
+    monkeypatch.setenv("TESTPREP_GOOGLE_CLIENT_SECRET", "secret")
+    monkeypatch.setenv("TESTPREP_SESSION_COOKIE_SECURE", "true")
     app = create_app({"DATABASE": str(tmp_path / "x.sqlite"), "CONTENT_DIR": str(content_dir), "SECRET_KEY": "t"})
     assert app.config["SESSION_COOKIE_SECURE"] is True
-    assert app.extensions["ddprep_auth"]["providers"] == ["google"]
+    assert app.extensions["testprep_auth"]["providers"] == ["google"]
     assert oauth_client(app, "google").client_id == "from-env"
 
 

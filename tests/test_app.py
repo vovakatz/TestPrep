@@ -3,8 +3,8 @@ import re
 import sqlite3
 from collections import Counter
 
-from ddprep import exams
-from ddprep.db import connect
+from testprep import exams
+from testprep.db import connect
 
 
 def db(app) -> sqlite3.Connection:
@@ -41,7 +41,7 @@ def test_pages_render(client):
 
 
 def test_seed_is_idempotent_and_deactivates_removed_items(app, content_dir):
-    from ddprep.seed import seed
+    from testprep.seed import seed
 
     conn = db(app)
     assert seed(conn, content_dir) is None  # unchanged content: no-op
@@ -171,7 +171,7 @@ def test_profiles_are_isolated(client, signed_in_client):
 
 
 def test_rich_text_filters_escape_html_and_format_code():
-    from ddprep.views import format_question, format_rich
+    from testprep.views import format_question, format_rich
 
     assert str(format_rich("Run `datadog-agent status` <b>")) == "Run <code>datadog-agent status</code> &lt;b&gt;"
     html = str(format_question("Given:\nkey: <v>\n  - item\nWhat is it?"))

@@ -10,7 +10,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt gunicorn
 
-COPY ddprep/ ddprep/
+COPY testprep/ testprep/
 COPY content/ content/
 COPY app.py .
 
@@ -23,4 +23,4 @@ USER app
 EXPOSE 5000
 
 # One worker: the app seeds SQLite on startup and the DB isn't built for concurrent writers.
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "4", "ddprep:create_app()"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "4", "testprep:create_app()"]

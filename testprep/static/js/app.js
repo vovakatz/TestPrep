@@ -14,8 +14,8 @@
     toggle.addEventListener("click", () => {
       const next = effectiveTheme() === "dark" ? "light" : "dark";
       html.setAttribute("data-theme", next);
-      localStorage.setItem("ddprep-theme", next);
-      document.dispatchEvent(new CustomEvent("ddprep:theme", { detail: next }));
+      localStorage.setItem("testprep-theme", next);
+      document.dispatchEvent(new CustomEvent("testprep:theme", { detail: next }));
     });
   }
 
@@ -75,5 +75,5 @@
     }
   }
 
-  window.DDPrep = { toast, effectiveTheme, rich, questionText };
+  window.TestPrep = { toast, effectiveTheme, rich, questionText };
 })();

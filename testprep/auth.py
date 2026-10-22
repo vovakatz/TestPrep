@@ -53,11 +53,11 @@ def init_app(app: Flask) -> None:
         enabled.append(name)
     if not enabled:
         app.logger.warning("No sign-in providers are configured, so nobody can sign in. See README, Sign-in.")
-    app.extensions["ddprep_auth"] = {"oauth": oauth, "providers": enabled}
+    app.extensions["testprep_auth"] = {"oauth": oauth, "providers": enabled}
 
 
 def _client(provider: str):
-    ext = current_app.extensions["ddprep_auth"]
+    ext = current_app.extensions["testprep_auth"]
     if provider not in ext["providers"]:
         abort(404)
     return ext["oauth"].create_client(provider)
@@ -154,7 +154,7 @@ def login():
     next_url = _safe_next(request.args.get("next"))
     if g.user is not None:
         return redirect(next_url or url_for("main.dashboard"))
-    providers = [{"name": n, "label": PROVIDERS[n][0]} for n in current_app.extensions["ddprep_auth"]["providers"]]
+    providers = [{"name": n, "label": PROVIDERS[n][0]} for n in current_app.extensions["testprep_auth"]["providers"]]
     return render_template("login.html", providers=providers, next_url=next_url)
 
 
@@ -189,7 +189,7 @@ def callback(provider: str):
         return redirect(url_for("auth.login"))
     if not _allowed(email, current_app.config.get("ALLOWED_EMAILS")):
         current_app.logger.warning("Rejected %s sign-in for %s", label, email or f"subject {subject}")
-        flash(f"{email or 'This account'} isn't allowed to use DDPrep.", "error")
+        flash(f"{email or 'This account'} isn't allowed to use TestPrep.", "error")
         return redirect(url_for("auth.login"))
 
     next_url = session.get("next")

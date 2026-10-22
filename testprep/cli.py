@@ -1,4 +1,4 @@
-"""Admin commands, e.g. `python -m flask --app ddprep profiles list`."""
+"""Admin commands, e.g. `python -m flask --app testprep profiles list`."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ def link(profile: str, email: str) -> None:
     conn = get_db()
     target = conn.execute("SELECT id, name FROM users WHERE name = ?", (profile,)).fetchone()
     if target is None:
-        raise click.ClickException(f"No profile called {profile!r}. See `python -m flask --app ddprep profiles list`.")
+        raise click.ClickException(f"No profile called {profile!r}. See `python -m flask --app testprep profiles list`.")
     sources = {
         r["user_id"]
         for r in conn.execute("SELECT user_id FROM identities WHERE email = ?", (email.strip().lower(),))

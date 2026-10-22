@@ -1,10 +1,10 @@
 services:
-  ddprep:
+  testprep:
     build: .
-    image: ddprep
+    image: testprep
     ports:
-      # Host port 5000 is taken by AirPlay Receiver on macOS; override with DDPREP_PORT=...
-      - "${DDPREP_PORT:-5050}:5000"
+      # Host port 5000 is taken by AirPlay Receiver on macOS; override with TESTPREP_PORT=...
+      - "${TESTPREP_PORT:-5050}:5000"
     env_file:
       # Sign-in client ids and secrets (see .env.example).
       - path: .env

@@ -14,7 +14,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from ddprep import create_app
+from testprep import create_app
 
 ROOT = Path(__file__).resolve().parent
 
@@ -25,7 +25,7 @@ def main() -> None:
     parser.add_argument("--port", type=int, default=5000)
     parser.add_argument("--open", action="store_true", help="open the app in your browser")
     parser.add_argument("--debug", action="store_true")
-    parser.add_argument("--db", help="SQLite file to use (default: instance/ddprep.sqlite)")
+    parser.add_argument("--db", help="SQLite file to use (default: instance/testprep.sqlite)")
     parser.add_argument("--content", help="content directory to load (default: content/)")
     args = parser.parse_args()
 

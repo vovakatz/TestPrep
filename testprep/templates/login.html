@@ -6,7 +6,7 @@
   <span class="brand-mark auth-mark" aria-hidden="true">
     <svg viewBox="0 0 32 32"><path d="M8 22V14M13 22V10M18 22V16M23 22V8" /></svg>
   </span>
-  <h1>Sign in to DDPrep</h1>
+  <h1>Sign in to TestPrep</h1>
   <p class="muted">Practice exams and flash cards for the Datadog Fundamentals certification. Your answers and progress are saved to your account.</p>
   <div class="auth-buttons">
     {% for p in providers %}
@@ -20,8 +20,8 @@
       </a>
     {% else %}
       <div class="notice flash-error" role="alert">
-        No sign-in providers are configured. Set <code>DDPREP_GOOGLE_CLIENT_ID</code> / <code>DDPREP_GOOGLE_CLIENT_SECRET</code>
-        or <code>DDPREP_MICROSOFT_CLIENT_ID</code> / <code>DDPREP_MICROSOFT_CLIENT_SECRET</code> and restart (see the README).
+        No sign-in providers are configured. Set <code>TESTPREP_GOOGLE_CLIENT_ID</code> / <code>TESTPREP_GOOGLE_CLIENT_SECRET</code>
+        or <code>TESTPREP_MICROSOFT_CLIENT_ID</code> / <code>TESTPREP_MICROSOFT_CLIENT_SECRET</code> and restart (see the README).
       </div>
     {% endfor %}
   </div>

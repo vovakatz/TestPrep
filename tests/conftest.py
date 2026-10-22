@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from ddprep import auth, create_app
-from ddprep.db import connect
+from testprep import auth, create_app
+from testprep.db import connect
 
 ROOT = Path(__file__).resolve().parent.parent
 

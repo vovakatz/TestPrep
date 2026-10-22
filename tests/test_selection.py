@@ -1,8 +1,8 @@
 import random
 from collections import Counter
 
-from ddprep import selection
-from ddprep.stats import TopicStat, topic_weight
+from testprep import selection
+from testprep.stats import TopicStat, topic_weight
 
 
 def make_items(topics: int, per_topic: int) -> list[selection.Item]:

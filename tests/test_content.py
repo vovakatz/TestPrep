@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from ddprep.db import connect, init_schema
-from ddprep.exams import EXAM_SIZE
-from ddprep.seed import seed
+from testprep.db import connect, init_schema
+from testprep.exams import EXAM_SIZE
+from testprep.seed import seed
 
 ROOT = Path(__file__).resolve().parent.parent
 CONTENT = ROOT / "content"

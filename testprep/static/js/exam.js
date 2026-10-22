@@ -79,7 +79,7 @@
     const q = items[current];
     ui.index.textContent = String(current + 1);
     ui.number.textContent = String(current + 1);
-    window.DDPrep.questionText(ui.text, q.question);
+    window.TestPrep.questionText(ui.text, q.question);
     ui.difficulty.textContent = "";
     ui.difficulty.title = ["", "Recall", "Applied", "Challenging"][q.difficulty] || "";
     for (let d = 1; d <= 3; d++) {
@@ -100,7 +100,7 @@
       letter.textContent = LETTERS[ci];
       const text = document.createElement("span");
       text.className = "choice-text";
-      window.DDPrep.rich(text, c.text);
+      window.TestPrep.rich(text, c.text);
       const mark = document.createElement("span");
       mark.className = "choice-mark";
       mark.setAttribute("aria-hidden", "true");
@@ -132,7 +132,7 @@
       ui.feedbackIcon.innerHTML = q.is_correct ? ICON_OK : ICON_BAD;
       ui.feedbackTitle.textContent = q.is_correct ? "Correct" : "Not quite";
       ui.feedbackTopic.textContent = q.domain + " · " + q.topic;
-      window.DDPrep.rich(ui.feedbackText, q.explanation);
+      window.TestPrep.rich(ui.feedbackText, q.explanation);
       if (q.reference) {
         ui.feedbackRef.hidden = false;
         ui.feedbackRef.href = q.reference;
@@ -204,7 +204,7 @@
       render();
       ui.next.focus();
     } catch (err) {
-      window.DDPrep.toast(err.message, "error");
+      window.TestPrep.toast(err.message, "error");
       ui.submit.disabled = false;
     } finally {
       busy = false;

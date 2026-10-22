@@ -25,13 +25,13 @@ def create_app(config: dict | None = None) -> Flask:
     app = Flask(__name__, instance_path=str(ROOT / "instance"))
     Path(app.instance_path).mkdir(parents=True, exist_ok=True)
     app.config.update(
-        DATABASE=os.environ.get("DDPREP_DB", str(Path(app.instance_path) / "ddprep.sqlite")),
+        DATABASE=os.environ.get("TESTPREP_DB", str(Path(app.instance_path) / "testprep.sqlite")),
         CONTENT_DIR=str(ROOT / "content"),
         SESSION_COOKIE_SAMESITE="Lax",
         MICROSOFT_TENANT="common",
     )
-    # Any DDPREP_<KEY> environment variable sets config <KEY>, e.g. DDPREP_GOOGLE_CLIENT_ID.
-    app.config.from_prefixed_env("DDPREP")
+    # Any TESTPREP_<KEY> environment variable sets config <KEY>, e.g. TESTPREP_GOOGLE_CLIENT_ID.
+    app.config.from_prefixed_env("TESTPREP")
     if config:
         app.config.update(config)
     if not app.config.get("SECRET_KEY"):

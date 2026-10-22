@@ -40,8 +40,8 @@
     ui.flip.classList.remove("is-flipped");
     ui.frontTopic.textContent = c.topic;
     ui.backTopic.textContent = c.topic;
-    window.DDPrep.rich(ui.frontText, c.front);
-    window.DDPrep.rich(ui.backText, c.back);
+    window.TestPrep.rich(ui.frontText, c.front);
+    window.TestPrep.rich(ui.backText, c.back);
     ui.backRef.hidden = !c.reference;
     if (c.reference) ui.backRef.href = c.reference;
     ui.pos.textContent = String(index + 1);
@@ -81,7 +81,7 @@
       if (!res.ok) throw new Error((await res.json()).error || "Could not save rating.");
       c.rating = rating;
     } catch (err) {
-      window.DDPrep.toast(err.message, "error");
+      window.TestPrep.toast(err.message, "error");
       return;
     } finally {
       busy = false;
