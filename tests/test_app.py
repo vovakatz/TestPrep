@@ -158,13 +158,13 @@ def test_flashcards_scoped_to_topic(client, app):
     assert topics == {topic_id} and len(ids) == 3
 
 
-def test_profiles_are_isolated(client, app):
+def test_profiles_are_isolated(client, signed_in_client):
     exam_id = start_exam(client)
-    client.post("/profile", data={"action": "create", "name": "Second"})
-    assert client.get(f"/exams/{exam_id}").status_code == 404
-    assert b"taken an exam yet" in client.get("/exams").data
+    other = signed_in_client("other", "other@example.com", "Other")
+    assert other.get(f"/exams/{exam_id}").status_code == 404
+    assert other.post(f"/exams/{exam_id}/delete").status_code == 404
+    assert b"taken an exam yet" in other.get("/exams").data
 
-    client.post("/profile/switch", data={"user_id": 1})
     assert client.get(f"/exams/{exam_id}").status_code == 200
     client.post("/profile", data={"action": "reset"})
     assert client.get(f"/exams/{exam_id}").status_code == 404

@@ -7,8 +7,9 @@ import secrets
 from pathlib import Path
 
 from flask import Flask
+from werkzeug.middleware.proxy_fix import ProxyFix
 
-from . import db, seed
+from . import auth, cli, db, seed
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -26,11 +27,18 @@ def create_app(config: dict | None = None) -> Flask:
     app.config.update(
         DATABASE=os.environ.get("DDPREP_DB", str(Path(app.instance_path) / "ddprep.sqlite")),
         CONTENT_DIR=str(ROOT / "content"),
+        SESSION_COOKIE_SAMESITE="Lax",
+        MICROSOFT_TENANT="common",
     )
+    # Any DDPREP_<KEY> environment variable sets config <KEY>, e.g. DDPREP_GOOGLE_CLIENT_ID.
+    app.config.from_prefixed_env("DDPREP")
     if config:
         app.config.update(config)
     if not app.config.get("SECRET_KEY"):
         app.config["SECRET_KEY"] = _secret_key(Path(app.instance_path))
+    if app.config.get("BEHIND_PROXY"):
+        # Trust X-Forwarded-Proto/Host from one reverse proxy so sign-in callback URLs use the public address.
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     db.init_app(app)
     conn = db.connect(app.config["DATABASE"])
@@ -44,5 +52,8 @@ def create_app(config: dict | None = None) -> Flask:
 
     from .views import bp
 
+    auth.init_app(app)
+    cli.init_app(app)
+    app.register_blueprint(auth.bp)
     app.register_blueprint(bp)
     return app

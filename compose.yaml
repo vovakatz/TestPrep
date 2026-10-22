@@ -5,6 +5,10 @@ services:
     ports:
       # Host port 5000 is taken by AirPlay Receiver on macOS; override with DDPREP_PORT=...
       - "${DDPREP_PORT:-5050}:5000"
+    env_file:
+      # Sign-in client ids and secrets (see .env.example).
+      - path: .env
+        required: false
     volumes:
       # Same instance/ folder as a local `python app.py` run, so both share one database.
       - ./instance:/app/instance

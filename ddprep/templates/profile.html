@@ -1,48 +1,52 @@
 {% extends "base.html" %}
-{% block title %}Profiles{% endblock %}
+{% block title %}Profile{% endblock %}
 {% block content %}
 <header class="page-head">
   <div>
-    <p class="eyebrow">Profiles</p>
+    <p class="eyebrow">Profile</p>
     <h1>{{ current_user.name }}</h1>
-    <p class="lede-dark">Each profile keeps its own exam history, answers and flash card ratings. Handy if several people share this app.</p>
+    <p class="lede-dark">Your exam history, answers and flash card ratings belong to the account you signed in with.</p>
   </div>
 </header>
 
 <section class="grid-2">
   <form class="card form-card" method="post">
-    <h2>Rename this profile</h2>
+    <h2>Display name</h2>
     <input type="hidden" name="action" value="rename">
     <label class="field"><span class="field-label">Name</span>
       <input class="input" name="name" maxlength="40" value="{{ current_user.name }}" required></label>
     <button class="btn btn-primary" type="submit">Save name</button>
   </form>
-  <form class="card form-card" method="post">
-    <h2>New profile</h2>
-    <input type="hidden" name="action" value="create">
-    <label class="field"><span class="field-label">Name</span>
-      <input class="input" name="name" maxlength="40" placeholder="e.g. Alex" required></label>
-    <button class="btn btn-secondary" type="submit">Create and switch</button>
-  </form>
+  <div class="card form-card">
+    <h2>Signed in with</h2>
+    <ul class="identity-list">
+      {% for i in identities %}
+        <li><strong>{{ provider_labels[i.provider][0] if i.provider in provider_labels else i.provider }}</strong>
+          <span class="muted">{{ i.email or 'no email shared' }}</span>
+          <span class="muted small">Last sign-in {{ i.last_login_at | when }}</span></li>
+      {% endfor %}
+    </ul>
+    <form method="post" action="{{ url_for('auth.logout') }}">
+      <button class="btn btn-ghost" type="submit">Sign out</button>
+    </form>
+  </div>
 </section>
 
 <section class="card danger-zone">
   <h2>Danger zone</h2>
   <div class="danger-row">
     <div><strong>Reset progress</strong><p class="muted small">Deletes every exam, recorded answer and flash card rating for “{{ current_user.name }}”. The question bank is not affected.</p></div>
-    <form method="post" onsubmit="return confirm('Delete all progress for this profile? This cannot be undone.');">
+    <form method="post" onsubmit="return confirm('Delete all your progress? This cannot be undone.');">
       <input type="hidden" name="action" value="reset">
       <button class="btn btn-danger" type="submit">Reset progress</button>
     </form>
   </div>
-  {% if all_users | length > 1 %}
   <div class="danger-row">
-    <div><strong>Delete profile</strong><p class="muted small">Removes this profile and all of its history.</p></div>
-    <form method="post" onsubmit="return confirm('Delete this profile and all its history?');">
+    <div><strong>Delete profile</strong><p class="muted small">Removes this profile and all of its history, and signs you out. Signing in again starts a new, empty profile.</p></div>
+    <form method="post" onsubmit="return confirm('Delete your profile and all its history?');">
       <input type="hidden" name="action" value="delete">
       <button class="btn btn-danger" type="submit">Delete profile</button>
     </form>
   </div>
-  {% endif %}
 </section>
 {% endblock %}

@@ -1,6 +1,6 @@
 """Start the TestPrep web app.
 
-    python app.py                 # http://127.0.0.1:5000
+    python app.py                 # http://localhost:5000
     python app.py --port 8080 --open
 """
 
@@ -10,8 +10,13 @@ import argparse
 import logging
 import threading
 import webbrowser
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 from ddprep import create_app
+
+ROOT = Path(__file__).resolve().parent
 
 
 def main() -> None:
@@ -25,6 +30,7 @@ def main() -> None:
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
+    load_dotenv(ROOT / ".env")  # sign-in client ids and secrets; see .env.example
     config = {}
     if args.db:
         config["DATABASE"] = args.db
@@ -32,7 +38,9 @@ def main() -> None:
         config["CONTENT_DIR"] = args.content
     app = create_app(config)
     if args.open:
-        threading.Timer(1.0, webbrowser.open, [f"http://{args.host}:{args.port}/"]).start()
+        # localhost, not 127.0.0.1: the sign-in redirect URIs are registered for localhost.
+        host = "localhost" if args.host in ("127.0.0.1", "0.0.0.0") else args.host
+        threading.Timer(1.0, webbrowser.open, [f"http://{host}:{args.port}/"]).start()
     app.run(host=args.host, port=args.port, debug=args.debug)
 
 

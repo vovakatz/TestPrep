@@ -6,7 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from ddprep import create_app
+from ddprep import auth, create_app
+from ddprep.db import connect
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -53,10 +54,37 @@ def app(tmp_path: Path, content_dir: Path):
             "DATABASE": str(tmp_path / "test.sqlite"),
             "CONTENT_DIR": str(content_dir),
             "SECRET_KEY": "test",
+            "GOOGLE_CLIENT_ID": "google-client",
+            "GOOGLE_CLIENT_SECRET": "google-secret",
+            "MICROSOFT_CLIENT_ID": "microsoft-client",
+            "MICROSOFT_CLIENT_SECRET": "microsoft-secret",
         }
     )
 
 
 @pytest.fixture
-def client(app):
+def signed_in_client(app):
+    """Return a factory: make_client(subject, email, name) -> test client signed in as that Google account."""
+
+    def make_client(subject: str = "tester", email: str = "tester@example.com", name: str = "Tester"):
+        conn = connect(app.config["DATABASE"])
+        try:
+            user_id = auth.sign_in(conn, "google", subject, email, name)
+        finally:
+            conn.close()
+        client = app.test_client()
+        with client.session_transaction() as sess:
+            sess["user_id"] = user_id
+        return client
+
+    return make_client
+
+
+@pytest.fixture
+def client(signed_in_client):
+    return signed_in_client()
+
+
+@pytest.fixture
+def anon_client(app):
     return app.test_client()

@@ -5,3 +5,4 @@ instance/
 .pytest_cache/
 .idea/
 .claude/settings.local.json
+.env

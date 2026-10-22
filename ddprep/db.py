@@ -19,6 +19,18 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TEXT NOT NULL
 );
 
+-- A Google or Microsoft account that signs in to a profile (users row).
+CREATE TABLE IF NOT EXISTS identities (
+    id            INTEGER PRIMARY KEY,
+    user_id       INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    provider      TEXT NOT NULL,
+    subject       TEXT NOT NULL,
+    email         TEXT,
+    created_at    TEXT NOT NULL,
+    last_login_at TEXT NOT NULL,
+    UNIQUE (provider, subject)
+);
+
 CREATE TABLE IF NOT EXISTS domains (
     id          INTEGER PRIMARY KEY,
     name        TEXT NOT NULL UNIQUE,
@@ -110,6 +122,7 @@ CREATE TABLE IF NOT EXISTS flashcard_reviews (
     UNIQUE (session_id, flashcard_id)
 );
 
+CREATE INDEX IF NOT EXISTS idx_identities_user ON identities(user_id);
 CREATE INDEX IF NOT EXISTS idx_exams_user ON exams(user_id, started_at);
 CREATE INDEX IF NOT EXISTS idx_exam_questions_question ON exam_questions(question_id);
 CREATE INDEX IF NOT EXISTS idx_flashcard_reviews_user ON flashcard_reviews(user_id, flashcard_id, reviewed_at);

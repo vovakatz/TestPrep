@@ -19,34 +19,17 @@ from flask import (
 )
 from markupsafe import Markup, escape
 
-from . import exams, flashcards
-from .db import get_db, now
+from . import auth, exams, flashcards
+from .db import get_db
 from .selection import focus_topics
 from .stats import answered_count, domain_stats, topic_stats
 
 bp = Blueprint("main", __name__)
 
-DEFAULT_PROFILE = "Learner"
 CODE_SPAN = re.compile(r"`([^`\n]+)`")
 
 
-# --- profile handling ---------------------------------------------------------------------------
-
-
-@bp.before_app_request
-def load_user() -> None:
-    conn = get_db()
-    user = None
-    if "user_id" in session:
-        user = conn.execute("SELECT * FROM users WHERE id = ?", (session["user_id"],)).fetchone()
-    if user is None:
-        user = conn.execute("SELECT * FROM users ORDER BY id LIMIT 1").fetchone()
-        if user is None:
-            conn.execute("INSERT INTO users (name, created_at) VALUES (?, ?)", (DEFAULT_PROFILE, now()))
-            conn.commit()
-            user = conn.execute("SELECT * FROM users ORDER BY id LIMIT 1").fetchone()
-        session["user_id"] = user["id"]
-    g.user = user
+# --- template helpers ---------------------------------------------------------------------------
 
 
 @bp.app_context_processor
@@ -54,7 +37,6 @@ def inject_globals() -> dict:
     conn = get_db()
     return {
         "current_user": g.get("user"),
-        "all_users": conn.execute("SELECT * FROM users ORDER BY name").fetchall(),
         "bank_counts": {
             "questions": conn.execute("SELECT COUNT(*) FROM questions WHERE active = 1").fetchone()[0],
             "flashcards": conn.execute("SELECT COUNT(*) FROM flashcards WHERE active = 1").fetchone()[0],
@@ -107,22 +89,16 @@ def format_pct(value: float | None) -> str:
     return "—" if value is None else f"{value * 100:.0f}%"
 
 
+# --- profile ------------------------------------------------------------------------------------
+
+
 @bp.route("/profile", methods=["GET", "POST"])
 def profile():
     conn = get_db()
     if request.method == "POST":
         action = request.form.get("action")
         name = (request.form.get("name") or "").strip()[:40]
-        if action == "create" and name:
-            if conn.execute("SELECT 1 FROM users WHERE name = ?", (name,)).fetchone():
-                flash(f"A profile called “{name}” already exists.", "error")
-            else:
-                cur = conn.execute("INSERT INTO users (name, created_at) VALUES (?, ?)", (name, now()))
-                conn.commit()
-                session["user_id"] = cur.lastrowid
-                flash(f"Created and switched to “{name}”.", "success")
-                return redirect(url_for("main.dashboard"))
-        elif action == "rename" and name:
+        if action == "rename" and name:
             if conn.execute("SELECT 1 FROM users WHERE name = ? AND id != ?", (name, g.user["id"])).fetchone():
                 flash(f"A profile called “{name}” already exists.", "error")
             else:
@@ -136,24 +112,17 @@ def profile():
             conn.commit()
             flash("All progress for this profile was cleared.", "success")
         elif action == "delete":
-            if conn.execute("SELECT COUNT(*) FROM users").fetchone()[0] <= 1:
-                flash("You can't delete the only profile. Reset its progress instead.", "error")
-            else:
-                conn.execute("DELETE FROM users WHERE id = ?", (g.user["id"],))
-                conn.commit()
-                session.pop("user_id", None)
-                flash("Profile deleted.", "success")
-                return redirect(url_for("main.dashboard"))
+            conn.execute("DELETE FROM users WHERE id = ?", (g.user["id"],))
+            conn.commit()
+            session.clear()
+            flash("Your profile and all of its history were deleted.", "success")
+            return redirect(url_for("auth.login"))
         return redirect(url_for("main.profile"))
-    return render_template("profile.html")
-
-
-@bp.post("/profile/switch")
-def switch_profile():
-    user_id = request.form.get("user_id", type=int)
-    if user_id and get_db().execute("SELECT 1 FROM users WHERE id = ?", (user_id,)).fetchone():
-        session["user_id"] = user_id
-    return redirect(request.referrer or url_for("main.dashboard"))
+    identities = conn.execute(
+        "SELECT provider, email, last_login_at FROM identities WHERE user_id = ? ORDER BY last_login_at DESC",
+        (g.user["id"],),
+    ).fetchall()
+    return render_template("profile.html", identities=identities, provider_labels=auth.PROVIDERS)
 
 
 # --- dashboard & progress -----------------------------------------------------------------------
