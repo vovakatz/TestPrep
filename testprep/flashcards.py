@@ -21,6 +21,7 @@ class FlashcardError(Exception):
 def create_session(
     conn: sqlite3.Connection,
     user_id: int,
+    cert_id: int,
     mode: str,
     size: int = DEFAULT_DECK_SIZE,
     domain_id: int | None = None,
@@ -30,8 +31,11 @@ def create_session(
     if mode not in ("random", "targeted"):
         raise FlashcardError(f"Unknown deck mode: {mode}")
     rng = rng or random.Random()
-    sql = "SELECT f.id, f.topic_id FROM flashcards f JOIN topics t ON t.id = f.topic_id WHERE f.active = 1"
-    params: list[int] = []
+    sql = (
+        "SELECT f.id, f.topic_id FROM flashcards f JOIN topics t ON t.id = f.topic_id "
+        "WHERE f.active = 1 AND t.certification_id = ?"
+    )
+    params: list[int] = [cert_id]
     scope = ""
     if topic_id:
         sql += " AND f.topic_id = ?"
@@ -49,13 +53,14 @@ def create_session(
         picked = selection.pick_random(pool, size, rng)
     else:
         picked = selection.pick_targeted_flashcards(
-            pool, size, topic_stats(conn, user_id), flashcard_history(conn, user_id), rng
+            pool, size, topic_stats(conn, user_id, cert_id), flashcard_history(conn, user_id), rng
         )
         rng.shuffle(picked)
 
     cur = conn.execute(
-        "INSERT INTO flashcard_sessions (user_id, mode, scope, card_ids, started_at) VALUES (?, ?, ?, ?, ?)",
-        (user_id, mode, scope, json.dumps([i.id for i in picked]), now()),
+        "INSERT INTO flashcard_sessions (user_id, certification_id, mode, scope, card_ids, started_at) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        (user_id, cert_id, mode, scope, json.dumps([i.id for i in picked]), now()),
     )
     conn.commit()
     return cur.lastrowid
@@ -110,19 +115,21 @@ def retry_session(conn: sqlite3.Connection, session_id: int, user_id: int) -> in
         raise FlashcardError("No cards were marked as still learning.")
     random.shuffle(learning)
     cur = conn.execute(
-        "INSERT INTO flashcard_sessions (user_id, mode, scope, card_ids, started_at) VALUES (?, ?, ?, ?, ?)",
-        (user_id, session["mode"], session["scope"], json.dumps(learning), now()),
+        "INSERT INTO flashcard_sessions (user_id, certification_id, mode, scope, card_ids, started_at) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        (user_id, session["certification_id"], session["mode"], session["scope"], json.dumps(learning), now()),
     )
     conn.commit()
     return cur.lastrowid
 
 
-def recent_sessions(conn: sqlite3.Connection, user_id: int, limit: int = 8) -> list[dict]:
+def recent_sessions(conn: sqlite3.Connection, user_id: int, cert_id: int, limit: int = 8) -> list[dict]:
     rows = conn.execute(
         "SELECT s.*, "
         "(SELECT COUNT(*) FROM flashcard_reviews r WHERE r.session_id = s.id) AS reviewed, "
         "(SELECT COUNT(*) FROM flashcard_reviews r WHERE r.session_id = s.id AND r.rating = 'known') AS known "
-        "FROM flashcard_sessions s WHERE s.user_id = ? ORDER BY s.started_at DESC, s.id DESC LIMIT ?",
-        (user_id, limit),
+        "FROM flashcard_sessions s WHERE s.user_id = ? AND s.certification_id = ? "
+        "ORDER BY s.started_at DESC, s.id DESC LIMIT ?",
+        (user_id, cert_id, limit),
     ).fetchall()
     return [dict(r, size=len(json.loads(r["card_ids"]))) for r in rows]

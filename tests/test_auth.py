@@ -47,12 +47,13 @@ def users(app):
 
 
 def test_every_page_requires_sign_in(anon_client):
-    for path in ["/", "/exams", "/flashcards", "/progress", "/profile", "/exams/1", "/nope"]:
+    c = "/datadog-fundamentals"
+    for path in ["/", f"{c}/", f"{c}/exams", f"{c}/flashcards", f"{c}/progress", "/profile", f"{c}/exams/1", "/nope"]:
         res = anon_client.get(path)
         assert res.status_code == 302 and urlparse(res.headers["Location"]).path == "/login", path
-    res = anon_client.get("/exams?tab=history")
-    assert parse_qs(urlparse(res.headers["Location"]).query)["next"] == ["/exams?tab=history"]
-    assert anon_client.post("/exams", data={"mode": "random"}).headers["Location"] == "/login"
+    res = anon_client.get(f"{c}/exams?tab=history")
+    assert parse_qs(urlparse(res.headers["Location"]).query)["next"] == [f"{c}/exams?tab=history"]
+    assert anon_client.post(f"{c}/exams", data={"mode": "random"}).headers["Location"] == "/login"
 
     res = anon_client.post("/api/exams/1/answer", json={"position": 1, "choice_id": 1})
     assert res.status_code == 401 and "signed out" in res.get_json()["error"]
@@ -203,7 +204,7 @@ def test_cli_links_account_to_existing_profile(app, monkeypatch):
     client = app.test_client()
     fake_provider(monkeypatch, app, "google", google_user(name="Vladimir"))
     callback(client)
-    client.post("/exams", data={"mode": "random"})  # history built up before linking
+    client.post("/datadog-fundamentals/exams", data={"mode": "random"})  # history built up before linking
 
     runner = app.test_cli_runner()
     assert "(no account)" in runner.invoke(args=["profiles", "list"]).output

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import sqlite3
 from datetime import datetime, timezone
 
@@ -31,20 +32,35 @@ CREATE TABLE IF NOT EXISTS identities (
     UNIQUE (provider, subject)
 );
 
-CREATE TABLE IF NOT EXISTS domains (
+-- A certification exam with its own question bank, e.g. Datadog Fundamentals. One per content/<slug>/ folder.
+CREATE TABLE IF NOT EXISTS certifications (
     id          INTEGER PRIMARY KEY,
-    name        TEXT NOT NULL UNIQUE,
     slug        TEXT NOT NULL UNIQUE,
+    name        TEXT NOT NULL,
+    vendor      TEXT NOT NULL DEFAULT '',
     description TEXT NOT NULL DEFAULT '',
-    sort_order  INTEGER NOT NULL DEFAULT 0
+    docs_url    TEXT,
+    active      INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS domains (
+    id               INTEGER PRIMARY KEY,
+    certification_id INTEGER NOT NULL REFERENCES certifications(id),
+    name             TEXT NOT NULL,
+    slug             TEXT NOT NULL,
+    description      TEXT NOT NULL DEFAULT '',
+    sort_order       INTEGER NOT NULL DEFAULT 0,
+    UNIQUE (certification_id, name)
 );
 
 CREATE TABLE IF NOT EXISTS topics (
-    id          INTEGER PRIMARY KEY,
-    domain_id   INTEGER NOT NULL REFERENCES domains(id),
-    name        TEXT NOT NULL UNIQUE,
-    description TEXT NOT NULL DEFAULT '',
-    sort_order  INTEGER NOT NULL DEFAULT 0
+    id               INTEGER PRIMARY KEY,
+    certification_id INTEGER NOT NULL REFERENCES certifications(id),
+    domain_id        INTEGER NOT NULL REFERENCES domains(id),
+    name             TEXT NOT NULL,
+    description      TEXT NOT NULL DEFAULT '',
+    sort_order       INTEGER NOT NULL DEFAULT 0,
+    UNIQUE (certification_id, name)
 );
 
 CREATE TABLE IF NOT EXISTS questions (
@@ -79,14 +95,15 @@ CREATE TABLE IF NOT EXISTS flashcards (
 );
 
 CREATE TABLE IF NOT EXISTS exams (
-    id           INTEGER PRIMARY KEY,
-    user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    mode         TEXT NOT NULL CHECK (mode IN ('random', 'targeted')),
-    started_at   TEXT NOT NULL,
-    completed_at TEXT,
-    total        INTEGER NOT NULL,
-    correct      INTEGER,
-    score        REAL
+    id               INTEGER PRIMARY KEY,
+    user_id          INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    certification_id INTEGER NOT NULL REFERENCES certifications(id),
+    mode             TEXT NOT NULL CHECK (mode IN ('random', 'targeted')),
+    started_at       TEXT NOT NULL,
+    completed_at     TEXT,
+    total            INTEGER NOT NULL,
+    correct          INTEGER,
+    score            REAL
 );
 
 -- One row per question in an exam; holds the user's recorded answer.
@@ -104,12 +121,13 @@ CREATE TABLE IF NOT EXISTS exam_questions (
 );
 
 CREATE TABLE IF NOT EXISTS flashcard_sessions (
-    id         INTEGER PRIMARY KEY,
-    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    mode       TEXT NOT NULL CHECK (mode IN ('random', 'targeted')),
-    scope      TEXT NOT NULL DEFAULT '',
-    card_ids   TEXT NOT NULL,
-    started_at TEXT NOT NULL
+    id               INTEGER PRIMARY KEY,
+    user_id          INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    certification_id INTEGER NOT NULL REFERENCES certifications(id),
+    mode             TEXT NOT NULL CHECK (mode IN ('random', 'targeted')),
+    scope            TEXT NOT NULL DEFAULT '',
+    card_ids         TEXT NOT NULL,
+    started_at       TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS flashcard_reviews (
@@ -123,10 +141,15 @@ CREATE TABLE IF NOT EXISTS flashcard_reviews (
 );
 
 CREATE INDEX IF NOT EXISTS idx_identities_user ON identities(user_id);
-CREATE INDEX IF NOT EXISTS idx_exams_user ON exams(user_id, started_at);
+CREATE INDEX IF NOT EXISTS idx_exams_user ON exams(user_id, certification_id, started_at);
+CREATE INDEX IF NOT EXISTS idx_flashcard_sessions_user ON flashcard_sessions(user_id, certification_id, started_at);
 CREATE INDEX IF NOT EXISTS idx_exam_questions_question ON exam_questions(question_id);
 CREATE INDEX IF NOT EXISTS idx_flashcard_reviews_user ON flashcard_reviews(user_id, flashcard_id, reviewed_at);
 """
+
+# Slug and name given to existing content and history when an older database is migrated.
+LEGACY_CERTIFICATION = ("datadog-fundamentals", "Datadog Fundamentals")
+CERTIFICATION_TABLES = ("domains", "topics", "exams", "flashcard_sessions")
 
 
 def now() -> str:
@@ -154,8 +177,53 @@ def close_db(_exc: BaseException | None = None) -> None:
 
 
 def init_schema(conn: sqlite3.Connection) -> None:
+    if _columns(conn, "domains") and "certification_id" not in _columns(conn, "domains"):
+        _migrate_to_certifications(conn)
     conn.executescript(SCHEMA)
     conn.commit()
+
+
+def _columns(conn: sqlite3.Connection, table: str) -> list[str]:
+    return [row["name"] for row in conn.execute(f"PRAGMA table_info({table})")]
+
+
+def _create_sql(table: str, as_name: str) -> str:
+    """SCHEMA's CREATE TABLE statement for `table`, creating `as_name` instead."""
+    match = re.search(rf"CREATE TABLE IF NOT EXISTS {table} (\(.*?\n\));", SCHEMA, re.S)
+    return f"CREATE TABLE {as_name} {match.group(1)}"
+
+
+def _migrate_to_certifications(conn: sqlite3.Connection) -> None:
+    """Give every domain, topic, exam and flash card deck a certification_id, keeping all ids.
+
+    Databases from before certifications existed hold only Datadog Fundamentals content and history.
+    SQLite can't add a NOT NULL foreign key column or change UNIQUE constraints in place, so each table
+    is rebuilt from its SCHEMA definition (https://www.sqlite.org/lang_altertable.html#otheralter).
+    """
+    conn.commit()
+    conn.execute("PRAGMA foreign_keys = OFF")  # no effect inside a transaction
+    try:
+        conn.execute("BEGIN")
+        conn.execute(_create_sql("certifications", "certifications"))
+        cert_id = conn.execute(
+            "INSERT INTO certifications (slug, name) VALUES (?, ?)", LEGACY_CERTIFICATION
+        ).lastrowid
+        for table in CERTIFICATION_TABLES:
+            columns = ", ".join(_columns(conn, table))
+            if not columns:
+                continue  # older than this table; SCHEMA creates it
+            conn.execute(_create_sql(table, f"{table}_new"))
+            conn.execute(
+                f"INSERT INTO {table}_new ({columns}, certification_id) SELECT {columns}, ? FROM {table}", (cert_id,)
+            )
+            conn.execute(f"DROP TABLE {table}")
+            conn.execute(f"ALTER TABLE {table}_new RENAME TO {table}")
+        conn.commit()
+    except BaseException:
+        conn.rollback()
+        raise
+    finally:
+        conn.execute("PRAGMA foreign_keys = ON")
 
 
 def init_app(app: Flask) -> None:

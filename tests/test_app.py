@@ -3,8 +3,11 @@ import re
 import sqlite3
 from collections import Counter
 
+from conftest import CERT
 from testprep import exams
 from testprep.db import connect
+
+C = f"/{CERT}"
 
 
 def db(app) -> sqlite3.Connection:
@@ -12,7 +15,7 @@ def db(app) -> sqlite3.Connection:
 
 
 def start_exam(client, mode="random") -> int:
-    res = client.post("/exams", data={"mode": mode})
+    res = client.post(f"{C}/exams", data={"mode": mode})
     assert res.status_code == 302
     return int(re.search(r"/exams/(\d+)", res.headers["Location"]).group(1))
 
@@ -36,7 +39,7 @@ def answer(client, exam_id, position, choice_id):
 
 
 def test_pages_render(client):
-    for path in ["/", "/exams", "/flashcards", "/progress", "/profile"]:
+    for path in ["/", f"{C}/", f"{C}/exams", f"{C}/flashcards", f"{C}/progress", "/profile"]:
         assert client.get(path).status_code == 200, path
 
 
@@ -45,9 +48,9 @@ def test_seed_is_idempotent_and_deactivates_removed_items(app, content_dir):
 
     conn = db(app)
     assert seed(conn, content_dir) is None  # unchanged content: no-op
-    bank = json.loads((content_dir / "bank.json").read_text())
+    bank = json.loads((content_dir / CERT / "bank.json").read_text())
     bank["questions"] = bank["questions"][:-1]
-    (content_dir / "bank.json").write_text(json.dumps(bank))
+    (content_dir / CERT / "bank.json").write_text(json.dumps(bank))
     seed(conn, content_dir)
     assert conn.execute("SELECT COUNT(*) FROM questions WHERE active = 0").fetchone()[0] == 1
     conn.close()
@@ -61,7 +64,7 @@ def test_random_exam_has_50_unique_questions_with_shuffled_choices(client, app):
     orders = [json.loads(r["choice_order"]) for r in rows]
     assert all(len(o) == 4 for o in orders)
     assert any(o != sorted(o) for o in orders)
-    page = client.get(f"/exams/{exam_id}")
+    page = client.get(f"{C}/exams/{exam_id}")
     assert page.status_code == 200
     # Unanswered questions never leak their correct answer into the page.
     data = json.loads(re.search(rb'id="exam-data">(.*?)</script>', page.data, re.S).group(1))
@@ -86,14 +89,14 @@ def test_answer_flow_records_result_and_explanation(client, app):
     assert answer(client, exam_id, first["position"], wrong).status_code == 400
     assert answer(client, exam_id, rows[2]["position"], wrong).status_code == 400
 
-    res = client.post(f"/exams/{exam_id}/finish")
+    res = client.post(f"{C}/exams/{exam_id}/finish")
     assert res.status_code == 302
     conn = db(app)
     exam = conn.execute("SELECT * FROM exams WHERE id = ?", (exam_id,)).fetchone()
     assert exam["correct"] == 1 and exam["score"] == 2.0  # 1 of 50; unanswered count as wrong
     conn.close()
 
-    results = client.get(f"/exams/{exam_id}/results")
+    results = client.get(f"{C}/exams/{exam_id}/results")
     assert results.status_code == 200 and b"1 of 50 correct" in results.data
     assert answer(client, exam_id, rows[3]["position"], correct[rows[3]["question_id"]]).status_code == 400
 
@@ -107,10 +110,12 @@ def test_targeted_exam_emphasises_missed_topic(client, app):
         right = correct[r["question_id"]]
         choice = right if r["topic_id"] != weak_topic else next(c for c in json.loads(r["choice_order"]) if c != right)
         assert answer(client, exam_id, r["position"], choice).status_code == 200
-    client.post(f"/exams/{exam_id}/finish")
+    client.post(f"{C}/exams/{exam_id}/finish")
 
     conn = db(app)
-    topic_count = conn.execute("SELECT COUNT(DISTINCT topic_id) FROM questions").fetchone()[0]
+    topic_count = conn.execute(
+        "SELECT COUNT(*) FROM topics WHERE certification_id = (SELECT id FROM certifications WHERE slug = ?)", (CERT,)
+    ).fetchone()[0]
     weak_pool = conn.execute("SELECT COUNT(*) FROM questions WHERE topic_id = ?", (weak_topic,)).fetchone()[0]
     conn.close()
 
@@ -124,10 +129,10 @@ def test_targeted_exam_emphasises_missed_topic(client, app):
 
 
 def test_flashcard_session_review_and_retry(client, app):
-    res = client.post("/flashcards", data={"mode": "random", "size": "10"})
+    res = client.post(f"{C}/flashcards", data={"mode": "random", "size": "10"})
     assert res.status_code == 302
     session_id = int(res.headers["Location"].rsplit("/", 1)[1])
-    page = client.get(f"/flashcards/{session_id}")
+    page = client.get(f"{C}/flashcards/{session_id}")
     cards = json.loads(re.search(rb'id="cards-data">(.*?)</script>', page.data, re.S).group(1))
     assert len(cards) == 10
 
@@ -137,7 +142,7 @@ def test_flashcard_session_review_and_retry(client, app):
         assert res.status_code == 200
     assert client.post(f"/api/flashcards/{session_id}/review", json={"card_id": 999999, "rating": "known"}).status_code == 400
 
-    res = client.post(f"/flashcards/{session_id}/retry")
+    res = client.post(f"{C}/flashcards/{session_id}/retry")
     retry_id = int(res.headers["Location"].rsplit("/", 1)[1])
     conn = db(app)
     retry = conn.execute("SELECT card_ids FROM flashcard_sessions WHERE id = ?", (retry_id,)).fetchone()
@@ -147,9 +152,9 @@ def test_flashcard_session_review_and_retry(client, app):
 
 def test_flashcards_scoped_to_topic(client, app):
     conn = db(app)
-    topic_id = conn.execute("SELECT topic_id FROM flashcards LIMIT 1").fetchone()[0]
+    topic_id = conn.execute("SELECT topic_id FROM flashcards ORDER BY id LIMIT 1").fetchone()[0]
     conn.close()
-    res = client.post("/flashcards", data={"mode": "random", "size": "50", "scope": f"topic:{topic_id}"})
+    res = client.post(f"{C}/flashcards", data={"mode": "random", "size": "50", "scope": f"topic:{topic_id}"})
     session_id = int(res.headers["Location"].rsplit("/", 1)[1])
     conn = db(app)
     ids = json.loads(conn.execute("SELECT card_ids FROM flashcard_sessions WHERE id = ?", (session_id,)).fetchone()[0])
@@ -161,13 +166,13 @@ def test_flashcards_scoped_to_topic(client, app):
 def test_profiles_are_isolated(client, signed_in_client):
     exam_id = start_exam(client)
     other = signed_in_client("other", "other@example.com", "Other")
-    assert other.get(f"/exams/{exam_id}").status_code == 404
-    assert other.post(f"/exams/{exam_id}/delete").status_code == 404
-    assert b"taken an exam yet" in other.get("/exams").data
+    assert other.get(f"{C}/exams/{exam_id}").status_code == 404
+    assert other.post(f"{C}/exams/{exam_id}/delete").status_code == 404
+    assert b"taken an exam yet" in other.get(f"{C}/exams").data
 
-    assert client.get(f"/exams/{exam_id}").status_code == 200
+    assert client.get(f"{C}/exams/{exam_id}").status_code == 200
     client.post("/profile", data={"action": "reset"})
-    assert client.get(f"/exams/{exam_id}").status_code == 404
+    assert client.get(f"{C}/exams/{exam_id}").status_code == 404
 
 
 def test_rich_text_filters_escape_html_and_format_code():

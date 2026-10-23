@@ -7,7 +7,7 @@
     <svg viewBox="0 0 32 32"><path d="M8 22V14M13 22V10M18 22V16M23 22V8" /></svg>
   </span>
   <h1>Sign in to TestPrep</h1>
-  <p class="muted">Practice exams and flash cards for the Datadog Fundamentals certification. Your answers and progress are saved to your account.</p>
+  <p class="muted">Practice exams and flash cards for certification exams. Your answers and progress are saved to your account.</p>
   <div class="auth-buttons">
     {% for p in providers %}
       <a class="btn btn-lg btn-provider" href="{{ url_for('auth.start', provider=p.name, next=next_url) }}">

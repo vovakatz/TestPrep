@@ -4,13 +4,13 @@
 {% block content %}
 <section class="hero">
   <div class="hero-copy">
-    <p class="eyebrow">Datadog Fundamentals certification</p>
+    <p class="eyebrow">{{ current_cert.name }} certification</p>
     <h1>{{ "Welcome back" if summary.answered else "Welcome" }}, {{ current_user.name }}.</h1>
     <p class="lede">Take 50-question practice exams built from the official exam guide, then sharpen weak spots with flash cards that learn from your mistakes.</p>
     <div class="hero-actions">
       <form method="post" action="{{ url_for('main.start_exam') }}">
         <input type="hidden" name="mode" value="random">
-        <button class="btn btn-light btn-lg" type="submit">Start a random exam</button>
+        <button class="btn btn-light btn-lg" type="submit" {{ 'disabled' if not bank_counts.questions }}>Start a random exam</button>
       </form>
       <a class="btn btn-outline-light btn-lg" href="{{ url_for('main.flashcard_hub') }}">Study flash cards</a>
     </div>
@@ -48,7 +48,7 @@
     <div class="feature-actions">
       <form method="post" action="{{ url_for('main.start_exam') }}">
         <input type="hidden" name="mode" value="random">
-        <button class="btn btn-primary" type="submit">Random exam</button>
+        <button class="btn btn-primary" type="submit" {{ 'disabled' if not bank_counts.questions }}>Random exam</button>
       </form>
       <form method="post" action="{{ url_for('main.start_exam') }}">
         <input type="hidden" name="mode" value="targeted">
@@ -67,7 +67,7 @@
     <div class="feature-actions">
       <form method="post" action="{{ url_for('main.start_flashcards') }}">
         <input type="hidden" name="mode" value="random">
-        <button class="btn btn-primary" type="submit">Random deck</button>
+        <button class="btn btn-primary" type="submit" {{ 'disabled' if not bank_counts.flashcards }}>Random deck</button>
       </form>
       <form method="post" action="{{ url_for('main.start_flashcards') }}">
         <input type="hidden" name="mode" value="targeted">

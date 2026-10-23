@@ -153,7 +153,7 @@ def require_login():
 def login():
     next_url = _safe_next(request.args.get("next"))
     if g.user is not None:
-        return redirect(next_url or url_for("main.dashboard"))
+        return redirect(next_url or url_for("main.home"))
     providers = [{"name": n, "label": PROVIDERS[n][0]} for n in current_app.extensions["testprep_auth"]["providers"]]
     return render_template("login.html", providers=providers, next_url=next_url)
 
@@ -198,7 +198,7 @@ def callback(provider: str):
     session.permanent = True
     session["user_id"] = user_id
     current_app.logger.info("%s signed in with %s", email or f"subject {subject}", label)
-    return redirect(next_url or url_for("main.dashboard"))
+    return redirect(next_url or url_for("main.home"))
 
 
 @bp.post("/logout")

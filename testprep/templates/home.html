@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Choose an exam{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Welcome, {{ current_user.name }}</p>
+    <h1>Choose your exam</h1>
+    <p class="lede-dark">Each certification has its own practice exams, flash cards and progress. Pick one to open its dashboard.</p>
+  </div>
+</header>
+
+<section class="cert-grid">
+  {% for c in certifications %}
+    <a class="feature-card cert-card" href="{{ url_for('main.dashboard', cert=c.cert.slug) }}">
+      <div class="cert-card-head">
+        <span class="cert-mark" aria-hidden="true">{{ (c.cert.vendor or c.cert.name)[:1] }}</span>
+        <div>
+          {% if c.cert.vendor %}<p class="eyebrow">{{ c.cert.vendor }}</p>{% endif %}
+          <h2>{{ c.cert.name }} Exam</h2>
+        </div>
+        {% if not c.bank.questions %}<span class="chip chip-new">Coming soon</span>{% endif %}
+      </div>
+      {% if c.cert.description %}<p>{{ c.cert.description }}</p>{% endif %}
+      <ul class="cert-facts">
+        <li><strong class="num">{{ c.bank.questions }}</strong>questions</li>
+        <li><strong class="num">{{ c.bank.flashcards }}</strong>flash cards</li>
+        <li><strong class="num">{{ c.summary.completed }}</strong>exam{{ '' if c.summary.completed == 1 else 's' }} taken</li>
+        <li><strong class="num">{{ (c.summary.avg_score | round | int ~ '%') if c.summary.avg_score is not none else '—' }}</strong>average score</li>
+      </ul>
+      {% if c.in_progress %}
+        <p class="cert-resume">Exam in progress · {{ c.in_progress.answered }} of {{ c.in_progress.total }} answered</p>
+      {% endif %}
+      <span class="cert-go">Open dashboard →</span>
+    </a>
+  {% else %}
+    <div class="empty"><p>No certifications found. Add a <code>content/&lt;slug&gt;/taxonomy.json</code> and restart.</p></div>
+  {% endfor %}
+</section>
+{% endblock %}

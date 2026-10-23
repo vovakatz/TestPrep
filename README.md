@@ -1,8 +1,13 @@
-# TestPrep: Datadog Fundamentals Exam Prep
+# TestPrep: Certification Exam Prep
 
-A local web app for studying for the **Datadog Fundamentals** certification. It has two sections:
+A local web app for studying for IT certification exams. Currently:
 
-- **Practice exams**: 50 single-answer multiple-choice questions per exam. You submit each answer and immediately see whether it was right, with an explanation and a link to the Datadog docs. At the end you get your percentage score, a breakdown by domain and topic, and a full answer review. Choose between:
+- **Datadog Fundamentals**: 747 questions and 347 flash cards.
+- **Dynatrace Associate**: coming soon (no questions yet).
+
+After signing in you pick an exam. Each exam has its own dashboard, practice exams, flash cards and progress, at `/<exam>/`, e.g. `/datadog-fundamentals/`. Each exam has two sections:
+
+- **Practice exams**: 50 single-answer multiple-choice questions per exam. You submit each answer and immediately see whether it was right, with an explanation and a link to the vendor's docs. At the end you get your percentage score, a breakdown by domain and topic, and a full answer review. Choose between:
   - **Random**: 50 questions drawn uniformly from the whole bank.
   - **Targeted**: weighted toward the topics and questions you've struggled with.
 - **Flash cards**: flip-and-rate decks (10–50 cards) for all domains, a single domain or a single topic.
@@ -27,7 +32,7 @@ Options: `--port 8080`, `--host 0.0.0.0`, `--db path/to/file.sqlite`, `--content
 
 Browse to `http://localhost:5000`, not `http://127.0.0.1:5000`: the sign-in redirect URIs below are registered for `localhost`.
 
-On first start the app creates `instance/testprep.sqlite` and loads the question bank into it. When the content files change, it re-syncs them on the next start.
+On first start the app creates `instance/testprep.sqlite` and loads the question banks into it. When the content files change, it re-syncs them on the next start. A database from before multiple exams existed is upgraded in place on start, and its history becomes Datadog Fundamentals history.
 
 ## Sign-in
 
@@ -64,7 +69,38 @@ docker compose exec testprep python -m flask --app testprep profiles link "Vova"
 
 ## Content
 
-The question bank and flash cards live in `content/*.json`. `content/taxonomy.json` lists the six exam-guide domains and their topics:
+Each exam is a folder under `content/`. The folder name is the exam's URL slug:
+
+```
+content/
+  datadog-fundamentals/
+    taxonomy.json           name, vendor, description, docs_url, domains and topics
+    01-hardware-linux.json  questions and flash cards (any number of files)
+    ...
+  dynatrace-associate/
+    taxonomy.json           no domains or questions yet
+```
+
+`taxonomy.json`:
+
+```json
+{
+  "name": "Datadog Fundamentals",
+  "vendor": "Datadog",
+  "description": "Shown on the exam picker.",
+  "docs_url": "https://docs.datadoghq.com/",
+  "domains": [
+    {"name": "Essential Concepts", "slug": "essential", "description": "…",
+     "topics": [{"name": "Linux Basics", "description": "…"}]}
+  ]
+}
+```
+
+An exam without questions shows as *Coming soon*. To add an exam, create a folder with a `taxonomy.json`, add question files, run the validator and restart.
+
+### Datadog Fundamentals
+
+`content/datadog-fundamentals/taxonomy.json` lists the six exam-guide domains and their topics:
 
 | Domain | Topics |
 |---|---|
@@ -77,7 +113,9 @@ The question bank and flash cards live in `content/*.json`. `content/taxonomy.js
 
 Questions were written from the Datadog docs linked in the official exam guide (and the pages those link to). They include reworded versions of the official sample questions. Each question cites its source URL.
 
-Question format:
+### Question and flash card format
+
+Question format (`topic` is a topic name from the same exam's `taxonomy.json`):
 
 ```json
 {
@@ -94,7 +132,7 @@ Question format:
 
 Flash card format: `{"id", "topic", "front", "back", "reference"}`.
 
-To add or edit content, change the JSON, then run the validator. It checks the schema, topics, unique ids, duplicate questions and answer-length bias:
+To add or edit content, change the JSON, then run the validator. It checks the schema, topics, unique ids (across all exams), duplicate questions and answer-length bias:
 
 ```bash
 python scripts/validate_content.py
@@ -106,7 +144,7 @@ Ids are stable keys. Editing an item updates it in place without touching record
 
 `testprep/selection.py` and `testprep/stats.py`:
 
-1. **Topic accuracy.** For each topic, the app estimates accuracy from all of your submitted exam answers, using a Beta(1,1) prior (`(correct+1)/(answered+2)`). An unseen topic counts as 50%, and a couple of lucky answers don't swing it much.
+1. **Topic accuracy.** For each topic, the app estimates accuracy from all of your submitted answers in that exam's practice exams, using a Beta(1,1) prior (`(correct+1)/(answered+2)`). An unseen topic counts as 50%, and a couple of lucky answers don't swing it much.
 2. **Topic weight.** `0.2 + 2 × (1 − accuracy)²`. With 10 answers each, a topic at 40% gets about 3.4× the weight of a topic at 90%. Weights are normalised so the bank's natural topic mix is the baseline.
 3. **Question factor.** Last answer wrong ×3, never seen ×1.5, right once ×0.6, right two or more times in a row ×0.3.
 4. **Sampling.** Weighted sampling without replacement. No single topic can take more than 25% of a targeted exam, so you still see breadth.
@@ -126,17 +164,17 @@ testprep/
   __init__.py           app factory (config, creates DB, syncs content)
   auth.py               Google / Microsoft sign-in and the login gate
   cli.py                `python -m flask --app testprep profiles ...` admin commands
-  db.py                 SQLite schema & connections
-  seed.py               content/*.json → SQLite upsert
+  db.py                 SQLite schema, connections & migration
+  seed.py               content/<exam>/*.json → SQLite upsert
   stats.py              per-topic accuracy from recorded answers
   selection.py          random / weighted selection
   exams.py              exam lifecycle (create, answer, finish, review)
   flashcards.py         decks & ratings
-  views.py              Flask routes + JSON endpoints
+  views.py              Flask routes (exam picker, /<exam>/ pages) + JSON endpoints
   templates/, static/   UI (vanilla JS, no build step)
-content/                question bank, flash cards, taxonomy
+content/<exam>/         question bank, flash cards, taxonomy, one folder per exam
 scripts/validate_content.py
 tests/
 ```
 
-This is an unofficial study aid, not affiliated with Datadog. Always confirm details against [docs.datadoghq.com](https://docs.datadoghq.com/).
+This is an unofficial study aid, not affiliated with Datadog, Dynatrace or any other certification vendor. Always confirm details against the vendor's documentation.

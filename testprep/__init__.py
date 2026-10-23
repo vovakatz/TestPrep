@@ -1,4 +1,4 @@
-"""TestPrep - Datadog Fundamentals exam preparation app."""
+"""TestPrep - certification exam preparation app."""
 
 from __future__ import annotations
 
@@ -46,7 +46,10 @@ def create_app(config: dict | None = None) -> Flask:
         db.init_schema(conn)
         result = seed.seed(conn, Path(app.config["CONTENT_DIR"]))
         if result:
-            app.logger.info("Loaded %(questions)d questions and %(flashcards)d flash cards", result)
+            app.logger.info(
+                "Loaded %(questions)d questions and %(flashcards)d flash cards for %(certifications)d certifications",
+                result,
+            )
     finally:
         conn.close()
 

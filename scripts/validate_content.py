@@ -1,8 +1,11 @@
 """Validate TestPrep content files.
 
+Each certification is a folder, content/<slug>/, holding taxonomy.json (name, vendor, domains and topics)
+and any number of question/flash card banks.
+
 Usage:
-    python scripts/validate_content.py                 # validate every content/*.json bank
-    python scripts/validate_content.py content/x.json  # validate specific files (ids still checked globally)
+    python scripts/validate_content.py                                      # validate every bank
+    python scripts/validate_content.py content/datadog-fundamentals/x.json  # specific files (ids still checked globally)
 
 Exits non-zero if any error is found. Warnings are printed but do not fail.
 """
@@ -17,30 +20,61 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CONTENT_DIR = ROOT / "content"
-TAXONOMY_FILE = CONTENT_DIR / "taxonomy.json"
+TAXONOMY_FILE = "taxonomy.json"
 
 ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 BANNED_CHOICE_RE = re.compile(r"\b(all|none|both) of the (above|below)\b", re.I)
 POSITIONAL_RE = re.compile(r"\b(option|answer|choice) [a-d]\b|\b[a-d] and [a-d]\b", re.I)
+# Top-level app routes a certification slug can't shadow.
+RESERVED_SLUGS = {"api", "auth", "login", "logout", "profile", "static"}
 
 
-def load_topics() -> dict[str, str]:
-    taxonomy = json.loads(TAXONOMY_FILE.read_text(encoding="utf-8"))
-    return {t["name"]: d["name"] for d in taxonomy["domains"] for t in d["topics"]}
+def certification_dirs() -> list[Path]:
+    return sorted(p.parent for p in CONTENT_DIR.glob(f"*/{TAXONOMY_FILE}"))
+
+
+def validate_taxonomy(cert_dir: Path, errors: list[str]) -> dict[str, str]:
+    """Check one certification's taxonomy.json. Returns its topic name -> domain name."""
+    where = f"{cert_dir.name}/{TAXONOMY_FILE}"
+    if not ID_RE.match(cert_dir.name) or cert_dir.name in RESERVED_SLUGS:
+        errors.append(
+            f"{cert_dir.name}: the folder name is the URL slug; use lowercase kebab-case other than "
+            f"{sorted(RESERVED_SLUGS)}"
+        )
+    try:
+        taxonomy = json.loads((cert_dir / TAXONOMY_FILE).read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        errors.append(f"{where}: invalid JSON: {exc}")
+        return {}
+    if not str(taxonomy.get("name", "")).strip():
+        errors.append(f"{where}: missing certification 'name'")
+    if taxonomy.get("docs_url") and not str(taxonomy["docs_url"]).startswith("https://"):
+        errors.append(f"{where}: docs_url must be an https URL")
+    topics: dict[str, str] = {}
+    for d in taxonomy.get("domains", []):
+        for t in d.get("topics", []):
+            if t["name"] in topics:
+                errors.append(f"{where}: topic '{t['name']}' appears more than once")
+            topics[t["name"]] = d["name"]
+    return topics
 
 
 def content_files() -> list[Path]:
-    return sorted(p for p in CONTENT_DIR.glob("*.json") if p.name != TAXONOMY_FILE.name)
+    return [p for d in certification_dirs() for p in sorted(d.glob("*.json")) if p.name != TAXONOMY_FILE]
 
 
 def normalize(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", text.lower()).strip()
 
 
+def label(path: Path) -> str:
+    return f"{path.parent.name}/{path.name}"
+
+
 def validate(paths: list[Path]) -> int:
-    topics = load_topics()
     errors: list[str] = []
     warnings: list[str] = []
+    topics_by_cert = {d: validate_taxonomy(d, errors) for d in certification_dirs()}
 
     # Load every bank so id / duplicate checks are global even when validating one file.
     banks: dict[Path, dict] = {}
@@ -48,7 +82,7 @@ def validate(paths: list[Path]) -> int:
         try:
             banks[path] = json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError as exc:
-            errors.append(f"{path.name}: invalid JSON: {exc}")
+            errors.append(f"{label(path)}: invalid JSON: {exc}")
 
     seen_ids: dict[str, str] = {}
     seen_questions: dict[str, str] = {}
@@ -58,17 +92,17 @@ def validate(paths: list[Path]) -> int:
             for item in bank.get(kind, []):
                 item_id = item.get("id", "")
                 if item_id in seen_ids:
-                    errors.append(f"{path.name}: duplicate id '{item_id}' (also in {seen_ids[item_id]})")
-                seen_ids.setdefault(item_id, path.name)
+                    errors.append(f"{label(path)}: duplicate id '{item_id}' (also in {seen_ids[item_id]})")
+                seen_ids.setdefault(item_id, label(path))
         for q in bank.get("questions", []):
             key = normalize(q.get("question", ""))
             if key in seen_questions and seen_questions[key] != q.get("id"):
-                warnings.append(f"{path.name}: question '{q.get('id')}' duplicates '{seen_questions[key]}'")
+                warnings.append(f"{label(path)}: question '{q.get('id')}' duplicates '{seen_questions[key]}'")
             seen_questions.setdefault(key, q.get("id"))
         for c in bank.get("flashcards", []):
             key = normalize(c.get("front", ""))
             if key in seen_fronts and seen_fronts[key] != c.get("id"):
-                warnings.append(f"{path.name}: flashcard '{c.get('id')}' duplicates '{seen_fronts[key]}'")
+                warnings.append(f"{label(path)}: flashcard '{c.get('id')}' duplicates '{seen_fronts[key]}'")
             seen_fronts.setdefault(key, c.get("id"))
 
     targets = paths or list(banks)
@@ -76,7 +110,11 @@ def validate(paths: list[Path]) -> int:
         bank = banks.get(path)
         if bank is None:
             continue
-        name = path.name
+        name = label(path)
+        topics = topics_by_cert.get(path.parent)
+        if topics is None:
+            errors.append(f"{name}: banks belong in a content/<slug>/ folder next to its {TAXONOMY_FILE}")
+            continue
         if not isinstance(bank, dict) or set(bank) - {"questions", "flashcards"}:
             errors.append(f"{name}: top level must be an object with only 'questions' and 'flashcards'")
             continue
@@ -157,6 +195,11 @@ def validate(paths: list[Path]) -> int:
         print(f"{name}: {len(questions)} questions, {len(bank.get('flashcards', []))} flashcards")
         for topic in sorted(set(per_topic) | set(cards_per_topic)):
             print(f"    {topic}: {per_topic[topic]} q / {cards_per_topic[topic]} cards")
+
+    if not paths:
+        for cert_dir, topics in topics_by_cert.items():
+            if not any(p.parent == cert_dir for p in banks):
+                print(f"{cert_dir.name}: no questions or flashcards yet ({len(topics)} topics)")
 
     for w in warnings:
         print(f"WARNING: {w}")

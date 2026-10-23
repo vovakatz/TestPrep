@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parent
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Datadog Fundamentals exam prep")
+    parser = argparse.ArgumentParser(description="Certification exam prep")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=5000)
     parser.add_argument("--open", action="store_true", help="open the app in your browser")

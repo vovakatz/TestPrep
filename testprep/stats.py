@@ -56,12 +56,14 @@ def topic_weight(stat: TopicStat) -> float:
     return 0.2 + 2.0 * stat.weakness**2
 
 
-def topic_stats(conn: sqlite3.Connection, user_id: int) -> dict[int, TopicStat]:
+def topic_stats(conn: sqlite3.Connection, user_id: int, cert_id: int) -> dict[int, TopicStat]:
+    """Every topic of one certification, with the user's exam answers in it."""
     stats = {
         row["id"]: TopicStat(row["id"], row["name"], row["domain_id"], row["domain"])
         for row in conn.execute(
             "SELECT t.id, t.name, t.domain_id, d.name AS domain FROM topics t "
-            "JOIN domains d ON d.id = t.domain_id ORDER BY d.sort_order, t.sort_order"
+            "JOIN domains d ON d.id = t.domain_id WHERE t.certification_id = ? ORDER BY d.sort_order, t.sort_order",
+            (cert_id,),
         )
     }
     rows = conn.execute(
@@ -69,9 +71,9 @@ def topic_stats(conn: sqlite3.Connection, user_id: int) -> dict[int, TopicStat]:
         "FROM exam_questions eq "
         "JOIN exams e ON e.id = eq.exam_id "
         "JOIN questions q ON q.id = eq.question_id "
-        "WHERE e.user_id = ? AND eq.selected_choice_id IS NOT NULL "
+        "WHERE e.user_id = ? AND e.certification_id = ? AND eq.selected_choice_id IS NOT NULL "
         "GROUP BY q.topic_id",
-        (user_id,),
+        (user_id, cert_id),
     )
     for row in rows:
         stat = stats.get(row["topic_id"])
@@ -119,9 +121,9 @@ def flashcard_history(conn: sqlite3.Connection, user_id: int) -> dict[int, str]:
     return {row["flashcard_id"]: row["rating"] for row in rows}
 
 
-def answered_count(conn: sqlite3.Connection, user_id: int) -> int:
+def answered_count(conn: sqlite3.Connection, user_id: int, cert_id: int) -> int:
     return conn.execute(
         "SELECT COUNT(*) FROM exam_questions eq JOIN exams e ON e.id = eq.exam_id "
-        "WHERE e.user_id = ? AND eq.selected_choice_id IS NOT NULL",
-        (user_id,),
+        "WHERE e.user_id = ? AND e.certification_id = ? AND eq.selected_choice_id IS NOT NULL",
+        (user_id, cert_id),
     ).fetchone()[0]

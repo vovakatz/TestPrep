@@ -13,7 +13,7 @@ from testprep.seed import seed
 
 ROOT = Path(__file__).resolve().parent.parent
 CONTENT = ROOT / "content"
-BANKS = sorted(p for p in CONTENT.glob("*.json") if p.name != "taxonomy.json")
+BANKS = sorted(p for p in CONTENT.glob("*/*.json") if p.name != "taxonomy.json")
 
 pytestmark = pytest.mark.skipif(not BANKS, reason="no content files yet")
 
@@ -26,14 +26,26 @@ def test_content_passes_validator():
 
 
 def test_real_content_seeds_and_covers_every_topic(tmp_path):
+    """Certifications without questions are "coming soon"; any that has questions needs a full exam's worth."""
     conn = connect(str(tmp_path / "content.sqlite"))
     init_schema(conn)
-    counts = seed(conn, CONTENT)
-    assert counts["questions"] >= EXAM_SIZE
-    empty = conn.execute(
-        "SELECT t.name FROM topics t LEFT JOIN questions q ON q.topic_id = t.id GROUP BY t.id HAVING COUNT(q.id) = 0"
+    seed(conn, CONTENT)
+    certs = conn.execute(
+        "SELECT c.slug, COUNT(q.id) AS questions FROM certifications c "
+        "LEFT JOIN topics t ON t.certification_id = c.id LEFT JOIN questions q ON q.topic_id = t.id "
+        "GROUP BY c.id"
     ).fetchall()
-    assert not empty, f"topics without questions: {[r[0] for r in empty]}"
+    assert {r["slug"] for r in certs} == {p.parent.name for p in CONTENT.glob("*/taxonomy.json")}
+    for cert in certs:
+        if not cert["questions"]:
+            continue
+        assert cert["questions"] >= EXAM_SIZE, cert["slug"]
+        empty = conn.execute(
+            "SELECT t.name FROM topics t JOIN certifications c ON c.id = t.certification_id "
+            "LEFT JOIN questions q ON q.topic_id = t.id WHERE c.slug = ? GROUP BY t.id HAVING COUNT(q.id) = 0",
+            (cert["slug"],),
+        ).fetchall()
+        assert not empty, f"{cert['slug']} topics without questions: {[r[0] for r in empty]}"
     conn.close()
 
 

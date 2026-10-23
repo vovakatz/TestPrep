@@ -17,28 +17,34 @@ class ExamError(Exception):
     """Invalid exam action (unknown exam, already answered, bad choice...)."""
 
 
-def create_exam(conn: sqlite3.Connection, user_id: int, mode: str, rng: random.Random | None = None) -> int:
+def create_exam(
+    conn: sqlite3.Connection, user_id: int, cert_id: int, mode: str, rng: random.Random | None = None
+) -> int:
     if mode not in ("random", "targeted"):
         raise ExamError(f"Unknown exam mode: {mode}")
     rng = rng or random.Random()
     pool = [
         selection.Item(row["id"], row["topic_id"])
-        for row in conn.execute("SELECT id, topic_id FROM questions WHERE active = 1 ORDER BY id")
+        for row in conn.execute(
+            "SELECT q.id, q.topic_id FROM questions q JOIN topics t ON t.id = q.topic_id "
+            "WHERE q.active = 1 AND t.certification_id = ? ORDER BY q.id",
+            (cert_id,),
+        )
     ]
     if not pool:
-        raise ExamError("The question bank is empty.")
+        raise ExamError("There are no questions for this exam yet.")
 
     if mode == "random":
         picked = selection.pick_random(pool, EXAM_SIZE, rng)
     else:
         picked = selection.pick_targeted_questions(
-            pool, EXAM_SIZE, topic_stats(conn, user_id), question_history(conn, user_id), rng
+            pool, EXAM_SIZE, topic_stats(conn, user_id, cert_id), question_history(conn, user_id), rng
         )
         rng.shuffle(picked)
 
     cur = conn.execute(
-        "INSERT INTO exams (user_id, mode, started_at, total) VALUES (?, ?, ?, ?)",
-        (user_id, mode, now(), len(picked)),
+        "INSERT INTO exams (user_id, certification_id, mode, started_at, total) VALUES (?, ?, ?, ?, ?)",
+        (user_id, cert_id, mode, now(), len(picked)),
     )
     exam_id = cur.lastrowid
     for position, item in enumerate(picked, start=1):
@@ -177,12 +183,12 @@ def breakdown(items: list[dict]) -> list[dict]:
     return sorted(result, key=lambda d: d["correct"] / d["total"])
 
 
-def history(conn: sqlite3.Connection, user_id: int) -> list[sqlite3.Row]:
+def history(conn: sqlite3.Connection, user_id: int, cert_id: int) -> list[sqlite3.Row]:
     return conn.execute(
         "SELECT e.*, (SELECT COUNT(*) FROM exam_questions eq WHERE eq.exam_id = e.id "
         "AND eq.selected_choice_id IS NOT NULL) AS answered "
-        "FROM exams e WHERE e.user_id = ? ORDER BY e.started_at DESC, e.id DESC",
-        (user_id,),
+        "FROM exams e WHERE e.user_id = ? AND e.certification_id = ? ORDER BY e.started_at DESC, e.id DESC",
+        (user_id, cert_id),
     ).fetchall()
 
 

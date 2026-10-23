@@ -1,4 +1,8 @@
 {
+  "name": "Datadog Fundamentals",
+  "vendor": "Datadog",
+  "description": "Entry-level Datadog certification: installing and running the Agent, data collection, tagging, dashboards, monitors and troubleshooting.",
+  "docs_url": "https://docs.datadoghq.com/",
   "domains": [
     {
       "name": "Essential Concepts",

@@ -17,13 +17,13 @@
       <svg viewBox="0 0 24 24"><path d="M3 7h4l10 10h4M3 17h4l3-3M14 10l3-3h4M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>
     </div>
     <h2>Random exam</h2>
-    <p>{{ exam_size }} questions drawn uniformly at random from the full bank of {{ bank_counts.questions }} questions, covering all six domains. Use it to see where you stand.</p>
+    <p>{{ exam_size }} questions drawn uniformly at random from the full bank of {{ bank_counts.questions }} questions, covering every exam domain. Use it to see where you stand.</p>
     <ul class="ticks">
       <li>Every question equally likely</li>
       <li>Answer order shuffled each time</li>
       <li>Good baseline before a targeted exam</li>
     </ul>
-    <button class="btn btn-primary btn-lg btn-block" type="submit">Start random exam</button>
+    <button class="btn btn-primary btn-lg btn-block" type="submit" {{ 'disabled' if not bank_counts.questions }}>Start random exam</button>
   </form>
 
   <form class="mode-card mode-card-accent" method="post" action="{{ url_for('main.start_exam') }}">

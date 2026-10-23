@@ -35,7 +35,7 @@
 <section class="card danger-zone">
   <h2>Danger zone</h2>
   <div class="danger-row">
-    <div><strong>Reset progress</strong><p class="muted small">Deletes every exam, recorded answer and flash card rating for “{{ current_user.name }}”. The question bank is not affected.</p></div>
+    <div><strong>Reset progress</strong><p class="muted small">Deletes every exam, recorded answer and flash card rating for “{{ current_user.name }}”, in every certification. The question bank is not affected.</p></div>
     <form method="post" onsubmit="return confirm('Delete all your progress? This cannot be undone.');">
       <input type="hidden" name="action" value="reset">
       <button class="btn btn-danger" type="submit">Reset progress</button>
